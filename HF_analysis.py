@@ -26,28 +26,25 @@ import time
 
 #%%
 
-def filter_duplicates2(x):
+def filter_duplicates(x):
+    """
+    input dataframe, df.x, eg. df.localisation
+    output value 
+    """
     xx = []
     # get only values
-    for i in x:
+    for i in x:  #for the values in the df x
         if not np.isnan(i):
             xx.append(i)    
     if len(xx)==0:
         return np.nan
     else:
-        xxx = [round(i, 2) for i in xx]
+        xxx = [np.round(i, 2) for i in xx]
         if len(set(xxx))==1:
-            return mean(xx)
+            return np.mean(xx)
         else:
             return np.nan
 
-
-def filter_duplicates(x):
-    xx = [round(i, 2) for i in x]
-    if len(set(xx))==1:
-        return mean(x)
-    else:
-        return 'err'
 
 sh = '/Users/Georgia/Code/MBQD/lattice-simulations/'
    
@@ -56,7 +53,7 @@ centre=25;
 form='MG' #
 
 df = pd.read_csv(sh+'analysis_gaus_complex.csv', 
-                 index_col=False)
+                 index_col=False, dtype={'hopping':np.complex128})
 
 for a in [10]:
     for b in [0.1]:
@@ -74,6 +71,7 @@ for a in [10]:
                 for i, omega in enumerate(np.arange(3.7, 20, step=0.1)):
                     omega = round(omega, 1)
                     print(omega)
+                    #%%
                     
                     """
                     HF
@@ -159,17 +157,23 @@ for a in [10]:
                            next_onsite,
                            NNN,
                            NNN_overtop]
-                
-            
+
+            #%%
                 df = df.append(df1, ignore_index=True, sort=False)
+                df= df.astype(dtype={'hopping': np.complex128, 
+                     'onsite':np.complex128,
+                     'next onsite':np.complex128,
+                     'NNN':np.complex128,
+                     'NNN overtop':np.complex128,
+                     })
                 
                 df = df.groupby(['form','a', 'b', 'c', 'omega', 'phi', 
-                                 'N']).agg({'localisation': filter_duplicates2,
-                                        'hopping':filter_duplicates2,
-                                        'onsite':filter_duplicates2,
-                                        'next onsite':filter_duplicates2,
-                                        'NNN':filter_duplicates2,
-                                        'NNN overtop':filter_duplicates2
+                                 'N']).agg({'localisation': filter_duplicates,
+                                        'hopping':filter_duplicates,
+                                        'onsite':filter_duplicates,
+                                        'next onsite':filter_duplicates,
+                                        'NNN':filter_duplicates,
+                                        'NNN overtop':filter_duplicates
                                         }).reset_index()
                 df.to_csv(sh+'analysis_gaus_complex.csv',
                           index=False, 
@@ -179,25 +183,7 @@ for a in [10]:
                                     'NNN overtop'])
     
 
-# single site
-#df = df.groupby(['a','omega', 'phi', 
-#                    'N']).agg({'localisation': filter_duplicates2,
-#                            'hopping':filter_duplicates2,
-#                            'onsite':filter_duplicates2,
-#                            'next onsite':filter_duplicates2,
-#                            'NNN':filter_duplicates2,
-#                            'NNN overtop':filter_duplicates2}).reset_index()
 
-# gaussian
-#df = df.groupby(['form','a', 'b', 'c', 'omega', 'phi', 
-#                 'N']).agg({'localisation': filter_duplicates2,
-#                            'hopping':filter_duplicates2,
-#                            'onsite':filter_duplicates2,
-#                            'next onsite':filter_duplicates2,
-#                            'NNN':filter_duplicates2,
-#                            'NNN overtop':filter_duplicates2}).reset_index()
-    
-        
 # single site modulation
 #df.to_csv('/Users/Georgia/Code/MBQD/lattice-simulations/analysis4.csv',
 #          index=False, columns=['a','omega', 'phi', 'N', 'localisation', 
