@@ -11,18 +11,18 @@ and other parameters
 """
 
 from numpy.linalg import eig
-from cmath import phase
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
-from numpy import exp, sin, cos, pi, log
+from numpy import  pi, log
 import numpy as np
 import matplotlib.pyplot as plt
 
 from scipy.integrate import solve_ivp
 from scipy.special import jv, jn_zeros
-import pandas as pd
-from numpy import mean 
+import pandas as pd 
 import time
+
+from hamiltonians import F_MG, F_OSC
 
 #%%
 
@@ -44,7 +44,36 @@ def filter_duplicates(x):
             return np.mean(xx)
         else:
             return np.nan
+        
+        
+def solve_schrodinger(form, N, centre, a, b, c, omega, phi, tspan, psi0):
+    """
+    solve time dependent schrodinger eq given initial conditions psi0, over
+    time tspan, for Hamiltonian signified by 'form'
+    """
+    
+    t_eval = np.linspace(tspan[0], tspan[1], 100)
+    if form=='OSC':
+        sol= solve_ivp(lambda t,psi: F_OSC(t, psi, 
+                           N, centre,
+                             a,
+                             omega, phi), 
+            t_span=tspan, y0=psi0, rtol=1e-7, 
+            atol=1e-7, t_eval=t_eval,
+            method='RK45')
+    elif form=='MG':
+        sol = solve_ivp(lambda t,psi: F_MG(t, psi, 
+                           N, centre,
+                             a,
+                             b, c,
+                             omega, phi), 
+            t_span=tspan, y0=psi0, rtol=1e-7, 
+            atol=1e-7, t_eval=t_eval,
+            method='RK45')
+    return sol
 
+def convert_complex(s):
+    return np.complex(s.replace('i', 'j'))
 
 sh = '/Users/Georgia/Code/MBQD/lattice-simulations/'
    
@@ -52,13 +81,29 @@ N = 51;
 centre=25;
 form='MG' #
 
-df = pd.read_csv(sh+'analysis_gaus_complex.csv', 
-                 index_col=False, dtype={'hopping':np.complex128})
 
-for a in [10]:
-    for b in [0.1]:
-        for c in [0.1]:
-            for phi in [pi/2]:
+df_dtype_dict = {'form':str,'a':np.float64, 'b':np.float64,'c':np.float64,
+            'omega':np.float64, 'phi':np.float64, 'N':int,
+            'localisation':np.float64, 'hopping':np.complex128,
+            'onsite':np.complex128, 'next onsite':np.complex128,
+            'NNN':np.complex128, 'NNN overtop':np.complex128}
+
+df = pd.read_csv(sh+'analysis_gaus_complex.csv', 
+                 index_col=False, 
+                 converters={'hopping': convert_complex,
+                             'onsite':convert_complex,
+                             'next onsite':convert_complex,
+                             'NNN':convert_complex, 
+                             'NNN overtop':convert_complex,
+                                              })
+
+
+#%%
+
+for a in [5, 10, 15, 20, 25, 30, 35]:
+    for b in [0.1,1]:
+        for c in [0.1,1]:
+            for phi in [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]:
                 print('a=',a,' b=',b,' c=',c,'  phi=',phi)
                 df1 = pd.DataFrame(columns=['form',
                                             'a', 
@@ -71,7 +116,7 @@ for a in [10]:
                 for i, omega in enumerate(np.arange(3.7, 20, step=0.1)):
                     omega = round(omega, 1)
                     print(omega)
-                    #%%
+                    
                     
                     """
                     HF
@@ -79,20 +124,13 @@ for a in [10]:
                     start = time.time()
                     T=2*pi/omega
                     tspan = (0,T)
-                    t_eval = np.linspace(tspan[0], tspan[1], 100)
                     UT = np.zeros([N,N], dtype=np.complex_)
                     for A_site_start in range(N):
-                    #    print(A_site_start)
                         psi0 = np.zeros(N, dtype=np.complex_); 
                         psi0[A_site_start] = 1;
-                        sol = solve_ivp(lambda t,psi: F_MG(t, psi, 
-                                                           N, centre,
-                                                             a,
-                                                             b, c,
-                                                             omega, phi), 
-                                            tspan, psi0, rtol=1e-7, 
-                                            atol=1e-7, t_eval=t_eval,
-                                            method='RK45')
+                        sol = solve_schrodinger(form, N, centre,
+                                                a, b, c, omega, 
+                                                phi, tspan, psi0)
                         UT[:,A_site_start]=sol.y[:,-1]
                         
                     evals_U, evecs = eig(UT)
@@ -108,23 +146,11 @@ for a in [10]:
                     """
                     psi0 = np.zeros(N, dtype=np.complex_); psi0[centre] = 1;
                     tspan = (0, 10)
-                    t_eval = np.linspace(tspan[0], tspan[1], 100)
-                    # single site
-            #            sol = solve_ivp(lambda t,psi: F_OSC(t, psi, N,
-            #                                       centre, a, omega, phi),
-            #                        t_span=tspan, y0=psi0, rtol=1e-6, 
-    #                                            atol=1e-6, t_eval=t_eval, 
-            #                        method='RK45')
-                    
-                    # gaussian
-                    sol = solve_ivp(lambda t,psi: F_MG(t, psi,
-                                                       N, centre, 
-                                                       a, b, c, 
-                                                       omega, phi),
-                                t_span=tspan, y0=psi0, rtol=1e-6, 
-                                atol=1e-6, t_eval=t_eval, 
-                                method='RK45')
-                    
+                    sol = solve_schrodinger(form, N, centre, 
+                                            a, b, c, omega, phi, 
+                                            tspan, psi0)
+
+
                     localisation = np.sum(abs(sol.y[centre]))/len(sol.t)
                     hopping=HF[centre][centre+1]
                     onsite = HF[centre][centre]
@@ -133,18 +159,6 @@ for a in [10]:
                     NNN_overtop=HF[centre-1][centre+1]
                     print('   ',time.time()-start, 's')
                     
-                    # single site
-            #           df1.loc[i] = [a, 
-            #                   omega, phi, 
-            #                   N,
-            #                   localisation,
-            #                   hopping,
-            #                   onsite,
-            #                   next_onsite,
-            #                   NNN,
-            #                   NNN_overtop]
-                    
-                    # gaussian
                     df1.loc[i] = [form, 
                            a,
                             b,
@@ -158,44 +172,25 @@ for a in [10]:
                            NNN,
                            NNN_overtop]
 
-            #%%
+            
                 df = df.append(df1, ignore_index=True, sort=False)
-                df= df.astype(dtype={'hopping': np.complex128, 
-                     'onsite':np.complex128,
-                     'next onsite':np.complex128,
-                     'NNN':np.complex128,
-                     'NNN overtop':np.complex128,
-                     })
+                df= df.astype(dtype=df_dtype_dict)
                 
-                df = df.groupby(['form','a', 'b', 'c', 'omega', 'phi', 
-                                 'N']).agg({'localisation': filter_duplicates,
+                df = df.groupby(by=['form','a', 'b', 'c', 'omega', 'phi', 
+                                 'N'], dropna=False).agg({'localisation': filter_duplicates,
                                         'hopping':filter_duplicates,
                                         'onsite':filter_duplicates,
                                         'next onsite':filter_duplicates,
                                         'NNN':filter_duplicates,
                                         'NNN overtop':filter_duplicates
                                         }).reset_index()
+                
                 df.to_csv(sh+'analysis_gaus_complex.csv',
                           index=False, 
                           columns=['form', 'a','b', 'c', 'omega', 'phi',
-                                   'N', 'localisation', 'hopping', 
-                                   'onsite', 'next onsite', 'NNN',
+                                  'N', 'localisation', 'hopping', 
+                                  'onsite', 'next onsite', 'NNN',
                                     'NNN overtop'])
-    
-
-
-# single site modulation
-#df.to_csv('/Users/Georgia/Code/MBQD/lattice-simulations/analysis4.csv',
-#          index=False, columns=['a','omega', 'phi', 'N', 'localisation', 
-#                                'hopping', 'onsite', 'next onsite', 'NNN',
-#                                'NNN overtop'])
-  
-# gaussian     
-#df.to_csv(sh+'analysis_gaus_complex.csv',
-#          index=False, columns=['form','a','b', 'c', 'omega', 'phi', 'N',
-#                                'localisation', 
-#                                'hopping', 'onsite', 'next onsite', 'NNN',
-#                                'NNN overtop'])
     
 
     
