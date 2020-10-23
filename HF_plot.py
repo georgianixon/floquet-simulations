@@ -175,11 +175,12 @@ fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
 ##              +', phi2='+str("{:.2f}".format(phi2/pi))+'pi'+
 #              ')', fontsize=16)
 #             
-fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
-        'first_year_report/HF,MGSTA,a=30,b=1,c=1,w=5,ph=0.pdf', 
-        format='pdf', bbox_inches='tight')
+#fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
+#        'first_year_report/HF,MGSTA,a=30,b=1,c=1,w=5,ph=0.pdf', 
+#        format='pdf', bbox_inches='tight')
 plt.show()
 #%%
+
 
 """
 Specific config we want for the paper

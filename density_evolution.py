@@ -20,7 +20,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 N = 51; A_site_start = 25;
 a = 30; 
 b=1; c=1;
-omega=7.83; phi=0; T=2*pi/omega
+omega=7.83; phi=pi/7; T=2*pi/omega
 centre = 25;
 tspan = (0,10)
 Nt = 100
@@ -130,12 +130,12 @@ import numpy as np
 
 N = 51; A_site_start = 25;
 a = 30; 
-b=1; c=1;
-omega=7.83; T=2*pi/omega
+b=0.1; c=0.1;
+omega=5; T=2*pi/omega
 centre = 25;
 tspan = (0,10)
 Nt = 100
-sz = 9
+sz = 14
 fig, ax = plt.subplots(nrows=2, ncols=3, sharey=True, constrained_layout=True, 
                        figsize=(sz,sz/2))
 
@@ -145,8 +145,10 @@ for nn, phi in enumerate([0, pi/2]):
     
     psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
     
-    sol = solve_ivp(lambda t,psi: F_OSC(t, psi, N, centre,
+    sol = solve_ivp(lambda t,psi: F_MG(t, psi, N, centre,
                                                          a,
+                                                         b,
+                                                         c,
                                                          omega, phi), 
                                         tspan, psi0, rtol=1e-7, atol=1e-7,
                                         t_eval=t_eval, method='RK45')
@@ -179,9 +181,9 @@ fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.825, 0.15, 0.01, 0.7])
 fig.colorbar(plt.cm.ScalarMappable(cmap='Purples'), cax=cbar_ax)# shrink=.5, pad=.01, aspect=10)
 #fig.suptitle('F = '+str(a)+', omega='+str(omega)+ ', phi='+str(phi))
-fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
-        'first_year_report/densityevolution,F=30,w=7p83.pdf', 
-        format='pdf', bbox_inches='tight')
+#fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
+#        'first_year_report/densityevolution,F=30,w=7p83.pdf', 
+#        format='pdf', bbox_inches='tight')
 plt.show()
     
 

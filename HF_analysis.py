@@ -57,15 +57,15 @@ sh = '/Users/Georgia/Code/MBQD/lattice-simulations/'
    
 N = 51; 
 centre=25;
-form='MG'
+form='MG' #
 
-df = pd.read_csv(sh+'analysis_gaus.csv', 
+df = pd.read_csv(sh+'analysis_gaus_complex.csv', 
                  index_col=False)
 
-for a in [5, 10, 15, 20, 25, 30, 35]:
-    for b in [1, 0.1]:
-        for c in [1, 0.1]:
-            for phi in [0, pi/2, pi/3, pi/4, pi/5, pi/6, pi/7]:
+for a in [10]:
+    for b in [0.1]:
+        for c in [0.1]:
+            for phi in [pi/2]:
                 print('a=',a,' b=',b,' c=',c,'  phi=',phi)
                 df1 = pd.DataFrame(columns=['form',
                                             'a', 
@@ -79,6 +79,9 @@ for a in [5, 10, 15, 20, 25, 30, 35]:
                     omega = round(omega, 1)
                     print(omega)
                     
+                    """
+                    HF
+                    """  
                     start = time.time()
                     T=2*pi/omega
                     tspan = (0,T)
@@ -98,9 +101,6 @@ for a in [5, 10, 15, 20, 25, 30, 35]:
                                             method='RK45')
                         UT[:,A_site_start]=sol.y[:,-1]
                         
-                    
-                            
-                    
                     evals_U, evecs = eig(UT)
                     evals_H = 1j / T *log(evals_U)
                 
@@ -132,11 +132,11 @@ for a in [5, 10, 15, 20, 25, 30, 35]:
                                 method='RK45')
                     
                     localisation = np.sum(abs(sol.y[centre]))/len(sol.t)
-                    hopping=-np.abs(HF)[centre][centre+1]
-                    onsite = np.abs(HF)[centre][centre]
-                    next_onsite=np.abs(HF)[centre+1][centre+1]
-                    NNN = -np.abs(HF)[centre][centre+2]
-                    NNN_overtop=-np.abs(HF)[centre-1][centre+1]
+                    hopping=HF[centre][centre+1]
+                    onsite = HF[centre][centre]
+                    next_onsite=HF[centre+1][centre+1]
+                    NNN = HF[centre][centre+2]
+                    NNN_overtop=HF[centre-1][centre+1]
                     print('   ',time.time()-start, 's')
                     
                     # single site
@@ -175,7 +175,7 @@ for a in [5, 10, 15, 20, 25, 30, 35]:
                                         'NNN':filter_duplicates2,
                                         'NNN overtop':filter_duplicates2
                                         }).reset_index()
-                df.to_csv(sh+'analysis_gaus.csv',
+                df.to_csv(sh+'analysis_gaus_complex.csv',
                           index=False, 
                           columns=['form', 'a','b', 'c', 'omega', 'phi',
                                    'N', 'localisation', 'hopping', 
@@ -193,13 +193,13 @@ for a in [5, 10, 15, 20, 25, 30, 35]:
 #                            'NNN overtop':filter_duplicates2}).reset_index()
 
 # gaussian
-df = df.groupby(['form','a', 'b', 'c', 'omega', 'phi', 
-                 'N']).agg({'localisation': filter_duplicates2,
-                            'hopping':filter_duplicates2,
-                            'onsite':filter_duplicates2,
-                            'next onsite':filter_duplicates2,
-                            'NNN':filter_duplicates2,
-                            'NNN overtop':filter_duplicates2}).reset_index()
+#df = df.groupby(['form','a', 'b', 'c', 'omega', 'phi', 
+#                 'N']).agg({'localisation': filter_duplicates2,
+#                            'hopping':filter_duplicates2,
+#                            'onsite':filter_duplicates2,
+#                            'next onsite':filter_duplicates2,
+#                            'NNN':filter_duplicates2,
+#                            'NNN overtop':filter_duplicates2}).reset_index()
     
         
 # single site modulation
@@ -208,12 +208,12 @@ df = df.groupby(['form','a', 'b', 'c', 'omega', 'phi',
 #                                'hopping', 'onsite', 'next onsite', 'NNN',
 #                                'NNN overtop'])
   
-# gaussian      
-df.to_csv(sh+'analysis_gaus.csv',
-          index=False, columns=['form','a','b', 'c', 'omega', 'phi', 'N',
-                                'localisation', 
-                                'hopping', 'onsite', 'next onsite', 'NNN',
-                                'NNN overtop'])
+# gaussian     
+#df.to_csv(sh+'analysis_gaus_complex.csv',
+#          index=False, columns=['form','a','b', 'c', 'omega', 'phi', 'N',
+#                                'localisation', 
+#                                'hopping', 'onsite', 'next onsite', 'NNN',
+#                                'NNN overtop'])
     
 
     
@@ -228,7 +228,7 @@ df = pd.read_csv('/Users/Georgia/Code/MBQD/lattice-simulations/analysis_gaus.csv
                  index_col=False)
 
 #plt.figure(figsize=(14,7))
-sz = 7
+sz = 12
 fig, ax = plt.subplots(figsize=(sz,sz/1.72))
 c = 1
 for a in [30]:
@@ -248,8 +248,8 @@ for a in [30]:
         #                     )
                 look='localisation'
                 look = 'hopping'
-#                look = 'onsite'
-#                look = 'next onsite'
+                look = 'onsite'
+                look = 'next onsite'
 #                look = 'NNN'
 #                look = 'NNN overtop'
         #        
@@ -261,7 +261,7 @@ for a in [30]:
 #                    continue
                 
         
-                ax.plot(df_plot['omega'], df_plot[look],
+                ax.plot(df_plot['omega'], df_plot[look], '.',
                          label=r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$')
             
         #    ax.vlines(a/jn_zeros(0,4), -0.4, 0.4, 
@@ -287,9 +287,9 @@ ax.set_xlabel(r'$\omega$')
 ax.legend()
 ax.set_xlim(xmin=3.7)
 #
-fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
-            'first_year_report/MGtunneling,a=30,b=0p1,c=1.pdf', 
-            format='pdf', bbox_inches='tight')
+#fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
+#            'first_year_report/MGtunneling,a=30,b=0p1,c=1.pdf', 
+#            format='pdf', bbox_inches='tight')
 
 
 plt.show()
@@ -359,9 +359,9 @@ ax.set_xlabel(r'$\omega$')
 ax.legend()
 ax.set_xlim(xmin=3.7)
 
-fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
-            'first_year_report/tunnelingmatrixelementsF=30.pdf', 
-            format='pdf', bbox_inches='tight')
+#fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
+#            'first_year_report/tunnelingmatrixelementsF=30.pdf', 
+#            format='pdf', bbox_inches='tight')
 
 
 plt.show()
@@ -405,9 +405,9 @@ for n1, look in enumerate(['hopping', 'onsite']):
 handles, labels = ax[0,0].get_legend_handles_labels()    
 fig.legend(handles, labels, loc='best')
 ##
-fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
-            'first_year_report/MG,onsite,tunneling,a=30.pdf', 
-            format='pdf', bbox_inches='tight')
+#fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
+#            'first_year_report/MG,onsite,tunneling,a=30.pdf', 
+#            format='pdf', bbox_inches='tight')
 
 
 plt.show()
