@@ -26,10 +26,6 @@ import time
 
 #%%
 
-def bandwidth(N):
-    evals, _ = eig(H_0(N))
-    return max(evals) - min(evals)
-
 def filter_duplicates2(x):
     xx = []
     # get only values
