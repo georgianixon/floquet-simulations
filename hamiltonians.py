@@ -5,7 +5,7 @@ Created on Mon Aug 17 14:25:20 2020
 @author: Georgia
 """
 
-from numpy import exp, sin, cos, pi
+from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -202,6 +202,10 @@ def F_MGSTA(t, psi, N, centre, a, b, c, omega, phi):
 def F_OSC(t, psi, N, centre, a, omega, phi):
     return -1j*np.dot(HT_OSC(N, centre, a, omega, t, phi),psi)
 
+# one site cosine 
+def F_OSC_i(t, psi, N, centre, a, omega, phi):
+    return -1*np.dot(HT_OSC(N, centre, a, omega, t, phi),psi)
+
 # two site cosine 
 def F_OSC2(t, psi, N, centre1, centre2, a1, a2, omega, phi1, phi2):
     return -1j*np.dot(HT_OSC2(N, centre1, centre2, a1, a2, omega,
@@ -225,3 +229,109 @@ def F_Linear(t, psi, N, a, omega, phi):
 # no energy offset at all
 def F_0(t, psi, N):
     return -1j*np.dot(H_0(N), psi)
+
+
+def F_HF(t, psi, HF):
+    return -1j*np.dot(HF, psi)
+
+
+#%%
+'''
+Create HF OFC
+'''
+
+
+
+def solve_schrodinger(form, N, centre, a, b, c, omega, phi, tspan, psi0, avg=False):
+    """
+    solve time dependent schrodinger eq given initial conditions psi0, over
+    time tspan, for Hamiltonian signified by 'form'
+    """
+    
+    t_eval = np.linspace(tspan[0], tspan[1], 100)
+    
+    if avg == True:
+        UT, HF = create_HF(form, N, centre, a, b, c,  phi, omega)
+        sol= solve_ivp(lambda t,psi: F_HF(t, psi, HF), 
+            t_span=tspan, y0=psi0, rtol=1e-7, 
+            atol=1e-7, t_eval=t_eval,
+            method='RK45')
+    
+    
+    elif form=='OSC' or form=='OSC_sort':
+        sol= solve_ivp(lambda t,psi: F_OSC(t, psi, 
+                           N, centre,
+                             a,
+                             omega, phi), 
+            t_span=tspan, y0=psi0, rtol=1e-7, 
+            atol=1e-7, t_eval=t_eval,
+            method='RK45')
+    elif form=='OSC_i':
+        sol= solve_ivp(lambda t,psi: F_OSC_i(t, psi, 
+                           N, centre,
+                             a,
+                             omega, phi), 
+            t_span=tspan, y0=psi0, rtol=1e-7, 
+            atol=1e-7, t_eval=t_eval,
+            method='RK45')
+    elif form=='MG':
+        sol = solve_ivp(lambda t,psi: F_MG(t, psi, 
+                           N, centre,
+                             a,
+                             b, c,
+                             omega, phi), 
+            t_span=tspan, y0=psi0, rtol=1e-7, 
+            atol=1e-7, t_eval=t_eval,
+            method='RK45')
+    elif form =='linear':
+        sol= solve_ivp(lambda t,psi: F_Linear(t, psi, N, a, omega, phi), 
+            t_span=tspan, y0=psi0, rtol=1e-7, 
+            atol=1e-7, t_eval=t_eval,
+            method='RK45')
+        
+    elif form == 'MGSTA':
+        sol = solve_ivp(lambda t,psi: F_MGSTA(t, psi, N, 
+                                         centre,
+                                         a, 
+                                         b,
+                                         c,
+                                         omega, 
+                                         phi), 
+                        tspan, psi0, rtol=1e-7, atol=1e-7)
+        
+    return sol
+
+
+from numpy.linalg import eig
+
+def create_HF(form, N, centre, a,b, c,phi, omega): 
+    T=2*pi/omega
+    tspan = (0,T)
+    UT = np.zeros([N,N], dtype=np.complex_)
+    # start = time.time()
+    for A_site_start in range(N):
+    #    print(A_site_start)
+        psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
+        sol = solve_schrodinger(form, N, centre, a, b, c, omega, phi,  tspan, psi0)
+        UT[:,A_site_start]=sol.y[:,-1]
+    
+    # print(time.time()-start, 'seconds.')
+    
+    evals_U, evecs = eig(UT)
+    
+    if form=='OSC_sort':
+        '''new order sort thing'''
+        idx = evals_U.argsort()[::-1]   
+        evals_U = evals_U[idx]
+        evecs = evecs[:,idx]
+
+    evals_H = 1j / T *log(evals_U)
+    
+    HF = np.zeros([N,N], dtype=np.complex_)
+    for i in range(N):
+        term = evals_H[i]*np.outer(evecs[:,i], evecs[:,i])
+        HF = HF+term
+        
+    # print('   ',time.time()-start, 's')
+    
+    return UT, HF
