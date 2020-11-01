@@ -1,0 +1,152 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 27 14:08:09 2020
+
+@author: Georgia
+"""
+
+"""
+Create csv that gives hopping as a function of a, omega, type of hamiltonian,
+and other parameters
+"""
+
+from numpy.linalg import eig
+import matplotlib.colors as col
+norm = col.Normalize(vmin=-1, vmax=1) 
+from numpy import  pi, log
+import numpy as np
+from scipy.integrate import solve_ivp
+import pandas as pd 
+import time
+from hamiltonians import F_MG, F_OSC, F_OSC_i, create_HF, solve_schrodinger
+
+#%%
+
+def filter_duplicates(x):
+    """
+    input dataframe, df.x, eg. df.localisation
+    output value 
+    """
+    xx = []
+    # get only values
+    for i in x:  #for the values in the df x
+        if not np.isnan(i):
+            xx.append(i)    
+    if len(xx)==0:
+        return np.nan
+    else:
+        xxx = [np.round(i, 2) for i in xx]
+        if len(set(xxx))==1:
+            return np.mean(xx)
+        else:
+            return np.nan
+        
+
+def convert_complex(s):
+    return np.complex(s.replace('i', 'j'))
+
+sh = '/Users/Georgia/Code/MBQD/lattice-simulations/'
+
+
+df_dtype_dict = {'form':str,'a':np.float64, 'b':np.float64,'c':np.float64,
+            'omega':np.float64, 'phi':np.float64, 'N':int,
+            'localisation':np.float64, 'hopping':np.complex128,
+            'onsite':np.complex128, 'next onsite':np.complex128,
+            'NNN':np.complex128, 'NNN overtop':np.complex128}
+
+df = pd.read_csv(sh+'analysis_gaus_complex.csv', 
+                 index_col=False, 
+                 converters={'hopping': convert_complex,
+                             'onsite':convert_complex,
+                             'next onsite':convert_complex,
+                             'NNN':convert_complex, 
+                             'NNN overtop':convert_complex,
+                                              })
+
+
+#%%
+
+
+N = 51; 
+centre=25;
+form='OSC_i' 
+aas = [35]
+bs = [np.nan]
+cs = [np.nan]
+phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+
+for a in aas:
+    for b in bs:
+        for c in cs:
+            for phi in phis:
+                print('a=',a,' b=',b,' c=',c,'  phi=',phi)
+                df1 = pd.DataFrame(columns=['form',
+                                            'a', 
+                                            'b', 'c', 
+                                            'omega', 'phi', 'N', 
+                                            'localisation', 
+                                            'hopping', 'onsite', 
+                                            'next onsite', 'NNN',
+                                            'NNN overtop'])
+                for i, omega in enumerate(np.arange(3.7, 20, step=0.1)):
+                    omega = round(omega, 1)
+                    print(omega)
+                    
+                    
+                    """
+                    HF
+                    """  
+                    UT, HF = create_HF(form, N, centre, a,b, c,phi, omega)
+                        
+                    """
+                    Localisation
+                    """
+                    psi0 = np.zeros(N, dtype=np.complex_); psi0[centre] = 1;
+                    tspan = (0, 10)
+                    sol = solve_schrodinger(form, N, centre, 
+                                            a, b, c, omega, phi, 
+                                            tspan, psi0)
+
+
+                    localisation = np.sum(abs(sol.y[centre]))/len(sol.t)
+                    hopping=HF[centre][centre+1]
+                    onsite = HF[centre][centre]
+                    next_onsite=HF[centre+1][centre+1]
+                    NNN = HF[centre][centre+2]
+                    NNN_overtop=HF[centre-1][centre+1]
+                    
+                    # print('   ',time.time()-start, 's')
+                    
+                    df1.loc[i] = [form, 
+                           a,
+                            b,
+                            c,
+                           omega, phi, 
+                           N,
+                           localisation,
+                           hopping,
+                           onsite,
+                           next_onsite,
+                           NNN,
+                           NNN_overtop]
+
+            
+                df = df.append(df1, ignore_index=True, sort=False)
+                df= df.astype(dtype=df_dtype_dict)
+                
+                df = df.groupby(by=['form','a', 'b', 'c', 'omega', 'phi', 
+                                 'N'], dropna=False).agg({'localisation': filter_duplicates,
+                                        'hopping':filter_duplicates,
+                                        'onsite':filter_duplicates,
+                                        'next onsite':filter_duplicates,
+                                        'NNN':filter_duplicates,
+                                        'NNN overtop':filter_duplicates
+                                        }).reset_index()
+                
+                df.to_csv(sh+'analysis_gaus_complex.csv',
+                          index=False, 
+                          columns=['form', 'a','b', 'c', 'omega', 'phi',
+                                  'N', 'localisation', 'hopping', 
+                                  'onsite', 'next onsite', 'NNN',
+                                    'NNN overtop'])
+    
