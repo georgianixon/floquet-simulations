@@ -113,12 +113,6 @@ def HT_Linear(N, a, omega, t, phi):
 def line(N, a, i):
     return a*(2*i / (N-1) - 1)
 
-def HT_Linear1(N, a, omega, t, phi):
-    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)  
-    for i in range(N):
-        matrix[i][i] = line(N, a, i)*cos(omega*t + phi)
-    return matrix
-
 #HT_Linear(6, 4, 1, 0, 0)
 
 
@@ -242,7 +236,7 @@ Create HF OFC
 
 
 
-def solve_schrodinger(form, N, centre, a, b, c, omega, phi, tspan, psi0, avg=False):
+def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, avg=False):
     """
     solve time dependent schrodinger eq given initial conditions psi0, over
     time tspan, for Hamiltonian signified by 'form'
@@ -251,10 +245,12 @@ def solve_schrodinger(form, N, centre, a, b, c, omega, phi, tspan, psi0, avg=Fal
     t_eval = np.linspace(tspan[0], tspan[1], 100)
     
     if avg == True:
-        UT, HF = create_HF(form, N, centre, a, b, c,  phi, omega)
+        UT, HF = create_HF(form, rtol, N, centre, a, b, c,  phi, omega)
+        # find eigenvalues
+        
         sol= solve_ivp(lambda t,psi: F_HF(t, psi, HF), 
-            t_span=tspan, y0=psi0, rtol=1e-7, 
-            atol=1e-7, t_eval=t_eval,
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
             method='RK45')
     
     
@@ -263,16 +259,16 @@ def solve_schrodinger(form, N, centre, a, b, c, omega, phi, tspan, psi0, avg=Fal
                            N, centre,
                              a,
                              omega, phi), 
-            t_span=tspan, y0=psi0, rtol=1e-7, 
-            atol=1e-7, t_eval=t_eval,
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
             method='RK45')
     elif form=='OSC_i':
         sol= solve_ivp(lambda t,psi: F_OSC_i(t, psi, 
                            N, centre,
                              a,
                              omega, phi), 
-            t_span=tspan, y0=psi0, rtol=1e-7, 
-            atol=1e-7, t_eval=t_eval,
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
             method='RK45')
     elif form=='MG':
         sol = solve_ivp(lambda t,psi: F_MG(t, psi, 
@@ -280,14 +276,16 @@ def solve_schrodinger(form, N, centre, a, b, c, omega, phi, tspan, psi0, avg=Fal
                              a,
                              b, c,
                              omega, phi), 
-            t_span=tspan, y0=psi0, rtol=1e-7, 
-            atol=1e-7, t_eval=t_eval,
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
             method='RK45')
+        
     elif form =='linear':
         sol= solve_ivp(lambda t,psi: F_Linear(t, psi, N, a, omega, phi), 
-            t_span=tspan, y0=psi0, rtol=1e-7, 
-            atol=1e-7, t_eval=t_eval,
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
             method='RK45')
+    
         
     elif form == 'MGSTA':
         sol = solve_ivp(lambda t,psi: F_MGSTA(t, psi, N, 
@@ -297,22 +295,22 @@ def solve_schrodinger(form, N, centre, a, b, c, omega, phi, tspan, psi0, avg=Fal
                                          c,
                                          omega, 
                                          phi), 
-                        tspan, psi0, rtol=1e-7, atol=1e-7)
+                        tspan, psi0, rtol=rtol, atol=rtol)
         
     return sol
 
 
 from numpy.linalg import eig
 
-def create_HF(form, N, centre, a,b, c,phi, omega): 
+def create_HF(form, rtol, N, centre, a,b, c,phi, omega): 
     T=2*pi/omega
     tspan = (0,T)
     UT = np.zeros([N,N], dtype=np.complex_)
-    # start = time.time()
+    
     for A_site_start in range(N):
     #    print(A_site_start)
         psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = solve_schrodinger(form, N, centre, a, b, c, omega, phi,  tspan, psi0)
+        sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi,  tspan, psi0)
         UT[:,A_site_start]=sol.y[:,-1]
     
     # print(time.time()-start, 'seconds.')

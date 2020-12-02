@@ -9,17 +9,16 @@ Created on Thu Sep 10 15:55:49 2020
 from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy.linalg import eig
-
-from scipy.integrate import solve_ivp
-from scipy.special import jv, jn_zeros
 import pandas as pd
-
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+import sys
+sys.path.append('/Users/Georgia/Code/MBQD/lattice-simulations')
 from hamiltonians import F_MG, F_OSC, create_HF, solve_schrodinger
 
 import matplotlib
 import seaborn as sns
+
+from math import log as mathlog
+
 
 size=15
 params = {
@@ -50,38 +49,42 @@ a = 35;
 b = np.nan
 c = np.nan 
 omega=10; 
-phi=pi/7; T=2*pi/omega
+phi=pi/2;
+T=2*pi/omega
 tspan = (0,10)
 Nt = 100
-form = 'OSC'
+form = 'linear'
+rtol=1e-7
 
 t_eval = np.linspace(tspan[0], tspan[1], Nt)
 psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
 
-sol = solve_schrodinger(form, N, centre, a, b, c, omega, phi, tspan, psi0, avg=0)
 
-sz = 20
-print(sol.y[25][0])
-print(sol.y[25][-1])
-fig, ax = plt.subplots(figsize=(sz,sz/2))
-ax.matshow((np.abs(sol.y))**2, interpolation='none', cmap='Purples')
-fig.colorbar(plt.cm.ScalarMappable(cmap='Purples'))
-plt.show()
 
-fig, ax = plt.subplots(figsize=(sz,sz/2))
-ax.matshow(np.abs(sol.y), interpolation='none', cmap='Purples')
-fig.colorbar(plt.cm.ScalarMappable(cmap='Purples'))
-plt.show()
+import numpy as np
+import matplotlib as mpl
+
+cmap= mpl.cm.get_cmap('Purples')
+normaliser= mpl.colors.Normalize(vmin=0,vmax=1)
+
+sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, avg=1)
+
+sz = 10
+
 
 fig, ax = plt.subplots(figsize=(sz,sz/2))
-ax.plot(sol.t, np.abs(sol.y)[25])
+ax.plot(t_eval,(np.abs(sol.y)[25])**2)
+ax.set_title('occupation of centre site')
+ax.set_xlabel('t')
 plt.show()
 
+
+sz=20
 fig, ax = plt.subplots(nrows=1, ncols=3, sharey=True, constrained_layout=True, 
                         figsize=(sz,sz/2))
-ax[0].matshow(abs(sol.y)**2, interpolation='none', cmap='Purples')
-ax[1].matshow(np.real(sol.y), interpolation='none', cmap='Purples')
-ax[2].matshow(np.angle(sol.y), interpolation='none', cmap='Purples')
+ax[0].matshow(abs(sol.y)**2, interpolation='none', cmap=cmap, norm=normaliser)
+ax[1].matshow(np.real(sol.y), interpolation='none', cmap=cmap, norm=normaliser)
+ax[2].matshow(np.imag(sol.y), interpolation='none', cmap=cmap, norm=normaliser)
 ax[0].set_title(r'$|\psi(t)|^2$')
 ax[1].set_title(r'$\mathrm{Re}\{\psi(t)\}$')
 ax[2].set_title(r'$\mathrm{Imag}\{\psi(t)\}$')
@@ -95,13 +98,44 @@ for i in range(3):
     ax[i].set_xticklabels(x_labels)
     if i == 0:
         ax[i].set_ylabel('site')
-    
-fig.colorbar(plt.cm.ScalarMappable(cmap='Purples'), ax=ax, shrink=.5, pad=.01, aspect=10)
+
+
+fig.colorbar(plt.cm.ScalarMappable(cmap='Purples'), shrink=.5, pad=.05, aspect=15, fraction=.1)
 # fig.suptitle('F = '+str(a)+', omega='+str(omega)+ ', phi='+str(phi))
 # fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
 #         'first_year_report/densityevolution,F=30,w=7p83,ph=0.pdf', 
 #         format='pdf', bbox_inches='tight')
 plt.show()
 
+#%%
+
+N = 51; A_site_start = 25;
+centre = 25
+a = 35;
+b = np.nan
+c = np.nan 
+omega=10; 
+phi=pi/2;
+T=2*pi/omega
+tspan = (0,10)
+Nt = 100
+form = 'linear'
+rtol=1e-7
+
+from numpy.linalg import eig
+
+t_eval = np.linspace(tspan[0], tspan[1], Nt)
+psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
+
+UT, HF = create_HF(form, rtol, N, centre, a, b, c,  phi, omega)
+evals_H, evecs = eig(HF)
+sol = np.exp(-1j*np.outer(evals_H, t_eval))*(psi0.reshape(N,1))
+sol1 = np.inner(sol,evecs)
 
 
+# find eigenvalues
+
+        
+        
+        
+        

@@ -18,6 +18,8 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import pandas as pd 
 import time
+import sys
+sys.path.append('/Users/Georgia/Code/MBQD/lattice-simulations')
 from hamiltonians import F_MG, F_OSC, F_OSC_i, create_HF, solve_schrodinger
 
 #%%
@@ -66,21 +68,22 @@ df = pd.read_csv(sh+'analysis_gaus_complex.csv',
 
 #%%
 
-
-N = 51; 
-centre=25;
-form='OSC_i' 
+ # need tp dp 1e-6 phi = 0
+N = 21; 
+centre=10;
+form='linear' 
+rtol = 1e-11
 aas = [35]
 bs = [np.nan]
 cs = [np.nan]
-phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phis = [pi/4, pi/5, pi/6, pi/7, 0, pi/2, pi/3]
 
 for a in aas:
     for b in bs:
         for c in cs:
             for phi in phis:
                 print('a=',a,' b=',b,' c=',c,'  phi=',phi)
-                df1 = pd.DataFrame(columns=['form',
+                df1 = pd.DataFrame(columns=['form', 'rtol',
                                             'a', 
                                             'b', 'c', 
                                             'omega', 'phi', 'N', 
@@ -92,32 +95,33 @@ for a in aas:
                     omega = round(omega, 1)
                     print(omega)
                     
-                    
+                    start = time.time()
                     """
                     HF
                     """  
-                    UT, HF = create_HF(form, N, centre, a,b, c,phi, omega)
+                    UT, HF = create_HF(form, rtol, N, centre, a,b, c,phi, omega)
                         
                     """
                     Localisation
                     """
-                    psi0 = np.zeros(N, dtype=np.complex_); psi0[centre] = 1;
-                    tspan = (0, 10)
-                    sol = solve_schrodinger(form, N, centre, 
-                                            a, b, c, omega, phi, 
-                                            tspan, psi0)
-
-
-                    localisation = np.sum(abs(sol.y[centre]))/len(sol.t)
+                    # psi0 = np.zeros(N, dtype=np.complex_); psi0[centre] = 1;
+                    # tspan = (0, 10)
+                    # sol = solve_schrodinger(form, N, centre, 
+                    #                         a, b, c, omega, phi, 
+                    #                         tspan, psi0)
+                    # localisation = np.sum(abs(sol.y[centre]))/len(sol.t)
+                    localisation = np.nan
+                    
                     hopping=HF[centre][centre+1]
                     onsite = HF[centre][centre]
                     next_onsite=HF[centre+1][centre+1]
                     NNN = HF[centre][centre+2]
                     NNN_overtop=HF[centre-1][centre+1]
                     
-                    # print('   ',time.time()-start, 's')
+                    print('   ',time.time()-start, 's')
                     
                     df1.loc[i] = [form, 
+                                  rtol,
                            a,
                             b,
                             c,
@@ -134,7 +138,8 @@ for a in aas:
                 df = df.append(df1, ignore_index=True, sort=False)
                 df= df.astype(dtype=df_dtype_dict)
                 
-                df = df.groupby(by=['form','a', 'b', 'c', 'omega', 'phi', 
+                print('  grouping..')
+                df = df.groupby(by=['form', 'rtol', 'a', 'b', 'c', 'omega', 'phi', 
                                  'N'], dropna=False).agg({'localisation': filter_duplicates,
                                         'hopping':filter_duplicates,
                                         'onsite':filter_duplicates,
@@ -143,9 +148,10 @@ for a in aas:
                                         'NNN overtop':filter_duplicates
                                         }).reset_index()
                 
+                print('   saving..')
                 df.to_csv(sh+'analysis_gaus_complex.csv',
                           index=False, 
-                          columns=['form', 'a','b', 'c', 'omega', 'phi',
+                          columns=['form', 'rtol', 'a','b', 'c', 'omega', 'phi',
                                   'N', 'localisation', 'hopping', 
                                   'onsite', 'next onsite', 'NNN',
                                     'NNN overtop'])

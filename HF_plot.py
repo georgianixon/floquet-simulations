@@ -13,8 +13,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 import pandas as pd
-import time
-from hamiltonians import F_OSC, create_HF
+import sys
+sys.path.append('/Users/Georgia/Code/MBQD/lattice-simulations')
+from hamiltonians import create_HF
 
 import matplotlib
 
@@ -45,8 +46,12 @@ matplotlib.rcParams.update(params)
 #%%
 
 """
-Plot HF
+Plot HF---------------
+
+Set form = ... and other parameters
+Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
+
 
 N=51; centre=25; a=35; phi=0; omega=6.34
 form='OSC'
