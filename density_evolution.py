@@ -20,7 +20,7 @@ import seaborn as sns
 from math import log as mathlog
 
 
-size=15
+size=25
 params = {
             'legend.fontsize': 'small',
 #          'figure.figsize': (20,8),
@@ -43,17 +43,17 @@ matplotlib.rcParams.update(params)
 
 # choose particular HF
 
-N = 51; A_site_start = 25;
+N = 51; A_site_start = 35;
 centre = 25
 a = 35;
 b = np.nan
 c = np.nan 
-omega=10; 
-phi=pi/2;
+omega=6.34; 
+phi=0;
 T=2*pi/omega
 tspan = (0,10)
 Nt = 100
-form = 'linear'
+form = 'OSC'
 rtol=1e-7
 
 t_eval = np.linspace(tspan[0], tspan[1], Nt)
@@ -109,32 +109,58 @@ plt.show()
 
 #%%
 
+
+# plot only psi squared
+
 N = 51; A_site_start = 25;
-centre = 25
+centre = 20
 a = 35;
 b = np.nan
 c = np.nan 
-omega=10; 
-phi=pi/2;
+omega=6.34; 
+phi=0;
 T=2*pi/omega
 tspan = (0,10)
 Nt = 100
-form = 'linear'
+form = 'OSC'
 rtol=1e-7
 
-from numpy.linalg import eig
+cmap_name = 'Blues'
 
 t_eval = np.linspace(tspan[0], tspan[1], Nt)
 psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
 
-UT, HF = create_HF(form, rtol, N, centre, a, b, c,  phi, omega)
-evals_H, evecs = eig(HF)
-sol = np.exp(-1j*np.outer(evals_H, t_eval))*(psi0.reshape(N,1))
-sol1 = np.inner(sol,evecs)
+
+import numpy as np
+import matplotlib as mpl
+
+cmap= mpl.cm.get_cmap(cmap_name)
+normaliser= mpl.colors.Normalize(vmin=0,vmax=1)
+# normaliser= mpl.colors.LogNorm(vmin=0,vmax=1)
+
+sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, avg=1)
+
+sz=10
+fig, ax = plt.subplots(figsize=(sz,sz/2))
+ax.matshow(abs(sol.y)**2, interpolation='none', cmap=cmap, norm=normaliser)
+ax.set_title(r'$|\psi(t)|^2$')
+x_positions = np.arange(0, Nt, T*(Nt/tspan[1]))
+x_labels = list(range(len(x_positions)))
+ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+      labeltop=False)  
+ax.set_xticks(x_positions)
+ax.set_xlabel('T')
+ax.set_xticklabels(x_labels)
+ax.set_ylabel('site')
 
 
-# find eigenvalues
-
+fig.colorbar(plt.cm.ScalarMappable(cmap=cmap_name))
+# fig.colorbar(plt.cm.ScalarMappable(cmap='Purples'), shrink=.9, pad=.05, aspect=15, fraction=.1)
+# fig.suptitle('F = '+str(a)+', omega='+str(omega)+ ', phi='+str(phi))
+# fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
+#         'first_year_report/densityevolution,F=30,w=7p83,ph=0.pdf', 
+#         format='pdf', bbox_inches='tight')
+plt.show()
         
         
         

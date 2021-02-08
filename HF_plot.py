@@ -17,6 +17,7 @@ import sys
 sys.path.append('/Users/Georgia/Code/MBQD/lattice-simulations')
 from hamiltonians import create_HF
 
+
 import matplotlib
 
 size=16
