@@ -235,6 +235,18 @@ Create HF OFC
 '''
 
 
+# import numpy as np
+# from sympy import Matrix, init_printing
+# init_printing()
+
+# display(Matrix(HF))
+
+
+#%%
+
+
+
+from numpy.linalg import eig
 
 def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, avg=False):
     """
@@ -300,36 +312,58 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, a
     return sol
 
 
-from numpy.linalg import eig
+from scipy.special import jv
+from numpy import exp, sin
 
 def create_HF(form, rtol, N, centre, a,b, c,phi, omega): 
-    T=2*pi/omega
-    tspan = (0,T)
-    UT = np.zeros([N,N], dtype=np.complex_)
     
-    for A_site_start in range(N):
-    #    print(A_site_start)
-        psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi,  tspan, psi0)
-        UT[:,A_site_start]=sol.y[:,-1]
-    
-    # print(time.time()-start, 'seconds.')
-    
-    evals_U, evecs = eig(UT)
-    
-    if form=='OSC_sort':
-        '''new order sort thing'''
-        idx = evals_U.argsort()[::-1]   
-        evals_U = evals_U[idx]
-        evecs = evecs[:,idx]
-
-    evals_H = 1j / T *log(evals_U)
-    
-    HF = np.zeros([N,N], dtype=np.complex_)
-    for i in range(N):
-        term = evals_H[i]*np.outer(evecs[:,i], evecs[:,i])
-        HF = HF+term
+    if form == 'theoretical':
+        HF =  np.zeros([N,N], dtype=np.complex_)
+        HF = HF + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1) 
+        entry = exp(1j*a*sin(phi)/omega)*jv(0, a/omega) 
+        HF[centre][centre+1] = entry
+        HF[centre][centre-1] = entry
+        HF[centre+1][centre] = entry
+        HF[centre-1][centre] = entry
         
-    # print('   ',time.time()-start, 's')
+        return 0, HF
+         
+        
+    else:
     
-    return UT, HF
+        T=2*pi/omega
+        tspan = (0,T)
+        UT = np.zeros([N,N], dtype=np.complex_)
+        
+        for A_site_start in range(N):
+        #    print(A_site_start)
+            psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
+            sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi,  tspan, psi0)
+            UT[:,A_site_start]=sol.y[:,-1]
+        
+        # print(time.time()-start, 'seconds.')
+        
+        evals_U, evecs = eig(UT)
+        
+        if form=='OSC_sort':
+            '''new order sort thing'''
+            idx = evals_U.argsort()[::-1]   
+            evals_U = evals_U[idx]
+            evecs = evecs[:,idx]
+    
+        evals_H = 1j / T *log(evals_U)
+        
+        HF = np.zeros([N,N], dtype=np.complex_)
+        for i in range(N):
+            term = evals_H[i]*np.outer(evecs[:,i], evecs[:,i])
+            HF = HF+term
+            
+        # print('   ',time.time()-start, 's')
+        
+        return UT, HF
+
+
+
+
+
+

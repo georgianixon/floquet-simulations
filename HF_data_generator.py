@@ -19,7 +19,7 @@ from scipy.integrate import solve_ivp
 import pandas as pd 
 import time
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/lattice-simulations')
+sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations')
 from hamiltonians import F_MG, F_OSC, F_OSC_i, create_HF, solve_schrodinger
 
 #%%
@@ -47,7 +47,7 @@ def filter_duplicates(x):
 def convert_complex(s):
     return np.complex(s.replace('i', 'j'))
 
-sh = '/Users/Georgia/Code/MBQD/lattice-simulations/'
+sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 
 
 df_dtype_dict = {'form':str,'a':np.float64, 'b':np.float64,'c':np.float64,
@@ -69,11 +69,11 @@ df = pd.read_csv(sh+'analysis_gaus_complex.csv',
 #%%
 
  # need tp dp 1e-6 phi = 0
-N = 21; 
-centre=10;
-form='linear' 
-rtol = 1e-11
-aas = [35]
+N = 51; 
+centre=25;
+form='theoretical' 
+rtol = np.nan
+aas = [30]
 bs = [np.nan]
 cs = [np.nan]
 phis = [pi/4, pi/5, pi/6, pi/7, 0, pi/2, pi/3]

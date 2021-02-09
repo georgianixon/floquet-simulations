@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/lattice-simulations')
+sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations')
 from hamiltonians import F_MG, F_OSC, create_HF, solve_schrodinger
 
 import matplotlib
@@ -49,11 +49,11 @@ a = 35;
 b = np.nan
 c = np.nan 
 omega=6.34; 
-phi=0;
+phi=pi/2;
 T=2*pi/omega
 tspan = (0,10)
 Nt = 100
-form = 'OSC'
+form = 'theoretical'
 rtol=1e-7
 
 t_eval = np.linspace(tspan[0], tspan[1], Nt)
