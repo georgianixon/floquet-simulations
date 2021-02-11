@@ -101,7 +101,7 @@ Plot General
 """
 
 N = 51; 
-forms=['OSC']
+forms=['theoretical']
 # rtols=[1e-6, 1e-7, 1e-8, 1e-9, 1e-10, 1e-11]
 rtols=[1e-7]
 aas = [35]
@@ -228,9 +228,6 @@ fig.savefig(sh+'test.png',
 plt.grid(True)
 plt.show()
 
-
-
-#%%
 
 
 
