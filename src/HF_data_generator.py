@@ -20,7 +20,7 @@ import pandas as pd
 import time
 import sys
 sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
-from hamiltonians import F_MG, F_OSC, F_OSC_i, create_HF, solve_schrodinger
+from hamiltonians import F_MG, F_OSC, create_HF, solve_schrodinger
 
 #%%
 
@@ -71,7 +71,7 @@ df = pd.read_csv(sh+'data/analysis_gaus_complex.csv',
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='theoretical' 
+form='theoretical_hermitian' 
 rtol = np.nan
 aas = [30]
 bs = [np.nan]

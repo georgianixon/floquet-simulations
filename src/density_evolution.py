@@ -1,7 +1,8 @@
+
 # -*- coding: utf-8 -*-
 """
 Created on Thu Sep 10 15:55:49 2020
-
+|
 @author: Georgia
 """
 
@@ -52,12 +53,20 @@ c = np.nan
 phi=pi/7
 omega=a*sin(pi/3)/pi
 T=2*pi/omega
-tspan = (0,10)
-Nt = 100
-form = 'theoretical'
-rtol=1e-7
 
-t_eval = np.linspace(tspan[0], tspan[1], Nt)
+#when we solve scrodinger eq, how many timesteps do we want
+n_timesteps = 100
+
+# how many oscillations of hamiltonian do we want to calculate psi for?
+n_oscillations = 15
+
+# define beginnning and end times to solve for
+tspan = (0,n_oscillations*T)
+
+form = 'theoretical_hermitian'
+rtol=1e-6
+
+t_eval = np.linspace(tspan[0], tspan[1], n_timesteps)
 psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
 
 hopping = exp(1j*a*sin(phi)/omega)*jv(0,a/omega)
@@ -68,32 +77,40 @@ import matplotlib as mpl
 cmap= mpl.cm.get_cmap('Purples')
 normaliser= mpl.colors.Normalize(vmin=0,vmax=1)
 
-sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, avg=1)
+if form=='theoretical' or form == 'theoretical_hermitian':
+    psievolve = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, 
+                                  tspan, n_timesteps, psi0)
+    
+else:
+    sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, 
+                            tspan, n_timesteps, psi0)
+    psievolve = sol.y
+    
 
 sz = 10
 
 
 fig, ax = plt.subplots(figsize=(sz,sz/2))
-ax.plot(np.linspace(0,50,51),(np.abs(sol.y.T[99]))**2)
+ax.plot(np.linspace(0,N-1,N), (np.abs(psievolve.T[n_timesteps-1]))**2)
 ax.set_title(r'$V(t) = 35 \cos( $' + str(round( omega, 2)) + r'$t + \pi /$' +
-             str(int(1/(phi/pi))) + 
+              str(int(1/(phi/pi))) + 
               r'$) $'+' |25><25|' + '\n'+r'$G_{25,26} = $'+"{:.1g}".format(hopping) + '\n' +
               r'$|\psi(t)|^2$ at $t_f$')
 ax.set_xlabel('n')
 plt.show()
 
 
-sz=20
+sz=15
 fig, ax = plt.subplots(nrows=1, ncols=3, sharey=True, constrained_layout=True, 
                         figsize=(sz,sz/2))
-ax[0].matshow(abs(sol.y)**2, interpolation='none', cmap=cmap, norm=normaliser)
-ax[1].matshow(np.real(sol.y), interpolation='none', cmap=cmap, norm=normaliser)
-ax[2].matshow(np.imag(sol.y), interpolation='none', cmap=cmap, norm=normaliser)
+ax[0].matshow(abs(psievolve)**2, interpolation='none', cmap=cmap, norm=normaliser)
+ax[1].matshow(np.real(psievolve), interpolation='none', cmap=cmap, norm=normaliser)
+ax[2].matshow(np.imag(psievolve), interpolation='none', cmap=cmap, norm=normaliser)
 ax[0].set_title(r'$|\psi(t)|^2$')
 ax[1].set_title(r'$\mathrm{Re}\{\psi(t)\}$')
 ax[2].set_title(r'$\mathrm{Imag}\{\psi(t)\}$')
-x_positions = np.arange(0, Nt, T*(Nt/tspan[1]))
-x_labels = list(range(len(x_positions)))
+x_positions = np.linspace(0, n_timesteps, n_oscillations+1)
+x_labels = list(range(n_oscillations+1))
 for i in range(3):
     ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
       labeltop=False)  

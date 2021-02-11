@@ -96,8 +96,6 @@ def HT_MGSTA(N, centre, a, b, c, omega, t, phi):
             elif abs(i - j) == 1:
                 matrix[i][j] = -1
     return matrix
-                            
-#HT_MGSTA(5, 3, 10, 1, 1, 3.3, 0, 0)
 
 
 """
@@ -110,10 +108,8 @@ def HT_Linear(N, a, omega, t, phi):
         matrix[i][i] = a*i*cos(omega*t + phi)
     return matrix
 
-def line(N, a, i):
-    return a*(2*i / (N-1) - 1)
-
-#HT_Linear(6, 4, 1, 0, 0)
+# def line(N, a, i):
+#     return a*(2*i / (N-1) - 1)
 
 
 """
@@ -134,7 +130,7 @@ def H_varied_hopping(N, centre, alterations):
                         matrix[i][j] = alterations[j- (centre - radius)]
     return matrix
                         
-H_varied_hopping(10, 5, [-0.9, -0.7, -0.1])
+
 
 
 """
@@ -146,30 +142,7 @@ def HT_OSC(N, centre, a, omega, t, phi):
     matrix[centre][centre] = a*cos(omega*t + phi)
     return matrix
 
-def HT_OSC2(N, centre1, centre2, a1, a2, omega, t, phi1, phi2):
-    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
-    matrix[centre1][centre1] = a1*cos(omega*t + phi1)
-    matrix[centre2][centre2] = a2*cos(omega*t + phi2)
-    return matrix
 
-HT_OSC(10, 4, 10, 1, pi, 0)
-
-def HT_OSCpa(N, centre, a, omega, t, phi):
-    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
-    matrix[centre][centre] = a*cos(omega*t + phi)+a
-    return matrix
-
-def HT_OSCp2a(N, centre, a, omega, t, phi):
-    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
-    matrix[centre][centre] = a*cos(omega*t + phi)+2*a
-    return matrix
-
-def HT_OSCp1p2a(N, centre, a, omega, t, phi):
-    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
-    matrix[centre][centre] = a*cos(omega*t + phi)+1.2*a
-    return matrix
-
-#HT_OSCpa(10, 4, 10, 1, pi, 0)
 
 """
 No energy offset
@@ -196,26 +169,6 @@ def F_MGSTA(t, psi, N, centre, a, b, c, omega, phi):
 def F_OSC(t, psi, N, centre, a, omega, phi):
     return -1j*np.dot(HT_OSC(N, centre, a, omega, t, phi),psi)
 
-# one site cosine 
-def F_OSC_i(t, psi, N, centre, a, omega, phi):
-    return -1*np.dot(HT_OSC(N, centre, a, omega, t, phi),psi)
-
-# two site cosine 
-def F_OSC2(t, psi, N, centre1, centre2, a1, a2, omega, phi1, phi2):
-    return -1j*np.dot(HT_OSC2(N, centre1, centre2, a1, a2, omega,
-                              t, phi1, phi2),psi)
-
-# one site cosine with centre potential = a not zero
-def F_OSCpa(t, psi, N, centre, a, b, c, omega, phi):
-    return -1j*np.dot(HT_OSCpa(N, centre, a, omega, t, phi),psi)
-
-def F_OSCp2a(t, psi, N, centre, a, b, c, omega, phi):
-    return -1j*np.dot(HT_OSCp2a(N, centre, a, omega, t, phi),psi)
-
-
-def F_OSCp1p2a(t, psi, N, centre, a, b, c, omega, phi):
-    return -1j*np.dot(HT_OSCp1p2a(N, centre, a, omega, t, phi),psi)
-
 # linear moving potential
 def F_Linear(t, psi, N, a, omega, phi):
     return -1j*np.dot(HT_Linear(N, a, omega, t, phi), psi)
@@ -229,32 +182,21 @@ def F_HF(t, psi, HF):
     return -1j*np.dot(HF, psi)
 
 
-#%%
-'''
-Create HF OFC
-'''
-
-
-# import numpy as np
-# from sympy import Matrix, init_printing
-# init_printing()
-
-# display(Matrix(HF))
-
 
 #%%
 
 
 
-from numpy.linalg import eig
+from scipy.linalg import eig as eig
+from scipy.linalg import expm
 
-def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, avg=False):
+def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_timesteps, psi0, avg=False):
     """
     solve time dependent schrodinger eq given initial conditions psi0, over
     time tspan, for Hamiltonian signified by 'form'
     """
     
-    t_eval = np.linspace(tspan[0], tspan[1], 100)
+    t_eval = np.linspace(tspan[0], tspan[1], n_timesteps)
     
     if avg == True:
         UT, HF = create_HF(form, rtol, N, centre, a, b, c,  phi, omega)
@@ -266,7 +208,7 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, a
             method='RK45')
     
     
-    elif form=='OSC' or form=='OSC_sort':
+    elif form=='OSC':
         sol= solve_ivp(lambda t,psi: F_OSC(t, psi, 
                            N, centre,
                              a,
@@ -274,14 +216,8 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, a
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
-    elif form=='OSC_i':
-        sol= solve_ivp(lambda t,psi: F_OSC_i(t, psi, 
-                           N, centre,
-                             a,
-                             omega, phi), 
-            t_span=tspan, y0=psi0, rtol=rtol, 
-            atol=rtol, t_eval=t_eval,
-            method='RK45')
+        
+
     elif form=='MG':
         sol = solve_ivp(lambda t,psi: F_MG(t, psi, 
                            N, centre,
@@ -308,6 +244,32 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, psi0, a
                                          omega, 
                                          phi), 
                         tspan, psi0, rtol=rtol, atol=rtol)
+    
+    elif form== 'theoretical_hermitian':
+        _, HF = create_HF(form, None, N, centre, a, None, None, phi, omega)
+        
+        #find solution at different times
+        sol = [np.dot(expm(-1j*HF*T), psi0) for T in t_eval]
+        #turn vector into same form as the solvers have
+        sol = np.vstack(sol).T
+        
+        
+        
+        # assert(np.all(0 == (HF - np.conj(HF.T))))
+        
+        # evals, evecs= eig(HF)
+        # coeffs =  np.dot(np.conj(evecs.T), psi0)
+        # psi0_n =np.dot(evecs, coeffs) # check = psi0?
+        
+        # sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
+        # sol = np.vstack(sol).T
+        
+    elif form == 'theoretical':
+        _, HF = create_HF(form, None, N, centre, a, None, None, phi, omega)
+        #find solution at different times
+        sol = [np.dot(expm(-1j*HF*T), psi0) for T in t_eval]
+        #turn vector into same form as the solvers have
+        sol = np.vstack(sol).T
         
     return sol
 
@@ -326,8 +288,18 @@ def create_HF(form, rtol, N, centre, a,b, c,phi, omega):
         HF[centre+1][centre] = entry
         HF[centre-1][centre] = entry
         
-        return 0, HF
-         
+        return None, HF
+    
+    if form == 'theoretical_hermitian':
+        HF =  np.zeros([N,N], dtype=np.complex_)
+        HF = HF + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1) 
+        entry = exp(1j*a*sin(phi)/omega)*jv(0, a/omega) 
+        HF[centre][centre+1] = entry
+        HF[centre][centre-1] = entry
+        HF[centre+1][centre] = np.conj(entry)
+        HF[centre-1][centre] = np.conj(entry)
+        
+        return None, HF     
         
     else:
     
@@ -338,18 +310,12 @@ def create_HF(form, rtol, N, centre, a,b, c,phi, omega):
         for A_site_start in range(N):
         #    print(A_site_start)
             psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-            sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi,  tspan, psi0)
+            sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, 100, psi0)
             UT[:,A_site_start]=sol.y[:,-1]
         
         # print(time.time()-start, 'seconds.')
         
         evals_U, evecs = eig(UT)
-        
-        if form=='OSC_sort':
-            '''new order sort thing'''
-            idx = evals_U.argsort()[::-1]   
-            evals_U = evals_U[idx]
-            evecs = evecs[:,idx]
     
         evals_H = 1j / T *log(evals_U)
         
