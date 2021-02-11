@@ -87,7 +87,7 @@ marker_index = cycle(['o', '+', 'x'])
 #%%
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 
-df = pd.read_csv(sh+'analysis_gaus_complex.csv', 
+df = pd.read_csv(sh+'data/analysis_gaus_complex.csv', 
                  index_col=False, 
                  converters={
                       'hopping': convert_complex,
@@ -222,7 +222,7 @@ fig.legend(handles, labels, loc='upper right')
 #               +r'$\pi/4)$'
              # +r'$\phi)$'
              # )
-fig.savefig(sh+'test.png', 
+fig.savefig(sh+'graphs/test.png', 
             format='png', bbox_inches='tight')
 
 plt.grid(True)
@@ -237,7 +237,7 @@ plt.show()
 
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 
-df = pd.read_csv(sh+'analysis_gaus_complex.csv', 
+df = pd.read_csv(sh+'data/analysis_gaus_complex.csv', 
                  index_col=False, 
                  converters={
                       'hopping': convert_complex,

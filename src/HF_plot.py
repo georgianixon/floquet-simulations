@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 import pandas as pd
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/lattice-simulations')
+sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
 from hamiltonians import create_HF
 
 
@@ -96,8 +96,7 @@ norm = col.Normalize(vmin=-1, vmax=1)
 cax = plt.axes([1.03, 0.1, 0.03, 0.8])
 fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
 #             
-#fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
-#        'first_year_report/HF,MGSTA,a=30,b=1,c=1,w=5,ph=0.pdf', 
+#fig.savefig('', 
 #        format='pdf', bbox_inches='tight')
 plt.show()
 

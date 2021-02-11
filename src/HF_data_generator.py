@@ -19,7 +19,7 @@ from scipy.integrate import solve_ivp
 import pandas as pd 
 import time
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations')
+sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
 from hamiltonians import F_MG, F_OSC, F_OSC_i, create_HF, solve_schrodinger
 
 #%%
@@ -56,7 +56,7 @@ df_dtype_dict = {'form':str,'a':np.float64, 'b':np.float64,'c':np.float64,
             'onsite':np.complex128, 'next onsite':np.complex128,
             'NNN':np.complex128, 'NNN overtop':np.complex128}
 
-df = pd.read_csv(sh+'analysis_gaus_complex.csv', 
+df = pd.read_csv(sh+'data/analysis_gaus_complex.csv', 
                  index_col=False, 
                  converters={'hopping': convert_complex,
                              'onsite':convert_complex,
@@ -149,7 +149,7 @@ for a in aas:
                                         }).reset_index()
                 
                 print('   saving..')
-                df.to_csv(sh+'analysis_gaus_complex.csv',
+                df.to_csv(sh+'data/analysis_gaus_complex.csv',
                           index=False, 
                           columns=['form', 'rtol', 'a','b', 'c', 'omega', 'phi',
                                   'N', 'localisation', 'hopping', 

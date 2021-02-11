@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations')
+sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
 from hamiltonians import F_MG, F_OSC, create_HF, solve_schrodinger
 
 import matplotlib
