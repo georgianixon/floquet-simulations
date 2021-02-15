@@ -101,14 +101,14 @@ Plot General
 """
 
 N = 51; 
-forms=['theoretical']
+forms=['theoretical_hermitian']
 # rtols=[1e-6, 1e-7, 1e-8, 1e-9, 1e-10, 1e-11]
 rtols=[1e-7]
 aas = [35]
 bs = [np.nan]
 cs = [np.nan]
 phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-# phis =  [0]
+# phis =  [pi/4]
 # phis =  [0]
 apply = [np.abs, np.real, np.imag]
 labels = [r'$|H_{n,n+1}|$', 
@@ -123,7 +123,7 @@ look = 'hopping'
 # look = 'localisation'
     
 sz =20
-fig, ax = plt.subplots(nrows=1, ncols=len(apply), figsize=(sz,sz/1.62/len(apply)),
+fig, ax = plt.subplots(ncols=1, nrows=len(apply), figsize=(sz/len(apply),sz/2),
                        constrained_layout=True, sharey=True)
 
 
@@ -136,9 +136,9 @@ for form in forms:
                 for nc, phi in enumerate(phis):
                     for rtol in rtols:
                         
-                        col = next(colour_index)
-                        ms = next(markersize_index)
-                        mark = next(marker_index)
+                        # col = next(colour_index)
+                        # ms = next(markersize_index)
+                        # mark = next(marker_index)
 
 
                         for n1, f in enumerate(apply):
@@ -167,7 +167,7 @@ for form in forms:
                                                   &
                                                   (df['phi']==phi)&
                                                   (df['rtol']==rtol)]
-                            elif form == 'theoretical':
+                            elif form == 'theoretical' or form == 'theoretical_hermitian':
                                 df_plot = df[(df['form']==form)&
                                              (df['N']==N)&
                                                   (df['a']==a)
@@ -186,8 +186,8 @@ for form in forms:
                                         # color=col,
                                         label=
                                           r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
-                                          # +', '+
-                                          # form
+                                           # +', '+
+                                           # form
                                          # 'rtol='+str(rtol)
                                          # color='Blue'
                                         )
@@ -222,8 +222,8 @@ fig.legend(handles, labels, loc='upper right')
 #               +r'$\pi/4)$'
              # +r'$\phi)$'
              # )
-fig.savefig(sh+'graphs/test.png', 
-            format='png', bbox_inches='tight')
+# fig.savefig(sh+'graphs/test.png', 
+#             format='png', bbox_inches='tight')
 
 plt.grid(True)
 plt.show()
