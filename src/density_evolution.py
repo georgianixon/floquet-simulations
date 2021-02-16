@@ -45,7 +45,7 @@ matplotlib.rcParams.update(params)
 
 # choose particular HF
 
-N = 51; A_site_start = 35;
+N = 71; A_site_start = 35;
 centre = 25
 a = 35;
 b = np.nan
@@ -63,7 +63,7 @@ n_oscillations = 15
 # define beginnning and end times to solve for
 tspan = (0,n_oscillations*T)
 
-form = 'theoretical_hermitian'
+form = 'OSC'
 rtol=1e-6
 
 t_eval = np.linspace(tspan[0], tspan[1], n_timesteps)
@@ -74,8 +74,9 @@ hopping = exp(1j*a*sin(phi)/omega)*jv(0,a/omega)
 import numpy as np
 import matplotlib as mpl
 
-cmap= mpl.cm.get_cmap('Purples')
-normaliser= mpl.colors.Normalize(vmin=0,vmax=1)
+cmap= mpl.cm.get_cmap('PiYG_r')
+normaliser= mpl.colors.Normalize(vmin=-1,vmax=1)
+
 
 if form=='theoretical' or form == 'theoretical_hermitian':
     psievolve = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, 
@@ -89,40 +90,39 @@ else:
 
 sz = 10
 
+# fig, ax = plt.subplots(figsize=(sz,sz/2))
+# ax.plot(np.linspace(0,N-1,N), (np.abs(psievolve.T[n_timesteps-1]))**2)
+# ax.set_title(r'$V(t) = 35 \cos( $' + str(round( omega, 2)) + r'$t + \pi /$' +
+#               str(int(1/(phi/pi))) + 
+#               r'$) $'+' |25><25|' + '\n'+r'$G_{25,26} = $'+"{:.1g}".format(hopping) + '\n' +
+#               r'$|\psi(t)|^2$ at $t_f$')
+# ax.set_xlabel('n')
+# plt.show()
 
-fig, ax = plt.subplots(figsize=(sz,sz/2))
-ax.plot(np.linspace(0,N-1,N), (np.abs(psievolve.T[n_timesteps-1]))**2)
-ax.set_title(r'$V(t) = 35 \cos( $' + str(round( omega, 2)) + r'$t + \pi /$' +
-              str(int(1/(phi/pi))) + 
-              r'$) $'+' |25><25|' + '\n'+r'$G_{25,26} = $'+"{:.1g}".format(hopping) + '\n' +
-              r'$|\psi(t)|^2$ at $t_f$')
-ax.set_xlabel('n')
-plt.show()
 
+sz=20
+labels = [r'$|\psi(t)|^2$', r'$\mathrm{Re}\{\psi(t)\}$', r'$\mathrm{Imag}\{\psi(t)\}$']
+apply = [lambda x: np.abs(x)**2, np.real, np.imag]
 
-sz=15
 fig, ax = plt.subplots(nrows=1, ncols=3, sharey=True, constrained_layout=True, 
                         figsize=(sz,sz/2))
-ax[0].matshow(abs(psievolve)**2, interpolation='none', cmap=cmap, norm=normaliser)
-ax[1].matshow(np.real(psievolve), interpolation='none', cmap=cmap, norm=normaliser)
-ax[2].matshow(np.imag(psievolve), interpolation='none', cmap=cmap, norm=normaliser)
-ax[0].set_title(r'$|\psi(t)|^2$')
-ax[1].set_title(r'$\mathrm{Re}\{\psi(t)\}$')
-ax[2].set_title(r'$\mathrm{Imag}\{\psi(t)\}$')
 x_positions = np.linspace(0, n_timesteps, n_oscillations+1)
 x_labels = list(range(n_oscillations+1))
-for i in range(3):
+for i, f in enumerate(apply):
+    ax[i].matshow(f(psievolve), interpolation='none', cmap=cmap, norm=normaliser)
+    ax[i].set_title(labels[i], fontsize=20)
     ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
       labeltop=False)  
     ax[i].set_xticks(x_positions)
-    ax[i].set_xlabel('T')
+    ax[i].set_xlabel('t/T', fontsize=15)
     ax[i].set_xticklabels(x_labels)
+    for side in ["bottom", "top", "left", "right"]:
+        ax[i].spines[side].set_visible(False)
     if i == 0:
-        ax[i].set_ylabel('site')
+        ax[i].set_ylabel('site', fontsize=15)
+    
 
-
-
-fig.colorbar(plt.cm.ScalarMappable(cmap='Purples'), shrink=.5)
+fig.colorbar(plt.cm.ScalarMappable(cmap='PiYG_r', norm=normaliser), shrink=.5)
 
 fig.suptitle(r'$V(t) = 35 \cos( $' + str(round( omega, 2)) + r'$t + \pi /$' +
              str(int(1/(phi/pi))) + 
@@ -132,6 +132,8 @@ fig.suptitle(r'$V(t) = 35 \cos( $' + str(round( omega, 2)) + r'$t + \pi /$' +
 # fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
 #         'first_year_report/densityevolution,F=30,w=7p83,ph=0.pdf', 
 #         format='pdf', bbox_inches='tight')
+
+
 plt.show()
 
 #%%
