@@ -159,27 +159,27 @@ Functions to Solve Schrodinger eq
 
 # moving gaus
 def F_MG(t, psi, N, centre, a, b, c, omega, phi):
-    return -1j*np.dot(HT_MG(N, centre, a, b, c, omega, t, phi),psi)
+    return 1j*np.dot(HT_MG(N, centre, a, b, c, omega, t, phi),psi)
     
 #moving gaus subtract time 
 def F_MGSTA(t, psi, N, centre, a, b, c, omega, phi):
-    return -1j*np.dot(HT_MGSTA(N, centre, a, b, c, omega, t, phi),psi)
+    return 1j*np.dot(HT_MGSTA(N, centre, a, b, c, omega, t, phi),psi)
 
 # one site cosine 
 def F_OSC(t, psi, N, centre, a, omega, phi):
-    return -1j*np.dot(HT_OSC(N, centre, a, omega, t, phi),psi)
+    return 1j*np.dot(HT_OSC(N, centre, a, omega, t, phi),psi)
 
 # linear moving potential
 def F_Linear(t, psi, N, a, omega, phi):
-    return -1j*np.dot(HT_Linear(N, a, omega, t, phi), psi)
+    return 1j*np.dot(HT_Linear(N, a, omega, t, phi), psi)
 
 # no energy offset at all
 def F_0(t, psi, N):
-    return -1j*np.dot(H_0(N), psi)
+    return 1j*np.dot(H_0(N), psi)
 
 
 def F_HF(t, psi, HF):
-    return -1j*np.dot(HF, psi)
+    return 1j*np.dot(HF, psi)
 
 
 
@@ -190,25 +190,15 @@ def F_HF(t, psi, HF):
 from scipy.linalg import eig as eig
 from scipy.linalg import expm
 
-def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_timesteps, psi0, avg=False):
+def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_timesteps, psi0):
     """
     solve time dependent schrodinger eq given initial conditions psi0, over
     time tspan, for Hamiltonian signified by 'form'
     """
     
-    t_eval = np.linspace(tspan[0], tspan[1], n_timesteps)
+    t_eval = np.linspace(tspan[0], tspan[1], n_timesteps+1)
     
-    if avg == True:
-        UT, HF = create_HF(form, rtol, N, centre, a, b, c,  phi, omega)
-        # find eigenvalues
-        
-        sol= solve_ivp(lambda t,psi: F_HF(t, psi, HF), 
-            t_span=tspan, y0=psi0, rtol=rtol, 
-            atol=rtol, t_eval=t_eval,
-            method='RK45')
-    
-    
-    elif form=='OSC':
+    if form=='OSC':
         sol= solve_ivp(lambda t,psi: F_OSC(t, psi, 
                            N, centre,
                              a,
@@ -216,6 +206,7 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
+        sol=sol.y
         
 
     elif form=='MG':
@@ -227,13 +218,14 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
+        sol=sol.y
         
     elif form =='linear':
         sol= solve_ivp(lambda t,psi: F_Linear(t, psi, N, a, omega, phi), 
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
-    
+        sol=sol.y
         
     elif form == 'MGSTA':
         sol = solve_ivp(lambda t,psi: F_MGSTA(t, psi, N, 
@@ -244,6 +236,7 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
                                          omega, 
                                          phi), 
                         tspan, psi0, rtol=rtol, atol=rtol)
+        sol=sol.y
     
     elif form== 'theoretical_hermitian':
         _, HF = create_HF(form, None, N, centre, a, None, None, phi, omega)
