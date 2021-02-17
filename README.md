@@ -1,8 +1,5 @@
-### Lattice simulation
+### Floquet simulation
 
-Wannier basis
-Bloch wave basis
-
-Exploring tunneling rates with time dependent potentials
+Exploring effective Hamiltonians created via floquet physics from local time dependent potentials on an optical lattice.
 
 :seedling:
