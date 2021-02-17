@@ -11,8 +11,6 @@ and other parameters
 """
 
 from numpy.linalg import eig
-import matplotlib.colors as col
-norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
 import numpy as np
 from scipy.integrate import solve_ivp
@@ -20,7 +18,7 @@ import pandas as pd
 import time
 import sys
 sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
-from hamiltonians import F_MG, F_OSC, create_HF, solve_schrodinger
+from hamiltonians import  create_HF, solve_schrodinger
 
 #%%
 
@@ -71,9 +69,9 @@ df = pd.read_csv(sh+'data/analysis_gaus_complex.csv',
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='theoretical_hermitian' 
-rtol = np.nan
-aas = [30]
+form='OSC_conj' 
+rtol = 1e-7
+aas = [35]
 bs = [np.nan]
 cs = [np.nan]
 phis = [pi/4, pi/5, pi/6, pi/7, 0, pi/2, pi/3]
@@ -104,13 +102,13 @@ for a in aas:
                     """
                     Localisation
                     """
-                    # psi0 = np.zeros(N, dtype=np.complex_); psi0[centre] = 1;
-                    # tspan = (0, 10)
-                    # sol = solve_schrodinger(form, N, centre, 
-                    #                         a, b, c, omega, phi, 
-                    #                         tspan, psi0)
-                    # localisation = np.sum(abs(sol.y[centre]))/len(sol.t)
-                    localisation = np.nan
+                    psi0 = np.zeros(N, dtype=np.complex_); psi0[centre] = 1;
+                    tspan = (0, 10)
+                    sol = solve_schrodinger(form, rtol, N, centre,
+                                            a, b, c, omega, phi,
+                                            tspan, 100, psi0)
+                    localisation = np.sum(abs(sol[centre]))/101
+                    # localisation = np.nan
                     
                     hopping=HF[centre][centre+1]
                     onsite = HF[centre][centre]

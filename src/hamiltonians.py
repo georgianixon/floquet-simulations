@@ -198,7 +198,7 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
     
     t_eval = np.linspace(tspan[0], tspan[1], n_timesteps+1)
     
-    if form=='OSC':
+    if form=='OSC' or form == 'OSC_conj':
         sol= solve_ivp(lambda t,psi: F_OSC(t, psi, 
                            N, centre,
                              a,
@@ -304,7 +304,7 @@ def create_HF(form, rtol, N, centre, a,b, c,phi, omega):
         #    print(A_site_start)
             psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
             sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, 100, psi0)
-            UT[:,A_site_start]=sol.y[:,-1]
+            UT[:,A_site_start]=sol[:,-1] 
         
         # print(time.time()-start, 'seconds.')
         
@@ -314,7 +314,11 @@ def create_HF(form, rtol, N, centre, a,b, c,phi, omega):
         
         HF = np.zeros([N,N], dtype=np.complex_)
         for i in range(N):
-            term = evals_H[i]*np.outer(evecs[:,i], evecs[:,i])
+            if form == 'OSC_conj':
+                term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
+            else:
+                term = evals_H[i]*np.outer(evecs[:,i], evecs[:,i])
+                
             HF = HF+term
             
         # print('   ',time.time()-start, 's')
