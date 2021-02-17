@@ -40736,8 +40736,8 @@ Cell[BoxData[
 }, Open  ]]
 }, Open  ]]
 },
-WindowSize->{1428., 735.75},
-WindowMargins->{{0, Automatic}, {540, Automatic}},
+WindowSize->{960, 508},
+WindowMargins->{{Automatic, -5.5}, {Automatic, -8.25}},
 TaggingRules->{
  "WelcomeScreenSettings" -> {"FEStarting" -> False}, "TryRealOnly" -> False},
 FrontEndVersion->"12.1 for Microsoft Windows (64-bit) (June 19, 2020)",
@@ -40756,16 +40756,16 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[580, 22, 151, 3, 66, "Section",ExpressionUUID->"684ae98b-9093-49a6-8d5c-a0bb1eb66ee2"],
+Cell[580, 22, 151, 3, 67, "Section",ExpressionUUID->"684ae98b-9093-49a6-8d5c-a0bb1eb66ee2"],
 Cell[CellGroupData[{
-Cell[756, 29, 1348, 35, 47, "Input",ExpressionUUID->"3f5ca9b8-adae-4db0-bf04-edde06f7e35f"],
+Cell[756, 29, 1348, 35, 68, "Input",ExpressionUUID->"3f5ca9b8-adae-4db0-bf04-edde06f7e35f"],
 Cell[2107, 66, 1448, 43, 147, "Output",ExpressionUUID->"1abb4917-9284-44a4-b57a-0360ebc11e2c"]
 }, Open  ]],
 Cell[3570, 112, 154, 3, 28, "Input",ExpressionUUID->"ddeec534-df45-40a2-a1a3-6dde32eed2a2"],
 Cell[CellGroupData[{
-Cell[3749, 119, 172, 3, 45, "Subsubsection",ExpressionUUID->"ae384252-2a25-40fd-be7a-8e9a1d409354"],
+Cell[3749, 119, 172, 3, 44, "Subsubsection",ExpressionUUID->"ae384252-2a25-40fd-be7a-8e9a1d409354"],
 Cell[CellGroupData[{
-Cell[3946, 126, 6515, 162, 422, "Input",ExpressionUUID->"c4041acc-0f68-4f71-abc0-68bb8e997793"],
+Cell[3946, 126, 6515, 162, 436, "Input",ExpressionUUID->"c4041acc-0f68-4f71-abc0-68bb8e997793"],
 Cell[10464, 290, 150, 2, 32, "Output",ExpressionUUID->"e539c8f4-11d1-4ade-8b82-a889307bc25d"]
 }, Open  ]],
 Cell[10629, 295, 2935, 73, 104, "Input",ExpressionUUID->"42a430b2-ccdb-4892-9dcb-c0a906d23e10"],
