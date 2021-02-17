@@ -19,8 +19,15 @@ import matplotlib.pyplot as plt
 from scipy.special import jv, jn_zeros
 import pandas as pd 
 
+# def convert_complex(s):
+#     return np.complex(s.replace('i', 'j'))
+
+
+# def convert_complex_mathematica(s):
+#     return np.complex(s.replace('*I', 'j').replace('*^', 'e'))
+
 def convert_complex(s):
-    return np.complex(s.replace('i', 'j'))
+    return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 
 def formatplot(look):
@@ -94,41 +101,56 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 #%%
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 
-df = pd.read_csv(sh+'data/analysis_gaus_complex.csv', 
-                 index_col=False, 
-                 converters={
+# df = pd.read_csv(sh+'data/analysis-G-python.csv', 
+#                   index_col=False, 
+#                   converters={
+#                       'hopping': convert_complex,
+#                                 'onsite':convert_complex,
+#                                 'next onsite':convert_complex,
+#                                 'NNN':convert_complex, 
+#                               'NNN overtop':convert_complex,
+#                                               })
+
+df = pd.read_csv(sh+'data/analysis-G.csv', 
+                  index_col=False, 
+                  converters={
                       'hopping': convert_complex,
-                               'onsite':convert_complex,
-                               'next onsite':convert_complex,
-                               'NNN':convert_complex, 
+                                'onsite':convert_complex,
+                                'next onsite':convert_complex,
+                                'NNN':convert_complex, 
                               'NNN overtop':convert_complex,
                                               })
+
+
 """
 Plot General
 """
 
 N = 51; 
+# forms=[
+#         # 'theoretical',
+#         # 'OSC_conj', 
+#         # 'OSC'
+#         'OSC-mathematica'
+#        ]
+
 forms=[
-        # 'theoretical',
-        # 'OSC_conj', 
-        'OSC'
+        'SS-m',
+        'SS-p'
        ]
-# rtols=[1e-6, 1e-7, 1e-8, 1e-9, 1e-10, 1e-11]
+
 rtols=[1e-7]
 aas = [35]
-bs = [np.nan]
-cs = [np.nan]
 phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-# phis =  [0]
 # phis =  [0]
 apply = [np.abs, np.real, np.imag]
 
 
 look = 'hopping'
-look = 'onsite'
-look = 'next onsite'
-look = 'NNN'
-look = 'NNN overtop'
+# look = 'onsite'
+# look = 'next onsite'
+# look = 'NNN'
+# look = 'NNN overtop'
 # look = 'localisation'
 
 title, indices = formatplot(look)
@@ -145,109 +167,72 @@ fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62
 
 
 for form in forms:
-    
-    
     for a in aas: 
-        for b in bs:
-            for c in cs:
-                for nc, phi in enumerate(phis):
-                    for rtol in rtols:
+        for nc, phi in enumerate(phis):
+            for rtol in rtols:
 
-                        for n1, f in enumerate(apply):
+                for n1, f in enumerate(apply):
+                        
+                    if form=='OSC' or form=='OSC_conj' or form =="SS-p":
+                        df_plot = df[(df['form']==form)&
+                                     (df['N']==N)&
+                                          (df['a']==a) &
+                                          (df['phi']==phi)&
+                                          (df['rtol']==rtol)]
+                        
+
+                    elif form == 'theoretical' or form == 'theoretical_hermitian':
+                        df_plot = df[(df['form']==form)&
+                                     (df['N']==N)&
+                                          (df['a']==a)
+                                          &
+                                          (df['phi']==phi)]
+                    elif form =='OSC-mathematica'or form =="SS-m":
+                        df_plot = df[(df['form']==form)&
+                                     (df['N']==N)&
+                                          (df['a']==a) &
+                                          (df['phi']==phi)]
+                    
+
+                    else:
+                        raise ValueError
+                    
+                    if not df_plot.empty:
+                        df_plot = df_plot.sort_values(by=['omega'])
                         
                         
-                            if form=='MG' or form =='MGSTA':
-                                df_plot = df[(df['form']==form)&
-                                             (df['N']==N)&
-                                                  (df['a']==a)&
-                                                  (df['phi']==phi)&
-                                                  (df['b']==b)&
-                                                  (df['c']==c)&
-                                                  (df['rtol']==rtol)]
-                                
-                            elif form=='OSC' or form=='OSC_conj':
-                                df_plot = df[(df['form']==form)&
-                                             (df['N']==N)&
-                                                  (df['a']==a) &
-                                                  (df['phi']==phi)&
-                                                  (df['rtol']==rtol)]
-                                
-                            elif form == 'linear':
-                                df_plot = df[(df['form']==form)&
-                                             (df['N']==N)&
-                                                  (df['a']==a)
-                                                  &
-                                                  (df['phi']==phi)&
-                                                  (df['rtol']==rtol)]
-                            elif form == 'theoretical' or form == 'theoretical_hermitian':
-                                df_plot = df[(df['form']==form)&
-                                             (df['N']==N)&
-                                                  (df['a']==a)
-                                                  &
-                                                  (df['phi']==phi)]
-
-                            else:
-                                raise ValueError
-                            
-                            df_plot = df_plot.sort_values(by=['omega'])
-                            
-                            
-                            ax[n1].plot(df_plot['omega'], f(df_plot[look]), 
-                                        label=
-                                           r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
-                                            # +', '+
-                                            # form
-                                         # 'rtol='+str(rtol)
-                                         # color='Blue'
-                                        )
-                            # if  not local_n:
-                            #     ax[n1].plot(df_plot['omega'], df_plot['localisation'],'.', lw=1,
-                            #               label=r'localisation')
-                            #     local_n = 1
-                            ax[n1].set_xlabel(r'$\omega$')
-                            # ax[n1].set_ylabel(r'Renormalised Tunneling')
-                            # ax[n1].set_xlim(xmin=3.7)
-                            
-                            ax[n1].set_title(labels[n1])
-                            
-                            #set x points
-                            # roundd = lambda t: round(t, 2)
-                            # turningvals = np.array(list(map(roundd, np.append(a/jn_zeros(0, 3), 
-                            #                                                   (a/jn_zeros(1, 3))))))
-                            # ax.set_xticks(turningvals[turningvals>4])
-                            # ax[n1].vlines(a/jn_zeros(0,4), -0.4, 0.4, colors='0.5', linestyles='dotted')
-                            # ax[n1].vlines(a/jn_zeros(1,4), -0.4, 0.4,  colors='r', linestyles='dotted')
-                            # extraticks = [7.5]
-                            # ax.set_xticks(list(ax.get_xticks()) + extraticks)
-                            # ax[n1].vlines([7.5], -0.4, 0.4,  colors='0.9', linestyles='dotted')
-
-# # make <0 grey
-# plt.axhspan(-0.4, 0, facecolor='0.4', alpha=0.5)
+                        ax[n1].plot(df_plot['omega'], f(df_plot[look]), 
+                                    label=
+                                       r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
+                                        +', '+
+                                        form
+                                     # 'rtol='+str(rtol)
+                                     # color='Blue'
+                                    )
+                        ax[n1].set_xlabel(r'$\omega$')
+                        ax[n1].set_title(labels[n1])
 
 
-if form == 'OSC':
-    title1 = 'Old Numerical'
-elif form == 'OSC_conj':
-    title1 = 'Updated Numerical'
-elif form == 'theoretical' or form == 'theoretical_hermitian':
-    title1 = 'Theoretical'
+
+# if form == 'OSC':
+#     title1 = 'Old Numerical'
+# elif form == 'OSC_conj':
+#     title1 = 'Updated Numerical'
+# elif form == 'theoretical' or form == 'theoretical_hermitian':
+#     title1 = 'Theoretical'
 
              
 handles, labels = ax[1].get_legend_handles_labels()    
 fig.legend(handles, labels, loc='upper right')
-fig.suptitle(title1+', '
-             + title + ' (' +indices+')'
-             # +'\n' 
-    + r', $V(t) = $'+
-    # str(a)+r'$ \cos( \omega t)$'
-      # str(a)+r'$ \cos( \omega t + \pi /$' + str(int(1/(phi/pi))) + ')'
-      str(a)+r'$ \cos( \omega t + \phi)$'
-    , fontsize = 20)
+# fig.suptitle(title1+', '
+#              + title + ' (' +indices+')'
+#              # +'\n' 
+#     + r', $V(t) = $'+
+#     # str(a)+r'$ \cos( \omega t)$'
+#       # str(a)+r'$ \cos( \omega t + \pi /$' + str(int(1/(phi/pi))) + ')'
+#       str(a)+r'$ \cos( \omega t + \phi)$'
+#     , fontsize = 20)
 
-# fig.suptitle(r'Tunneling matrix element ($H_{n,n+1}$), for linear offset potential, '+r'$35 \cos(\omega t + $'
-#               +r'$\pi/4)$'
-#               +r'$\phi)$'
-#               )
 # fig.savefig(sh+'graphs/test.png', 
 #             format='png', bbox_inches='tight')
 
