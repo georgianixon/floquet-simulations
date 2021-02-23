@@ -263,6 +263,16 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
         #turn vector into same form as the solvers have
         sol = np.vstack(sol).T
         
+    elif form == 'numerical G':
+        _, HF = create_HF('OSC', rtol, N, centre, a, None, None, phi, omega)
+        assert(np.all(0 == (HF - np.conj(HF.T))))
+        evals, evecs= eig(HF)
+        coeffs =  np.dot(np.conj(evecs.T), psi0)
+        psi0_n =np.dot(evecs, coeffs) # check = psi0?
+        sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
+        sol = np.vstack(sol).T
+        
+        
     return sol
 
 

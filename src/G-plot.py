@@ -17,6 +17,8 @@ import sys
 sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
 from hamiltonians import create_HF
 
+from scipy.special import jn_zeros
+
 
 import matplotlib
 
@@ -54,12 +56,15 @@ Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
 
-N=51; centre=25; a=35; phi=pi/3; omega=9.6
-form='SS-p'
+N=51; centre=25; a=35; phi=pi/2;
+omega=a/jn_zeros(0,1)[0]
+# omega=9.6
+# form='SS-p'
 form='linear'
-rtol=1e-7
+rtol=1e-11
 UT, HF = create_HF(form, rtol, N, centre, a,None, None,phi, omega)
 
+#%%
 
 norm = col.Normalize(vmin=-1, vmax=1)
 linthresh = 1e-8
@@ -99,9 +104,15 @@ fig.suptitle('Python'
              +', Linear'
     + r', $V_{n,n}(t) = $'+
     # str(a)+r'$ \cos( \omega t)$'
-       str(a)+r'$n \cos( $'+str(omega)+r'$ t + \pi /$' + str(int(1/(phi/pi))) + ')'
+       str(a)+r'$n \cos( $'
+        # +str(omega)
+        +"{:.2f}".format(omega)
+       +r'$ t$'
+        + r'$ + \pi /$' + str(int(1/(phi/pi))) 
+       + ')'
         +'\n'+'linthresh='+str(linthresh)
-    , fontsize = 30, y=0.96)
+        +', rtol='+str(rtol)
+    , fontsize = 25, y=0.96)
 
 
 #             

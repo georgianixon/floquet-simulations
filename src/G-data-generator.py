@@ -20,7 +20,6 @@ import sys
 sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
 from hamiltonians import  create_HF, solve_schrodinger
 
-#%%
 
 def filter_duplicates(x):
     """
@@ -70,16 +69,14 @@ df = pd.read_csv(sh+'data/analysis-G.csv',
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='SS-p' 
+form='linear' 
 rtol = 1e-7
 aas = [35]
 phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-b = None
-c = None
 
 for a in aas:
     for phi in phis:
-        print('a=',a,' b=',b,' c=',c,'  phi=',phi)
+        print('a=',a,'  phi=',phi)
         df1 = pd.DataFrame(columns=["form", "rtol",
                                     "a", 
                                     "omega", "phi", "N", 
@@ -94,7 +91,7 @@ for a in aas:
             """
             HF
             """  
-            UT, HF = create_HF(form, rtol, N, centre, a,b, c,phi, omega)
+            UT, HF = create_HF(form, rtol, N, centre, a,None, None,phi, omega)
             
             hopping=HF[centre][centre+1]
             onsite = HF[centre][centre]
@@ -120,21 +117,21 @@ for a in aas:
         df = df.append(df1, ignore_index=True, sort=False)
         df= df.astype(dtype=df_dtype_dict)
         
-print('  grouping..')
-df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
-                 'N'], dropna=False).agg({
-                        'hopping':filter_duplicates,
-                        'onsite':filter_duplicates,
-                        'next onsite':filter_duplicates,
-                        'NNN':filter_duplicates,
-                        'NNN overtop':filter_duplicates
-                        }).reset_index()
-
-print('   saving..')
-df.to_csv(sh+'data/analysis-G.csv',
-          index=False, 
-          columns=['form', 'rtol', 'a', 'omega', 'phi',
-                  'N', 'hopping', 
-                  'onsite', 'next onsite', 'NNN',
-                    'NNN overtop'])
+        print('  grouping..')
+        df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
+                         'N'], dropna=False).agg({
+                                'hopping':filter_duplicates,
+                                'onsite':filter_duplicates,
+                                'next onsite':filter_duplicates,
+                                'NNN':filter_duplicates,
+                                'NNN overtop':filter_duplicates
+                                }).reset_index()
+        
+        print('   saving..')
+        df.to_csv(sh+'data/analysis-G.csv',
+                  index=False, 
+                  columns=['form', 'rtol', 'a', 'omega', 'phi',
+                          'N', 'hopping', 
+                          'onsite', 'next onsite', 'NNN',
+                            'NNN overtop'])
     

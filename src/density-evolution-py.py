@@ -17,7 +17,7 @@ from hamiltonians import solve_schrodinger
 
 import matplotlib as mpl
 import seaborn as sns
-from scipy.special import jv
+from scipy.special import jv, jn_zeros
 
 size=25
 params = {
@@ -69,8 +69,8 @@ def plotPsi(psi, n_timesteps, n_oscillations, title, normaliser):
     cmapcol = 'PuOr' #PiYG_r
     cmap= mpl.cm.get_cmap(cmapcol)
 
-    x_positions = np.linspace(0, n_timesteps, n_oscillations+1)
-    x_labels = list(range(n_oscillations+1))
+    x_positions = np.linspace(0, n_timesteps, int(n_oscillations/6+1))
+    x_labels = list(range(0, n_oscillations+1, 6))
     
     sz = 17
     fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
@@ -94,21 +94,26 @@ def plotPsi(psi, n_timesteps, n_oscillations, title, normaliser):
     
     plt.show()
 
+
+def phistring(phi):
+    
 #%%
 
 
 # choose particular HF
 
 N = 71; A_site_start = 35;
-centre = 25
-a = 58;
-phi1=0; phi2=pi/7;
-omega=8
+centre = 25;
+a = 35;
+phi1=pi/7; phi2=pi/3;
+omega=30
 T=2*pi/omega
 
 #when we solve scrodinger eq, how many timesteps do we want
+
+n_oscillations = 90
 n_timesteps = 100
-n_oscillations = 15
+
 tspan = (0,n_oscillations*T)
 
 form = 'OSC'
@@ -128,7 +133,8 @@ psi_phi2 = solve_schrodinger(form, rtol, N, centre, a, None, None, omega, phi2 ,
 
 
 # normaliser= mpl.colors.Normalize(vmin=-1,vmax=1)
-linthresh =1e-6
+#%%
+linthresh =1e-7
 normaliser = mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 title = ("Python; difference in "+r"$\psi$ for $\phi = 0$"
@@ -143,6 +149,29 @@ title = ("Python; difference in "+r"$\psi$ for $\phi = 0$"
 plotPsi(psi_phi1 - psi_phi2, n_timesteps, n_oscillations, title,
       normaliser)
 
+# title = ("Python; "
+#          +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
+#                     # + r'$ + \pi /$' + str(int(1/(phi1/pi))) + 
+#                  # + r'+ $\phi$' + 
+#                   r'$) $'+' |25><25|]'  
+#                     +', log scale, linthresh='+str(linthresh)
+#                     +', rtol='+str(rtol)
+#                   ) 
+
+# plotPsi(psi_phi1, n_timesteps, n_oscillations, title,
+#       normaliser)
+
+# title = ("Python; "
+#          +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
+#                     + r'$ + \pi /$' + str(int(1/(phi2/pi))) + 
+#                  # + r'+ $\phi$' + 
+#                   r'$) $'+' |25><25|]'  
+#                     +', log scale, linthresh='+str(linthresh)
+#                     +', rtol='+str(rtol)
+#                   ) 
+
+# plotPsi(psi_phi2, n_timesteps, n_oscillations, title,
+#       normaliser)
 
 
 
