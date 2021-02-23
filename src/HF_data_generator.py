@@ -43,7 +43,7 @@ def filter_duplicates(x):
         
 
 def convert_complex(s):
-    return np.complex(s.replace('i', 'j'))
+    return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 
@@ -55,7 +55,7 @@ df_dtype_dict = {'form':str, "rtol":np.float64,
             'onsite':np.complex128, 'next onsite':np.complex128,
             'NNN':np.complex128, 'NNN overtop':np.complex128}
 
-df = pd.read_csv(sh+'data/analysis_gaus_complex.csv', 
+df = pd.read_csv(sh+'data/analysis-G.csv', 
                  index_col=False, 
                  converters={'hopping': convert_complex,
                              'onsite':convert_complex,
@@ -72,8 +72,8 @@ N = 51;
 centre=25;
 form='SS-p' 
 rtol = 1e-7
-aas = [30]
-phis = [pi/4, pi/5, pi/6, pi/7, 0, pi/2, pi/3]
+aas = [35]
+phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 b = None
 c = None
 
@@ -95,17 +95,6 @@ for a in aas:
             HF
             """  
             UT, HF = create_HF(form, rtol, N, centre, a,b, c,phi, omega)
-                
-            """
-            Localisation
-            """
-            psi0 = np.zeros(N, dtype=np.complex_); psi0[centre] = 1;
-            tspan = (0, 10)
-            sol = solve_schrodinger(form, rtol, N, centre,
-                                    a, b, c, omega, phi,
-                                    tspan, 100, psi0)
-            localisation = np.sum(abs(sol[centre]))/101
-            # localisation = np.nan
             
             hopping=HF[centre][centre+1]
             onsite = HF[centre][centre]
@@ -142,7 +131,7 @@ df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi',
                         }).reset_index()
 
 print('   saving..')
-df.to_csv(sh+'data/analysis_G.csv',
+df.to_csv(sh+'data/analysis-G.csv',
           index=False, 
           columns=['form', 'rtol', 'a', 'omega', 'phi',
                   'N', 'hopping', 

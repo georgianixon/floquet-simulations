@@ -11,10 +11,8 @@ from fractions import Fraction
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-
-def convert_complex_mathematica(s):
-    return np.complex(s.replace('*I', 'j').replace('*^', 'e'))
-
+def convert_complex(s):
+    return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 
 def plotPsi(psi, n_timesteps, n_oscillations, title, a, omega, phi):
@@ -66,7 +64,7 @@ sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 df = pd.read_csv(sh+'data/A35-w9p6-phpio7-mathematica-data.csv', 
                  index_col=False, 
                  header=None,
-                 converters = dict.fromkeys(range(1000), convert_complex_mathematica)
+                 converters = dict.fromkeys(range(1000), convert_complex)
                 )
 assert(len(df.columns)<1000)
 

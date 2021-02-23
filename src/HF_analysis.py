@@ -19,13 +19,6 @@ import matplotlib.pyplot as plt
 from scipy.special import jv, jn_zeros
 import pandas as pd 
 
-# def convert_complex(s):
-#     return np.complex(s.replace('i', 'j'))
-
-
-# def convert_complex_mathematica(s):
-#     return np.complex(s.replace('*I', 'j').replace('*^', 'e'))
-
 def convert_complex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
@@ -92,24 +85,13 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
                CB91_Purple,
                 # CB91_Violet,
                 'dodgerblue',
-                'slategrey',
-              
-              'khaki']
+                'slategrey']
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
 #%%
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 
-# df = pd.read_csv(sh+'data/analysis-G-python.csv', 
-#                   index_col=False, 
-#                   converters={
-#                       'hopping': convert_complex,
-#                                 'onsite':convert_complex,
-#                                 'next onsite':convert_complex,
-#                                 'NNN':convert_complex, 
-#                               'NNN overtop':convert_complex,
-#                                               })
 
 df = pd.read_csv(sh+'data/analysis-G.csv', 
                   index_col=False, 
@@ -136,7 +118,7 @@ N = 51;
 
 forms=[
         'SS-m',
-        'SS-p'
+        # 'SS-p'
        ]
 
 rtols=[1e-7]
@@ -147,22 +129,22 @@ apply = [np.abs, np.real, np.imag]
 
 
 look = 'hopping'
-# look = 'onsite'
-# look = 'next onsite'
-# look = 'NNN'
+look = 'onsite'
+look = 'next onsite'
+look = 'NNN'
 # look = 'NNN overtop'
 # look = 'localisation'
 
 title, indices = formatplot(look)
 
-labels = [r'$|$' + indices + r'$|$', 
-          r'$\mathrm{Real}|$'+indices+r'$|$',
-          r'$\mathrm{Imag}|$'+indices+r'$|$']
 
+labels = [r'$|$'+indices+r'$|$', 
+          r'$\mathrm{Real} \{$'+indices+r'$\}$',
+          r'$\mathrm{Imag} \{$'+indices+r'$\}$']
 
     
-sz =20
-fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62*0.89),
+sz =9.5
+fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62*1.4),
                        constrained_layout=True, sharey=True)
 
 
@@ -204,8 +186,8 @@ for form in forms:
                         ax[n1].plot(df_plot['omega'], f(df_plot[look]), 
                                     label=
                                        r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
-                                        +', '+
-                                        form
+                                        # +', '+
+                                        # form
                                      # 'rtol='+str(rtol)
                                      # color='Blue'
                                     )
@@ -214,24 +196,28 @@ for form in forms:
 
 
 
-# if form == 'OSC':
-#     title1 = 'Old Numerical'
-# elif form == 'OSC_conj':
-#     title1 = 'Updated Numerical'
-# elif form == 'theoretical' or form == 'theoretical_hermitian':
-#     title1 = 'Theoretical'
+if form == 'OSC':
+    title1 = 'Old Numerical'
+elif form == 'OSC_conj':
+    title1 = 'Updated Numerical'
+elif form == 'theoretical' or form == 'theoretical_hermitian':
+    title1 = 'Theoretical'
+elif form == 'SS-m':
+    title1 = "Mathematica"
+elif form == 'SS-p':
+    title1 = "Python"    
 
              
-handles, labels = ax[1].get_legend_handles_labels()    
-fig.legend(handles, labels, loc='upper right')
-# fig.suptitle(title1+', '
-#              + title + ' (' +indices+')'
-#              # +'\n' 
-#     + r', $V(t) = $'+
-#     # str(a)+r'$ \cos( \omega t)$'
-#       # str(a)+r'$ \cos( \omega t + \pi /$' + str(int(1/(phi/pi))) + ')'
-#       str(a)+r'$ \cos( \omega t + \phi)$'
-#     , fontsize = 20)
+# handles, labels = ax[1].get_legend_handles_labels()    
+# fig.legend(handles, labels, loc='upper right')
+fig.suptitle(title1+', '
+              + title + ' (' +indices+')'
+              # +'\n' 
+    + r', $V(t) = $'+
+    # str(a)+r'$ \cos( \omega t)$'
+      # str(a)+r'$ \cos( \omega t + \pi /$' + str(int(1/(phi/pi))) + ')'
+      str(a)+r'$ \cos( \omega t + \phi)$'
+    , fontsize = 20)
 
 # fig.savefig(sh+'graphs/test.png', 
 #             format='png', bbox_inches='tight')

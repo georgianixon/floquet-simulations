@@ -198,7 +198,7 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
     
     t_eval = np.linspace(tspan[0], tspan[1], n_timesteps+1)
     
-    if form=='OSC' or form == 'OSC_conj':
+    if form=='OSC' or form == 'OSC_conj' or form == 'SS-p':
         sol= solve_ivp(lambda t,psi: F_OSC(t, psi, 
                            N, centre,
                              a,
@@ -246,9 +246,7 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
         #turn vector into same form as the solvers have
         sol = np.vstack(sol).T
         
-        
-        
-        # assert(np.all(0 == (HF - np.conj(HF.T))))
+        ###### This needs fixing up
         
         # evals, evecs= eig(HF)
         # coeffs =  np.dot(np.conj(evecs.T), psi0)
@@ -259,6 +257,7 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
         
     elif form == 'theoretical':
         _, HF = create_HF(form, None, N, centre, a, None, None, phi, omega)
+        assert(np.all(0 == (HF - np.conj(HF.T))))
         #find solution at different times
         sol = [np.dot(expm(-1j*HF*T), psi0) for T in t_eval]
         #turn vector into same form as the solvers have
@@ -273,17 +272,6 @@ from numpy import exp, sin
 def create_HF(form, rtol, N, centre, a,b, c,phi, omega): 
     
     if form == 'theoretical':
-        HF =  np.zeros([N,N], dtype=np.complex_)
-        HF = HF + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1) 
-        entry = exp(1j*a*sin(phi)/omega)*jv(0, a/omega) 
-        HF[centre][centre+1] = entry
-        HF[centre][centre-1] = entry
-        HF[centre+1][centre] = entry
-        HF[centre-1][centre] = entry
-        
-        return None, HF
-    
-    if form == 'theoretical_hermitian':
         HF =  np.zeros([N,N], dtype=np.complex_)
         HF = HF + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1) 
         entry = exp(1j*a*sin(phi)/omega)*jv(0, a/omega) 
@@ -309,16 +297,11 @@ def create_HF(form, rtol, N, centre, a,b, c,phi, omega):
         # print(time.time()-start, 'seconds.')
         
         evals_U, evecs = eig(UT)
-    
         evals_H = 1j / T *log(evals_U)
         
         HF = np.zeros([N,N], dtype=np.complex_)
         for i in range(N):
-            if form == 'OSC_conj':
-                term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
-            else:
-                term = evals_H[i]*np.outer(evecs[:,i], evecs[:,i])
-                
+            term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
             HF = HF+term
             
         # print('   ',time.time()-start, 's')

@@ -54,47 +54,62 @@ Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
 
-N=51; centre=25; a=35; phi=0; omega=6.34
-form='OSC'
-UT, HF = create_HF(form, N, centre, a,np.nan, np.nan,phi, omega)
-
-'''One large'''
-sz = 10
-fig, ax = plt.subplots(figsize=(sz,sz))
+N=51; centre=25; a=35; phi=pi/3; omega=9.6
+form='SS-p'
+rtol=1e-7
+UT, HF = create_HF(form, rtol, N, centre, a,None, None,phi, omega)
 norm = col.Normalize(vmin=-1, vmax=1)
-ax.matshow(np.imag(HF), interpolation='none', cmap='PuOr', norm=norm)
-ax.tick_params(axis="x", bottom=True, top=False,  labelbottom=True,  labeltop=False)
-ax.set_xlabel('m')
-ax.set_ylabel('n', rotation=0, labelpad=10)
 
-cax = plt.axes([1, 0.05, 0.06, 0.9])
-fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
-# fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
-#         'first_year_report/HF,F=30,w=8,ph=0.pdf', 
-#         format='pdf', bbox_inches='tight')
-plt.show()
+# '''One large'''
+# sz = 10
+# fig, ax = plt.subplots(figsize=(sz,sz))
+
+# ax.matshow(np.imag(HF), interpolation='none', cmap='PuOr', norm=norm)
+# ax.tick_params(axis="x", bottom=True, top=False,  labelbottom=True,  labeltop=False)
+# ax.set_xlabel('m', fontsize=20)
+# ax.set_ylabel('n', rotation=0, labelpad=10)
+
+# cax = plt.axes([1, 0.05, 0.06, 0.9])
+# fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
+# # fig.savefig('/Users/Georgia/Dropbox/phd/own_notes/'+
+# #         'first_year_report/HF,F=30,w=8,ph=0.pdf', 
+# #         format='pdf', bbox_inches='tight')
+# plt.show()
 
 '''abs real imag'''
+
+apply = [np.abs, np.real, np.imag]
+labels = [r'$\mathrm{Abs}\{G_{n,m}\}$', 
+          r'$\mathrm{Re}\{G_{n,m}\}$',
+          r'$\mathrm{Imag}\{G_{n,m}\}$']
+
 sz = 20
 fig, ax = plt.subplots(nrows=1, ncols=3, sharey=True, constrained_layout=True, 
                        figsize=(sz,sz/2))
-ax[0].matshow(np.abs(HF), interpolation='none', cmap='PuOr',  norm=norm)
-ax[1].matshow(np.real(HF), interpolation='none', cmap='PuOr',  norm=norm)
-ax[2].matshow(np.imag(HF), interpolation='none', cmap='PuOr',  norm=norm)
-ax[0].set_title(r'$\mathrm{Abs}\{G_{n,m}\}$')
-ax[1].set_title(r'$\mathrm{Re}\{G_{n,m}\}$')
-ax[2].set_title(r'$\mathrm{Imag}\{G_{n,m}\}$')
+
+for n1, f in enumerate(apply):
+    ax[n1].matshow(f(HF), interpolation='none', cmap='PuOr',  norm=norm)
+    ax[n1].set_title(labels[n1], fontsize=25)
 
 
-ax[0].set_ylabel('n', rotation=0, labelpad=10)
+
+ax[0].set_ylabel('n', rotation=0, labelpad=10, fontsize=20)
 for i in range(3):
     ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
       labeltop=False)  
-    ax[i].set_xlabel('m')
+    ax[i].set_xlabel('m', fontsize=20)
     
 norm = col.Normalize(vmin=-1, vmax=1) 
 cax = plt.axes([1.03, 0.1, 0.03, 0.8])
 fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
+
+fig.suptitle('Python'
+    + r', $V(t) = $'+
+    # str(a)+r'$ \cos( \omega t)$'
+       str(a)+r'$ \cos( $'+str(omega)+r'$ t + \pi /$' + str(int(1/(phi/pi))) + ')'
+    , fontsize = 30, y=0.96)
+
+
 #             
 #fig.savefig('', 
 #        format='pdf', bbox_inches='tight')
