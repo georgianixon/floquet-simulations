@@ -16,6 +16,30 @@ def convert_complex(s):
 
 
 def plotPsi(psi, n_timesteps, n_oscillations, title, a, omega, phi):
+    """
+    Parameters
+    ----------
+    psi : TYPE
+        Wavefunction to plot
+    n_timesteps : TYPE
+        number of timesteps generated between t0 and t_final
+    n_oscillations : TYPE
+        numer of full cycles
+    title : TYPE
+        title of graph
+    a : TYPE
+        DESCRIPTION.
+    omega : TYPE
+        DESCRIPTION.
+    phi : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    
+    Graph
+
+    """
     
     mpl.rcParams.update({
           'mathtext.fontset':'stix'
@@ -25,7 +49,9 @@ def plotPsi(psi, n_timesteps, n_oscillations, title, a, omega, phi):
     labels = [r'$|\psi(t)|^2$', r'$\mathrm{Re}\{\psi(t)\}$', r'$\mathrm{Imag}\{\psi(t)\}$']
     
     
-    cmap= mpl.cm.get_cmap('PiYG_r')
+
+    cmapcol = 'PuOr' #PiYG_r
+    cmap= mpl.cm.get_cmap(cmapcol)
     normaliser= mpl.colors.Normalize(vmin=-1,vmax=1)
     
     x_positions = np.linspace(0, n_timesteps, n_oscillations+1)
@@ -48,7 +74,7 @@ def plotPsi(psi, n_timesteps, n_oscillations, title, a, omega, phi):
         if i == 0:
             ax[i].set_ylabel('site', fontsize=15, fontfamily='STIXGeneral')
         
-    fig.colorbar(plt.cm.ScalarMappable(cmap='PiYG_r', norm=normaliser), shrink=.5)
+    fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), shrink=.5)
     fig.suptitle(title 
                  + "\n" + r'$V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t + \pi /$' +
                  str(int(1/(phi/pi))) + 
@@ -59,7 +85,9 @@ def plotPsi(psi, n_timesteps, n_oscillations, title, a, omega, phi):
 
 
 
-
+"""
+Import mathematica results
+"""
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 df = pd.read_csv(sh+'data/A35-w9p6-phpio7-mathematica-data.csv', 
                  index_col=False, 
