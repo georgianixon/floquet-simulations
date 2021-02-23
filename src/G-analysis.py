@@ -119,13 +119,14 @@ N = 51;
 forms=[
         # 'SS-m',
         # 'SS-p',
-        'linear'
+        # 'Linear-m'
+        "linear"
        ]
 
 rtols=[1e-7]
 aas = [35]
-# phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phis =  [0, pi/7]
+phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+# phis =  [0, pi/7]
 apply = [np.abs, np.real, np.imag]
 
 
@@ -170,7 +171,7 @@ for form in forms:
                                           (df['a']==a)
                                           &
                                           (df['phi']==phi)]
-                    elif form =='OSC-mathematica'or form =="SS-m":
+                    elif form =='OSC-mathematica'or form =="SS-m" or form == "Linear-m":
                         df_plot = df[(df['form']==form)&
                                      (df['N']==N)&
                                           (df['a']==a) &
