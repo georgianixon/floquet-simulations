@@ -110,7 +110,7 @@ def phistring(phi):
 N = 71; A_site_start = 35;
 centre = 25;
 a = 35;
-phi1=0; phi2=pi/2;
+phi1=0; phi2=pi/7;
 omega=a/jn_zeros(0,1)[0]
 T=2*pi/omega
 
