@@ -74,12 +74,13 @@ norm=col.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=1
 '''abs real imag'''
 
 apply = [
-    np.abs, 
+         np.abs, 
          np.real, np.imag]
 labels = [
-    r'$\mathrm{Abs}\{G_{n,m}\}$', 
+          r'$\mathrm{Abs}\{G_{n,m}\}$', 
           r'$\mathrm{Re}\{G_{n,m}\}$',
-          r'$\mathrm{Imag}\{G_{n,m}\}$']
+          r'$\mathrm{Imag}\{G_{n,m}\}$'
+          ]
 
 sz = 20
 fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 

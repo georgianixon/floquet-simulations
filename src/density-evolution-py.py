@@ -38,7 +38,7 @@ params = {
 mpl.rcParams.update(params)
 
 
-def plotPsi(psi, n_timesteps, n_oscillations, title, normaliser):
+def plotPsi(psi, x_positions, x_labels, title, normaliser):
     """
     Parameters
     ----------
@@ -68,16 +68,13 @@ def plotPsi(psi, n_timesteps, n_oscillations, title, normaliser):
     
     cmapcol = 'PuOr' #PiYG_r
     cmap= mpl.cm.get_cmap(cmapcol)
-
-    x_positions = np.linspace(0, n_timesteps, int(n_oscillations/6+1))
-    x_labels = list(range(0, n_oscillations+1, 6))
     
-    sz = 17
+    sz = 6
     fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
-                            figsize=(sz,sz/2))
+                            figsize=(sz*len(apply),sz))
     
     for i, f in enumerate(apply):
-        ax[i].matshow(f(psi), interpolation='none', cmap=cmap, norm=normaliser)
+        ax[i].matshow(f(psi), interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
         ax[i].set_title(labels[i], fontsize=20, fontfamily='STIXGeneral')
         ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
           labeltop=False)  
@@ -88,14 +85,22 @@ def plotPsi(psi, n_timesteps, n_oscillations, title, normaliser):
             ax[i].spines[side].set_visible(False)
         if i == 0:
             ax[i].set_ylabel('site', fontsize=15, fontfamily='STIXGeneral')
-        
-    fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), shrink=.5)
-    fig.suptitle(title, y = 0.85, fontsize=20, fontfamily='STIXGeneral')
+    
+    cax = plt.axes([1.03, 0.1, 0.03, 0.8])
+    fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
+    fig.suptitle(title, y = 1.11, fontsize=20, fontfamily='STIXGeneral')
     
     plt.show()
 
 
 def phistring(phi):
+    if phi == 0:
+        return ""
+    elif phi == "phi":
+        return r'+ $\phi$' 
+    else:
+        return  r'$+ \pi /$' + str(int(1/(phi/pi)))
+    
     
 #%%
 
@@ -105,18 +110,19 @@ def phistring(phi):
 N = 71; A_site_start = 35;
 centre = 25;
 a = 35;
-phi1=pi/7; phi2=pi/3;
-omega=30
+phi1=0; phi2=pi/2;
+omega=a/jn_zeros(0,1)[0]
 T=2*pi/omega
 
 #when we solve scrodinger eq, how many timesteps do we want
 
-n_oscillations = 90
-n_timesteps = 100
+n_oscillations = 60
+n_timesteps = 60
+n_osc_divisions = 4
 
 tspan = (0,n_oscillations*T)
 
-form = 'OSC'
+form = 'numericalG-SS-p'
 rtol=1e-11
 
 t_eval = np.linspace(tspan[0], tspan[1], n_timesteps)
@@ -134,44 +140,44 @@ psi_phi2 = solve_schrodinger(form, rtol, N, centre, a, None, None, omega, phi2 ,
 
 # normaliser= mpl.colors.Normalize(vmin=-1,vmax=1)
 #%%
-linthresh =1e-7
+linthresh =1e-3
 normaliser = mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
+x_positions = np.linspace(0, n_timesteps, int(n_oscillations/n_osc_divisions+1))
+x_labels = list(range(0, n_oscillations+1, n_osc_divisions))
+    
 title = ("Python; difference in "+r"$\psi$ for $\phi = 0$"
          + r" and $\phi = \pi / $" +str(int(1/(phi2/pi)))
          +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
-                 #   + r'$\pi /$' + str(int(1/(phi/pi))) + 
-                 + r'+ $\phi$' + 
-                  r'$) $'+' |25><25|]'  
-                    +', log scale, linthresh='+str(linthresh)
-                    +', rtol='+str(rtol)
-                  ) 
-plotPsi(psi_phi1 - psi_phi2, n_timesteps, n_oscillations, title,
+         + phistring("phi")
+         + r'$) $'+' |25><25|]'  
+         +', log scale, linthresh='+str(linthresh)
+         +', rtol='+str(rtol)
+        ) 
+plotPsi(psi_phi1 - psi_phi2, x_positions, x_labels, title,
       normaliser)
 
-# title = ("Python; "
-#          +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
-#                     # + r'$ + \pi /$' + str(int(1/(phi1/pi))) + 
-#                  # + r'+ $\phi$' + 
-#                   r'$) $'+' |25><25|]'  
-#                     +', log scale, linthresh='+str(linthresh)
-#                     +', rtol='+str(rtol)
-#                   ) 
+title = ("Python; "
+          +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
+          + phistring(phi1)
+          + r'$) $'+' |25><25|]'  
+          +', log scale, linthresh='+str(linthresh)
+          +', rtol='+str(rtol)
+         ) 
 
-# plotPsi(psi_phi1, n_timesteps, n_oscillations, title,
-#       normaliser)
+plotPsi(psi_phi1, x_positions, x_labels,  title,
+      normaliser)
 
-# title = ("Python; "
-#          +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
-#                     + r'$ + \pi /$' + str(int(1/(phi2/pi))) + 
-#                  # + r'+ $\phi$' + 
-#                   r'$) $'+' |25><25|]'  
-#                     +', log scale, linthresh='+str(linthresh)
-#                     +', rtol='+str(rtol)
-#                   ) 
+title = ("Python; "
+          +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
+          + phistring(phi2)
+          + r'$) $'+' |25><25|]'  
+          +', log scale, linthresh='+str(linthresh)
+          +', rtol='+str(rtol)
+         ) 
 
-# plotPsi(psi_phi2, n_timesteps, n_oscillations, title,
-#       normaliser)
+plotPsi(psi_phi2, x_positions, x_labels,  title,
+      normaliser)
 
 
 
