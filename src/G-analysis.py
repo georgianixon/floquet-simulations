@@ -93,7 +93,7 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 
 
-df = pd.read_csv(sh+'data/analysis-G.csv', 
+df = pd.read_csv(sh+'data/analysis-G-mat-lin-35.csv', 
                   index_col=False, 
                   converters={
                       'hopping': convert_complex,
@@ -103,38 +103,53 @@ df = pd.read_csv(sh+'data/analysis-G.csv',
                               'NNN overtop':convert_complex,
                                               })
 
+df1 = pd.read_csv(sh+'data/analysis-G.csv', 
+                  index_col=False, 
+                  converters={
+                      'hopping': convert_complex,
+                                'onsite':convert_complex,
+                                'next onsite':convert_complex,
+                                'NNN':convert_complex, 
+                              'NNN overtop':convert_complex,
+                                              })
 
+df = df.append(df1, ignore_index=True, sort=False)
+
+df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
+                 'N'], dropna=False).agg({
+                        'hopping':filter_duplicates,
+                        'onsite':filter_duplicates,
+                        'next onsite':filter_duplicates,
+                        'NNN':filter_duplicates,
+                        'NNN overtop':filter_duplicates
+                        }).reset_index()
+                             
+                             
 """
 Plot General
 """
 
 N = 51; 
-# forms=[
-#         # 'theoretical',
-#         # 'OSC_conj', 
-#         # 'OSC'
-#         'OSC-mathematica'
-#        ]
 
 forms=[
         # 'SS-m',
         # 'SS-p',
-        # 'Linear-m'
+        'linear-m',
         "linear"
        ]
 
 rtols=[1e-7]
 aas = [35]
-phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-# phis =  [0, pi/7]
+# phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phis =  [0, pi/7, pi/6]
 apply = [np.abs, np.real, np.imag]
 
 
 look = 'hopping'
 look = 'onsite'
 look = 'next onsite'
-look = 'NNN'
-look = 'NNN overtop'
+# look = 'NNN'
+# look = 'NNN overtop'
 # look = 'localisation'
 
 title, indices = formatplot(look)
@@ -171,7 +186,7 @@ for form in forms:
                                           (df['a']==a)
                                           &
                                           (df['phi']==phi)]
-                    elif form =='OSC-mathematica'or form =="SS-m" or form == "Linear-m":
+                    elif form =='OSC-mathematica'or form =="SS-m" or form == "linear-m":
                         df_plot = df[(df['form']==form)&
                                      (df['N']==N)&
                                           (df['a']==a) &
@@ -188,8 +203,8 @@ for form in forms:
                         ax[n1].plot(df_plot['omega'], f(df_plot[look]), 
                                     label=
                                        r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
-                                        # +', '+
-                                        # form
+                                        +', '+
+                                        form
                                      # 'rtol='+str(rtol)
                                      # color='Blue'
                                     )
