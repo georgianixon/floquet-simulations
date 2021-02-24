@@ -137,7 +137,7 @@ def H_varied_hopping(N, centre, alterations):
 Create one site cosine modulated energy offset hamiltonian
 Centre indexed from 0
 """
-def HT_OSC(N, centre, a, omega, t, phi):
+def HT_SS(N, centre, a, omega, t, phi):
     matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
     matrix[centre][centre] = a*cos(omega*t + phi)
     return matrix
@@ -166,8 +166,8 @@ def F_MGSTA(t, psi, N, centre, a, b, c, omega, phi):
     return 1j*np.dot(HT_MGSTA(N, centre, a, b, c, omega, t, phi),psi)
 
 # one site cosine 
-def F_OSC(t, psi, N, centre, a, omega, phi):
-    return 1j*np.dot(HT_OSC(N, centre, a, omega, t, phi),psi)
+def F_SS(t, psi, N, centre, a, omega, phi):
+    return 1j*np.dot(HT_SS(N, centre, a, omega, t, phi),psi)
 
 # linear moving potential
 def F_Linear(t, psi, N, a, omega, phi):
@@ -190,6 +190,9 @@ def F_HF(t, psi, HF):
 from scipy.linalg import eig as eig
 from scipy.linalg import expm
 
+def roundcomplex(num, dp):
+    return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
+
 def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_timesteps, psi0):
     """
     solve time dependent schrodinger eq given initial conditions psi0, over
@@ -199,7 +202,7 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
     t_eval = np.linspace(tspan[0], tspan[1], n_timesteps+1)
     
     if form=='OSC' or form == 'OSC_conj' or form == 'SS-p':
-        sol= solve_ivp(lambda t,psi: F_OSC(t, psi, 
+        sol= solve_ivp(lambda t,psi: F_SS(t, psi, 
                            N, centre,
                              a,
                              omega, phi), 
@@ -263,12 +266,12 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
         #turn vector into same form as the solvers have
         sol = np.vstack(sol).T
         
-    elif form == 'numerical G':
-        _, HF = create_HF('OSC', rtol, N, centre, a, None, None, phi, omega)
-        assert(np.all(0 == (HF - np.conj(HF.T))))
-        evals, evecs= eig(HF)
+    elif form == 'numericalG-SS-p':
+        _, HF = create_HF('SS-p', rtol, N, centre, a, None, None, phi, omega)
+        HFr = roundcomplex(HF, 5)
+        assert(np.all(0 == (HFr - np.conj(HFr.T))))
+        evals, evecs= eig(HFr)
         coeffs =  np.dot(np.conj(evecs.T), psi0)
-        psi0_n =np.dot(evecs, coeffs) # check = psi0?
         sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
         sol = np.vstack(sol).T
         
