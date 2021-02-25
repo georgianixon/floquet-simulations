@@ -107,21 +107,24 @@ def phistring(phi):
 
 # choose particular HF
 
-N = 141; A_site_start = 65;
-centre = 55;
+N = 111; A_site_start = 55;
+centre = 45;
 a = 35;
-phi1=0; phi2=pi/2;
-omega=a/jn_zeros(0,1)[0]
+phi1=pi/7;
+phi2=pi/3;
+omega=a/jn_zeros(0,3)[0]
+# omega=26
 T=2*pi/omega
 
 #when we solve scrodinger eq, how many timesteps do we want
 
-n_oscillations = 120
-n_timesteps = 120
-n_osc_divisions = 8
+n_oscillations = 60
+n_timesteps = 60
+n_osc_divisions = 4
 
 tspan = (0,n_oscillations*T)
 
+# form = 'SS-p'
 form = 'numericalG-SS-p'
 rtol=1e-11
 
@@ -133,22 +136,33 @@ psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
 psi_phi1 = solve_schrodinger(form, rtol, N, centre, a, None, None, omega, phi1, 
                                   tspan, n_timesteps, psi0)
 
-psi_phi2 = solve_schrodinger(form, rtol, N, centre, a, None, None, omega, phi2 ,
+psi_phi2 = solve_schrodinger(form, rtol, N, centre, a, None, None, omega, phi2,
                                   tspan, n_timesteps, psi0)
     
 
 
 # normaliser= mpl.colors.Normalize(vmin=-1,vmax=1)
 #%%
-linthresh =1e-7
+
+if form == 'SS-p':
+    title1 = "H(t)"
+elif form == 'numericalG-SS-p':
+    title1 = " effective hamiltonian G"
+else:
+    ValueError
+    
+linthresh =1e-4
 normaliser = mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 x_positions = np.linspace(0, n_timesteps, int(n_oscillations/n_osc_divisions+1))
 x_labels = list(range(0, n_oscillations+1, n_osc_divisions))
     
-title = ("Python; difference in "+r"$\psi$ for $\phi = 0$"
-         + r" and $\phi = \pi / $" +str(int(1/(phi2/pi)))
-         +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
+title = ("Python; "
+          + title1
+         + "\n difference in "+r"$\psi$ for "
+         # + "G and H(t)"
+          + "$\phi =$" +phistring(phi1) + r"and $\phi = $" + phistring(phi2)
+         + r', $[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
          + phistring("phi")
          + r'$) $'+' |25><25|]'  
          +', log scale, linthresh='+str(linthresh)
@@ -158,6 +172,7 @@ plotPsi(psi_phi1 - psi_phi2, x_positions, x_labels, title,
       normaliser)
 
 title = ("Python; "
+          + title1
           +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
           + phistring(phi1)
           + r'$) $'+' |25><25|]'  
@@ -169,6 +184,7 @@ plotPsi(psi_phi1, x_positions, x_labels,  title,
       normaliser)
 
 title = ("Python; "
+          + title1
           +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
           + phistring(phi2)
           + r'$) $'+' |25><25|]'  

@@ -6,7 +6,7 @@ Created on Sat Aug 22 14:01:15 2020
 """
 
 from numpy.linalg import eig
-import matplotlib.colors as col
+import matplotlib as mpl
 
 from numpy import exp, sin, cos, pi, log
 import numpy as np
@@ -19,8 +19,19 @@ from hamiltonians import create_HF
 
 from scipy.special import jn_zeros
 
+def roundcomplex(num, dp):
+    return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
 
-import matplotlib
+
+
+
+def phistring(phi):
+    if phi == 0:
+        return ""
+    elif phi == "phi":
+        return r'+ $\phi$' 
+    else:
+        return  r'$+ \pi /$' + str(int(1/(phi/pi)))
 
 size=20
 params = {
@@ -43,7 +54,7 @@ params = {
           'font.family' : 'STIXGeneral',
           'mathtext.fontset':'stix'
           }
-matplotlib.rcParams.update(params)
+mpl.rcParams.update(params)
 
 
 #%%
@@ -56,19 +67,21 @@ Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
 
-N=51; centre=25; a=35; phi=pi/2;
+N=51; centre=25; a=35; phi=pi/3;
 omega=a/jn_zeros(0,1)[0]
 # omega=9.6
-# form='SS-p'
 form='linear'
 rtol=1e-11
 UT, HF = create_HF(form, rtol, N, centre, a,None, None,phi, omega)
 
 #%%
 
-norm = col.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-8
-norm=col.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+HFr = roundcomplex(HF, 7)
+assert(np.all(0 == (HFr - np.conj(HFr.T))))
+
+norm = mpl.colors.Normalize(vmin=-1, vmax=1)
+linthresh = 1e-10
+norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 
 '''abs real imag'''
@@ -102,17 +115,19 @@ fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
 # fig.colorbar(pcm, ax=ax[0], extend='max')
 
 fig.suptitle('Python'
-             +', Linear'
-    + r', $V_{n,n}(t) = $'+
+             +', SS'
+             # +', Linear'
+    + r', $V(t) = $'
+    + r"$|25><25|$"
     # str(a)+r'$ \cos( \omega t)$'
-       str(a)+r'$n \cos( $'
-        # +str(omega)
-        +"{:.2f}".format(omega)
-       +r'$ t$'
-        + r'$ + \pi /$' + str(int(1/(phi/pi))) 
-       + ')'
-        +'\n'+'linthresh='+str(linthresh)
-        +', rtol='+str(rtol)
+    + str(a)+r'$\cos( $'
+    # +str(omega)
+    + "{:.2f}".format(omega)
+    + r'$ t$'
+    + phistring(phi)
+    + ')'
+    + '\n'+'linthresh='+str(linthresh)
+    + ', rtol='+str(rtol)
     , fontsize = 25, y=0.96)
 
 
