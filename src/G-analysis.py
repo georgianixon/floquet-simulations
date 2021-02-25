@@ -93,7 +93,7 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
 
 
-df = pd.read_csv(sh+'data/analysis-G-mat-lin-35.csv', 
+df = pd.read_csv(sh+'data/analysis-G.csv', 
                   index_col=False, 
                   converters={
                       'hopping': convert_complex,

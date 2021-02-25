@@ -107,18 +107,18 @@ def phistring(phi):
 
 # choose particular HF
 
-N = 71; A_site_start = 35;
-centre = 25;
+N = 141; A_site_start = 65;
+centre = 55;
 a = 35;
-phi1=0; phi2=pi/7;
+phi1=0; phi2=pi/2;
 omega=a/jn_zeros(0,1)[0]
 T=2*pi/omega
 
 #when we solve scrodinger eq, how many timesteps do we want
 
-n_oscillations = 60
-n_timesteps = 60
-n_osc_divisions = 4
+n_oscillations = 120
+n_timesteps = 120
+n_osc_divisions = 8
 
 tspan = (0,n_oscillations*T)
 
@@ -140,7 +140,7 @@ psi_phi2 = solve_schrodinger(form, rtol, N, centre, a, None, None, omega, phi2 ,
 
 # normaliser= mpl.colors.Normalize(vmin=-1,vmax=1)
 #%%
-linthresh =1e-3
+linthresh =1e-7
 normaliser = mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 x_positions = np.linspace(0, n_timesteps, int(n_oscillations/n_osc_divisions+1))
