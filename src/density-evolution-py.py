@@ -18,6 +18,7 @@ from hamiltonians import solve_schrodinger
 import matplotlib as mpl
 import seaborn as sns
 from scipy.special import jv, jn_zeros
+from fractions import Fraction
 
 size=25
 params = {
@@ -107,25 +108,25 @@ def phistring(phi):
 
 # choose particular HF
 
-N = 111; A_site_start = 55;
-centre = 45;
+N = 91; A_site_start = 45;
+centre = 35;
 a = 35;
-phi1=pi/7;
-phi2=pi/3;
-omega=a/jn_zeros(0,3)[0]
-# omega=26
+phi1=pi/2;
+phi2=0;
+# omega=a/jn_zeros(0,3)[0]
+omega=10
 T=2*pi/omega
 
 #when we solve scrodinger eq, how many timesteps do we want
 
-n_oscillations = 60
-n_timesteps = 60
-n_osc_divisions = 4
+n_oscillations = 30
+n_timesteps = 30*100
+n_osc_divisions = 2
 
 tspan = (0,n_oscillations*T)
 
-# form = 'SS-p'
-form = 'numericalG-SS-p'
+form = 'SS-p'
+# form = 'numericalG-SS-p'
 rtol=1e-11
 
 t_eval = np.linspace(tspan[0], tspan[1], n_timesteps)
@@ -151,7 +152,7 @@ elif form == 'numericalG-SS-p':
 else:
     ValueError
     
-linthresh =1e-4
+linthresh =1e-3
 normaliser = mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 x_positions = np.linspace(0, n_timesteps, int(n_oscillations/n_osc_divisions+1))

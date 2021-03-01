@@ -70,7 +70,7 @@ Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 N=51; centre=25; a=35; phi=pi/3;
 omega=a/jn_zeros(0,1)[0]
 # omega=9.6
-form='linear'
+form='SS-p'
 rtol=1e-11
 UT, HF = create_HF(form, rtol, N, centre, a,None, None,phi, omega)
 
