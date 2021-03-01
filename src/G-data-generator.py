@@ -17,7 +17,7 @@ from scipy.integrate import solve_ivp
 import pandas as pd 
 import time
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
+sys.path.append('/Users/Georgia Nixon/Code/MBQD/floquet-simulations/src')
 from hamiltonians import  create_HF, solve_schrodinger
 
 
@@ -44,9 +44,23 @@ def filter_duplicates(x):
 def convert_complex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
-sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
+sh = '/Users/Georgia Nixon/Code/MBQD/floquet-simulations/'
 
+df = pd.DataFrame(columns=["form", "rtol",
+                                    "a", 
+                                    "omega", "phi", "N", 
+                                    "hopping", "onsite", 
+                                    "next onsite", "NNN",
+                                    "NNN overtop"])
+    
+df.to_csv(sh+'data/analysis-G-py-rtol1e-9.csv',
+                  index=False, 
+                  columns=['form', 'rtol', 'a', 'omega', 'phi',
+                          'N', 'hopping', 
+                          'onsite', 'next onsite', 'NNN',
+                            'NNN overtop'])
 
+#%%
 df_dtype_dict = {'form':str, "rtol":np.float64,
                  'a':np.float64, 
             'omega':np.float64, 'phi':np.float64, 'N':int,
@@ -54,7 +68,7 @@ df_dtype_dict = {'form':str, "rtol":np.float64,
             'onsite':np.complex128, 'next onsite':np.complex128,
             'NNN':np.complex128, 'NNN overtop':np.complex128}
 
-df = pd.read_csv(sh+'data/analysis-G.csv', 
+df = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9.csv', 
                  index_col=False, 
                  converters={'hopping': convert_complex,
                              'onsite':convert_complex,
@@ -70,7 +84,7 @@ df = pd.read_csv(sh+'data/analysis-G.csv',
 N = 51; 
 centre=25;
 form='linear' 
-rtol = 1e-7
+rtol = 1e-9
 aas = [35]
 phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 
@@ -128,7 +142,7 @@ for a in aas:
                                 }).reset_index()
         
         print('   saving..')
-        df.to_csv(sh+'data/analysis-G.csv',
+        df.to_csv(sh+'data/analysis-G-py-rtol1e-9.csv',
                   index=False, 
                   columns=['form', 'rtol', 'a', 'omega', 'phi',
                           'N', 'hopping', 
