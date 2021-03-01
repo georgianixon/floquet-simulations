@@ -17,7 +17,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from scipy.special import jv, jn_zeros
-import pandas as pd 
+import pandas as pd
+
+import matplotlib as mpl
+import seaborn as sns
+
+def filter_duplicates(x):
+    """
+    input dataframe, df.x, eg. df.localisation
+    output value 
+    """
+    xx = []
+    # get only values
+    for i in x:  #for the values in the df x
+        if not np.isnan(i):
+            xx.append(i)    
+    if len(xx)==0:
+        return np.nan
+    else:
+        xxx = [np.round(i, 2) for i in xx]
+        if len(set(xxx))==1:
+            return np.mean(xx)
+        else:
+            return np.nan
 
 def convert_complex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
@@ -43,9 +65,16 @@ def formatplot(look):
     
     return  title, indices
 
+def phistring(phi):
+    if phi == 0:
+        return ""
+    elif phi == "phi":
+        return r'+ $\phi$' 
+    else:
+        return  r'$+ \pi /$' + str(int(1/(phi/pi)))
+    
+    
 
-import matplotlib
-import seaborn as sns
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
 size=20
@@ -64,15 +93,13 @@ params = {
 
 
 
-matplotlib.rcParams.update(params)
-
+mpl.rcParams.update(params)
 # plt.rcParams['axes.facecolor'] = 'white'
 plt.rcParams['axes.edgecolor'] = 'white'
 plt.rcParams['axes.grid'] = True
 plt.rcParams['grid.alpha'] = 1
 # plt.rcParams['grid.color'] = "0.9" # grid axis colour
 
-#%%
 
 CB91_Blue = 'darkblue'#'#2CBDFE'
 CB91_Green = '#47DBCD'
@@ -89,42 +116,20 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
-#%%
 sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
-
 
 df = pd.read_csv(sh+'data/analysis-G.csv', 
                   index_col=False, 
                   converters={
-                      'hopping': convert_complex,
+                       'hopping': convert_complex,
                                 'onsite':convert_complex,
                                 'next onsite':convert_complex,
                                 'NNN':convert_complex, 
                               'NNN overtop':convert_complex,
                                               })
 
-df1 = pd.read_csv(sh+'data/analysis-G.csv', 
-                  index_col=False, 
-                  converters={
-                      'hopping': convert_complex,
-                                'onsite':convert_complex,
-                                'next onsite':convert_complex,
-                                'NNN':convert_complex, 
-                              'NNN overtop':convert_complex,
-                                              })
 
-df = df.append(df1, ignore_index=True, sort=False)
-
-df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
-                 'N'], dropna=False).agg({
-                        'hopping':filter_duplicates,
-                        'onsite':filter_duplicates,
-                        'next onsite':filter_duplicates,
-                        'NNN':filter_duplicates,
-                        'NNN overtop':filter_duplicates
-                        }).reset_index()
-                             
-                             
+#%%                           
 """
 Plot General
 """
@@ -134,22 +139,22 @@ N = 51;
 forms=[
         # 'SS-m',
         # 'SS-p',
-        'linear-m',
+        # 'linear-m',
         "linear"
        ]
 
 rtols=[1e-7]
 aas = [35]
 # phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phis =  [0, pi/7, pi/6]
+phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3,  pi/2]
 apply = [np.abs, np.real, np.imag]
 
 
 look = 'hopping'
 look = 'onsite'
 look = 'next onsite'
-# look = 'NNN'
-# look = 'NNN overtop'
+look = 'NNN'
+look = 'NNN overtop'
 # look = 'localisation'
 
 title, indices = formatplot(look)
@@ -160,7 +165,7 @@ labels = [r'$|$'+indices+r'$|$',
           r'$\mathrm{Imag} \{$'+indices+r'$\}$']
 
     
-sz =15
+sz =25
 fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62*1.4),
                        constrained_layout=True, sharey=True)
 
@@ -213,31 +218,44 @@ for form in forms:
 
 
 
-if form == 'OSC':
-    title1 = 'Old Numerical'
-elif form == 'OSC_conj':
-    title1 = 'Updated Numerical'
-elif form == 'theoretical' or form == 'theoretical_hermitian':
-    title1 = 'Theoretical'
-elif form == 'SS-m':
-    title1 = "Mathematica"
+# if form == 'OSC':
+#     title1 = 'Old Numerical'
+# elif form == 'OSC_conj':
+#     title1 = 'Updated Numerical'
+# if form == 'theoretical' or form == 'theoretical_hermitian':
+#     title1 = 'Theoretical'
+if form == 'SS-m':
+    title1 = "Mathematica, SS"
 elif form == 'SS-p':
-    title1 = "Python" 
+    title1 = "Python, SS" 
 elif form == 'linear':
     title1 = "Python, full chain"
+elif form == 'linear-m':
+    title1 = "Mathematica, full chain"
+else:
+    ValueError
 
-             
+
+if form in ['SS-m', "SS-p"]:
+    eq =  r"$ |25><25| $"
+elif form in ["linear-m", "linear-p", "linear"]:
+    eq = r"$\sum_j  |j><j| j $"
+else:
+    ValueError
+    
+    
 handles, labels = ax[1].get_legend_handles_labels()    
 fig.legend(handles, labels, loc='upper right')
 fig.suptitle(title1+', '
-              + title + ' (' +indices+')'
-              # +'\n' 
-    + r', $V(t) = $'+
-    str(a)+r'$ \cos( \omega t)$'
-       # str(a)+r'$ \cos( \omega t + \pi /$' + str(int(1/(phi/pi))) + ')'
-      # str(a)+r'$ \cos( \omega t + \phi)$'
-      + ', rtol = '+str(rtol)
-    , fontsize = 20)
+             + title + ' (' +indices+')'
+             + r', $V(t) = $'
+             +eq
+             + str(a)
+             +r'$ \cos( \omega t$'
+             + phistring("phi")
+             + r'$) $'
+             + ', rtol = '+str(rtol)
+             , fontsize = 20)
 
 # fig.savefig(sh+'graphs/test.png', 
 #             format='png', bbox_inches='tight')
