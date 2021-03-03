@@ -119,30 +119,42 @@ def solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, n_times
 
 def create_HF(form, rtol, N, centre, a,b, c,phi, omega): 
     
-    assert(form in ['linear', "linear-p", "SS-p"])
-    T=2*pi/omega
-    tspan = (0,T)
-    UT = np.zeros([N,N], dtype=np.complex_)
-    
-    for A_site_start in range(N):
-    #    print(A_site_start)
-        psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, 100, psi0)
-        UT[:,A_site_start]=sol[:,-1] 
-    
-    # print(time.time()-start, 'seconds.')
-    
-    evals_U, evecs = eig(UT)
-    evals_H = 1j / T *log(evals_U)
-    
-    HF = np.zeros([N,N], dtype=np.complex_)
-    for i in range(N):
-        term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
-        HF = HF+term
+    if form == 'theoretical':
+        HF =  np.zeros([N,N], dtype=np.complex_)
+        HF = HF + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1) 
+        entry = exp(1j*a*sin(phi)/omega)*jv(0, a/omega) 
+        HF[centre][centre+1] = entry
+        HF[centre][centre-1] = entry
+        HF[centre+1][centre] = np.conj(entry)
+        HF[centre-1][centre] = np.conj(entry)
         
-    # print('   ',time.time()-start, 's')
+        return None, HF 
     
-    return UT, HF
+    else:
+        assert(form in ['linear', "linear-p", "SS-p"])
+        T=2*pi/omega
+        tspan = (0,T)
+        UT = np.zeros([N,N], dtype=np.complex_)
+        
+        for A_site_start in range(N):
+        #    print(A_site_start)
+            psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
+            sol = solve_schrodinger(form, rtol, N, centre, a, b, c, omega, phi, tspan, 100, psi0)
+            UT[:,A_site_start]=sol[:,-1] 
+        
+        # print(time.time()-start, 'seconds.')
+        
+        evals_U, evecs = eig(UT)
+        evals_H = 1j / T *log(evals_U)
+        
+        HF = np.zeros([N,N], dtype=np.complex_)
+        for i in range(N):
+            term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
+            HF = HF+term
+            
+        # print('   ',time.time()-start, 's')
+        
+        return UT, HF
 
 
 
