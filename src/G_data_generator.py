@@ -86,7 +86,7 @@ centre=25;
 form='linear' 
 rtol = 1e-9
 aas = [35]
-phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
+phis = [ pi/6, pi/5, pi/4, pi/3, pi/2, 0]
 
 for a in aas:
     for phi in phis:
@@ -131,18 +131,18 @@ for a in aas:
         df = df.append(df1, ignore_index=True, sort=False)
         df= df.astype(dtype=df_dtype_dict)
         
-        print('  grouping..')
-        df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
-                         'N'], dropna=False).agg({
-                                'hopping':filter_duplicates,
-                                'onsite':filter_duplicates,
-                                'next onsite':filter_duplicates,
-                                'NNN':filter_duplicates,
-                                'NNN overtop':filter_duplicates
-                                }).reset_index()
+#        print('  grouping..')
+#        df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
+#                         'N'], dropna=False).agg({
+#                                'hopping':filter_duplicates,
+#                                'onsite':filter_duplicates,
+#                                'next onsite':filter_duplicates,
+#                                'NNN':filter_duplicates,
+#                                'NNN overtop':filter_duplicates
+#                                }).reset_index()
         
         print('   saving..')
-        df.to_csv(sh+'data/analysis-G-py-rtol1e-9-2.csv',
+        df.to_csv(sh+'data/analysis-G-py-rtol1e-9.csv',
                   index=False, 
                   columns=['form', 'rtol', 'a', 'omega', 'phi',
                           'N', 'hopping', 
