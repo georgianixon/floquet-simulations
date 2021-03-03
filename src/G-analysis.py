@@ -128,6 +128,27 @@ df = pd.read_csv(sh+'data/analysis-G.csv',
                               'NNN overtop':convert_complex,
                                               })
 
+df1 = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9.csv', 
+                  index_col=False, 
+                  converters={
+                        'hopping': convert_complex,
+                                'onsite':convert_complex,
+                                'next onsite':convert_complex,
+                                'NNN':convert_complex, 
+                              'NNN overtop':convert_complex,
+                                              })
+df2 = df1[df1.rtol==1e-9]
+
+df = df.append(df2, ignore_index=True, sort=False)
+       
+        
+        
+# df.to_csv(sh+'data/analysis-G.csv',
+#           index=False, 
+#           columns=['form', 'rtol', 'a', 'omega', 'phi',
+#                   'N', 'hopping', 
+#                   'onsite', 'next onsite', 'NNN',
+#                     'NNN overtop'])
 
 #%%                           
 """
@@ -143,10 +164,10 @@ forms=[
         "linear"
        ]
 
-rtols=[1e-7]
+rtols=[ 1e-9]
 aas = [35]
 # phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3,  pi/2]
+phis =  [0]
 apply = [np.abs, np.real, np.imag]
 
 
@@ -154,7 +175,7 @@ look = 'hopping'
 look = 'onsite'
 look = 'next onsite'
 look = 'NNN'
-look = 'NNN overtop'
+# look = 'NNN overtop'
 # look = 'localisation'
 
 title, indices = formatplot(look)
@@ -165,7 +186,7 @@ labels = [r'$|$'+indices+r'$|$',
           r'$\mathrm{Imag} \{$'+indices+r'$\}$']
 
     
-sz =25
+sz =17
 fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62*1.4),
                        constrained_layout=True, sharey=True)
 
@@ -210,7 +231,7 @@ for form in forms:
                                        r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
                                         +', '+
                                         form
-                                     # 'rtol='+str(rtol)
+                                      + ' rtol='+str(rtol)
                                      # color='Blue'
                                     )
                         ax[n1].set_xlabel(r'$\omega$')
