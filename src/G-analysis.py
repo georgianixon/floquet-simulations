@@ -129,37 +129,6 @@ df = pd.read_csv(sh+'data/analysis-G.csv',
                               'NNN overtop':convert_complex,
                                               })
 
-df1 = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9-pio7.csv', 
-                  index_col=False, 
-                  converters={
-                        'hopping': convert_complex,
-                                'onsite':convert_complex,
-                                'next onsite':convert_complex,
-                                'NNN':convert_complex, 
-                              'NNN overtop':convert_complex,
-                                              })
-
-df2 = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9.csv', 
-                  index_col=False, 
-                  converters={
-                        'hopping': convert_complex,
-                                'onsite':convert_complex,
-                                'next onsite':convert_complex,
-                                'NNN':convert_complex, 
-                              'NNN overtop':convert_complex,
-                                              })
-
-# df = df.append(df1, ignore_index=True, sort=False)
-df = df.append(df2, ignore_index=True, sort=False)
-       
-        
-        
-# df.to_csv(sh+'data/analysis-G.csv',
-#           index=False, 
-#           columns=['form', 'rtol', 'a', 'omega', 'phi',
-#                   'N', 'hopping', 
-#                   'onsite', 'next onsite', 'NNN',
-#                     'NNN overtop'])
 
 #%%                           
 """
@@ -170,20 +139,20 @@ N = 51;
 
 forms=[
         # 'SS-m',
-        # 'SS-p',
-        'linear-m',
+        'SS-p',
+        # 'linear-m',
         # "linear"
        ]
 
 rtols=[1e-9]
 aas = [35]
-# phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phis =  [pi/7, pi/6, pi/5, pi/4]
+phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+# phis =  [pi/7, pi/6, pi/5, pi/4]
 apply = [np.abs, np.real, np.imag]
 
 
 look = 'hopping'
-look = 'onsite'
+# look = 'onsite'
 # look = 'next onsite'
 # look = 'NNN'
 # look = 'NNN overtop'
@@ -195,19 +164,18 @@ labels = [r'$|$'+indices+r'$|$',
           r'$\mathrm{Real} \{$'+indices+r'$\}$',
           r'$\mathrm{Imag} \{$'+indices+r'$\}$']
 
-    
 sz =17
+
 fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62*1.4),
                        constrained_layout=True, sharey=True)
 
-
-for form in forms:
-    for a in aas: 
-        for nc, phi in enumerate(phis):
+for nc, phi in enumerate(phis):
+    for form in forms:
+        for a in aas: 
             for rtol in rtols:
 
                 for n1, f in enumerate(apply):
-                        
+
                     if form=='OSC' or form=='OSC_conj' or form =="SS-p" or form == 'linear':
                         df_plot = df[(df['form']==form)&
                                      (df['N']==N)&
@@ -232,6 +200,7 @@ for form in forms:
                     else:
                         raise ValueError
                     
+                    
                     if not df_plot.empty:
                         df_plot = df_plot.sort_values(by=['omega'])
                         
@@ -241,7 +210,7 @@ for form in forms:
                                        r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
                                         +', '+
                                         form
-                                      + ' rtol='+str(rtol)
+                                      # + ' rtol='+str(rtol)
                                      # color='Blue'
                                     )
                         ax[n1].set_xlabel(r'$\omega$')
@@ -275,8 +244,8 @@ else:
     ValueError
     
     
-handles, labels = ax[1].get_legend_handles_labels()    
-fig.legend(handles, labels, loc='upper right')
+handles_legend, labels_legend = ax[1].get_legend_handles_labels()    
+fig.legend(handles_legend, labels_legend, loc='upper right')
 fig.suptitle(title1+', '
              + title + ' (' +indices+')'
              + r', $V(t) = $'
