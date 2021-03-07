@@ -45,6 +45,8 @@ def convert_complex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 sh = '/Users/Georgia Nixon/Code/MBQD/floquet-simulations/'
+dfname = "data/analysis-G-py-rtol1e-9-SS.csv"
+
 
 df = pd.DataFrame(columns=["form", "rtol",
                                     "a", 
@@ -53,7 +55,7 @@ df = pd.DataFrame(columns=["form", "rtol",
                                     "next onsite", "NNN",
                                     "NNN overtop"])
     
-df.to_csv(sh+'data/analysis-G-py-rtol1e-9-2.csv',
+df.to_csv(sh+dfname,
                   index=False, 
                   columns=['form', 'rtol', 'a', 'omega', 'phi',
                           'N', 'hopping', 
@@ -68,7 +70,7 @@ df_dtype_dict = {'form':str, "rtol":np.float64,
             'onsite':np.complex128, 'next onsite':np.complex128,
             'NNN':np.complex128, 'NNN overtop':np.complex128}
 
-df = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9-2.csv', 
+df = pd.read_csv(sh+dfname, 
                  index_col=False, 
                  converters={'hopping': convert_complex,
                              'onsite':convert_complex,
@@ -83,10 +85,10 @@ df = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9-2.csv',
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='linear' 
+form='SS-p' 
 rtol = 1e-9
 aas = [35]
-phis = [ pi/6, pi/5, pi/4, pi/3, pi/2, 0]
+phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
 
 for a in aas:
     for phi in phis:
@@ -142,7 +144,7 @@ for a in aas:
 #                                }).reset_index()
         
         print('   saving..')
-        df.to_csv(sh+'data/analysis-G-py-rtol1e-9.csv',
+        df.to_csv(sh+dfname,
                   index=False, 
                   columns=['form', 'rtol', 'a', 'omega', 'phi',
                           'N', 'hopping', 
