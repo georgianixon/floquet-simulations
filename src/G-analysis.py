@@ -128,7 +128,7 @@ df = pd.read_csv(sh+'data/analysis-G.csv',
                               'NNN overtop':convert_complex,
                                               })
 
-df1 = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9.csv', 
+df1 = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9-pio7.csv', 
                   index_col=False, 
                   converters={
                         'hopping': convert_complex,
@@ -137,9 +137,8 @@ df1 = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9.csv',
                                 'NNN':convert_complex, 
                               'NNN overtop':convert_complex,
                                               })
-df2 = df1[df1.rtol==1e-9]
 
-df = df.append(df2, ignore_index=True, sort=False)
+df = df.append(df1, ignore_index=True, sort=False)
        
         
         
@@ -164,19 +163,18 @@ forms=[
         "linear"
        ]
 
-rtols=[ 1e-9]
+rtols=[1e-9, np.nan]
 aas = [35]
 # phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phis =  [0]
+phis =  [pi/7]
 apply = [np.abs, np.real, np.imag]
 
 
 look = 'hopping'
-look = 'onsite'
-look = 'next onsite'
-look = 'NNN'
-# look = 'NNN overtop'
-# look = 'localisation'
+# look = 'onsite'
+# look = 'next onsite'
+# look = 'NNN'
+look = 'NNN overtop'
 
 title, indices = formatplot(look)
 
