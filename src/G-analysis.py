@@ -107,6 +107,7 @@ CB91_Pink = '#F3A0F2'
 CB91_Purple = '#9D2EC5'
 CB91_Violet = '#661D98'
 CB91_Amber = '#F5B14C'
+red = "#FC4445"
 
 color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
                CB91_Purple,
@@ -138,7 +139,18 @@ df1 = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9-pio7.csv',
                               'NNN overtop':convert_complex,
                                               })
 
-df = df.append(df1, ignore_index=True, sort=False)
+df2 = pd.read_csv(sh+'data/analysis-G-py-rtol1e-9.csv', 
+                  index_col=False, 
+                  converters={
+                        'hopping': convert_complex,
+                                'onsite':convert_complex,
+                                'next onsite':convert_complex,
+                                'NNN':convert_complex, 
+                              'NNN overtop':convert_complex,
+                                              })
+
+# df = df.append(df1, ignore_index=True, sort=False)
+df = df.append(df2, ignore_index=True, sort=False)
        
         
         
@@ -159,22 +171,22 @@ N = 51;
 forms=[
         # 'SS-m',
         # 'SS-p',
-        # 'linear-m',
-        "linear"
+        'linear-m',
+        # "linear"
        ]
 
-rtols=[1e-9, np.nan]
+rtols=[1e-9]
 aas = [35]
 # phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phis =  [pi/7]
+phis =  [pi/7, pi/6, pi/5, pi/4]
 apply = [np.abs, np.real, np.imag]
 
 
 look = 'hopping'
-# look = 'onsite'
+look = 'onsite'
 # look = 'next onsite'
 # look = 'NNN'
-look = 'NNN overtop'
+# look = 'NNN overtop'
 
 title, indices = formatplot(look)
 

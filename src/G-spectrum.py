@@ -63,9 +63,10 @@ mpl.rcParams.update(params)
 
 #%%
 
-N=49; centre=24; a=35; phi=pi/3;
-omega=a/jn_zeros(0,1)[0]
-# omega=9.6
+N=49; centre=24; a=35; phi=pi/7;
+# omega=a/jn_zeros(0,1)[0]
+omega=9.6
+
 form='SS-p'
 rtol=1e-11
 UT, HF = create_HF(form, rtol, N, centre, a,None, None,phi, omega)
