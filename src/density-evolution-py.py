@@ -22,13 +22,13 @@ from fractions import Fraction
 
 size=25
 params = {
-            'legend.fontsize': size,
+            'legend.fontsize': size*0.75,
 #          'figure.figsize': (20,8),
           'axes.labelsize': size,
           'axes.titlesize': size,
           'xtick.labelsize': size*0.75,
           'ytick.labelsize': size*0.75,
-          'font.size': size*1.2,
+          'font.size': size,
           'axes.edgecolor' :'white',
           'xtick.minor.visible': False,
 #          'axes.titlepad': 25
@@ -70,26 +70,26 @@ def plotPsi(psi, x_positions, x_labels, title, normaliser):
     cmapcol = 'PuOr' #PiYG_r
     cmap= mpl.cm.get_cmap(cmapcol)
     
-    sz = 6
+    sz = 5
     fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
                             figsize=(sz*len(apply),sz))
     
     for i, f in enumerate(apply):
         ax[i].matshow(f(psi), interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
-        ax[i].set_title(labels[i], fontsize=20, fontfamily='STIXGeneral')
+        ax[i].set_title(labels[i],  fontfamily='STIXGeneral')
         ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
           labeltop=False)  
         ax[i].set_xticks(x_positions)
-        ax[i].set_xlabel('t/T', fontsize=15, fontfamily='STIXGeneral')
+        ax[i].set_xlabel('t/T', fontfamily='STIXGeneral')
         ax[i].set_xticklabels(x_labels)
         for side in ["bottom", "top", "left", "right"]:
             ax[i].spines[side].set_visible(False)
         if i == 0:
-            ax[i].set_ylabel('site', fontsize=15, fontfamily='STIXGeneral')
+            ax[i].set_ylabel('site', fontfamily='STIXGeneral')
     
     cax = plt.axes([1.03, 0.1, 0.03, 0.8])
     fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
-    fig.suptitle(title, y = 1.11, fontsize=20, fontfamily='STIXGeneral')
+    fig.suptitle(title, y = 1.2,  fontfamily='STIXGeneral')
     
     plt.show()
 
@@ -102,6 +102,14 @@ def phistring(phi):
     else:
         return  r'$+ \pi /$' + str(int(1/(phi/pi)))
     
+def phistringnum(phi):
+    if phi == 0:
+        return "0"
+    elif phi == "phi":
+        return r'\phi' 
+    else:
+        return  r'\pi /' + str(int(1/(phi/pi)))
+    
     
 #%%
 
@@ -113,8 +121,8 @@ centre = 35;
 a = 35;
 phi1=pi/2;
 phi2=0;
-# omega=a/jn_zeros(0,3)[0]
-omega=10
+omega=a/jn_zeros(0,3)[0]
+# omega=10
 T=2*pi/omega
 
 #when we solve scrodinger eq, how many timesteps do we want
@@ -134,10 +142,10 @@ psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
 
 
 
-psi_phi1 = solve_schrodinger(form, rtol, N, centre, a, None, None, omega, phi1, 
+psi_phi1 = solve_schrodinger(form, rtol, N, centre, a, omega, phi1, 
                                   tspan, n_timesteps, psi0)
 
-psi_phi2 = solve_schrodinger(form, rtol, N, centre, a, None, None, omega, phi2,
+psi_phi2 = solve_schrodinger(form, rtol, N, centre, a,omega, phi2,
                                   tspan, n_timesteps, psi0)
     
 
@@ -152,23 +160,34 @@ elif form == 'numericalG-SS-p':
 else:
     ValueError
     
-linthresh =1e-3
-normaliser = mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
+# linthresh = 1e-11
+# normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 x_positions = np.linspace(0, n_timesteps, int(n_oscillations/n_osc_divisions+1))
 x_labels = list(range(0, n_oscillations+1, n_osc_divisions))
     
-title = ("Python; "
-          + title1
-         + "\n difference in "+r"$\psi$ for "
-         # + "G and H(t)"
-          + "$\phi =$" +phistring(phi1) + r"and $\phi = $" + phistring(phi2)
-         + r', $[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
-         + phistring("phi")
-         + r'$) $'+' |25><25|]'  
-         +', log scale, linthresh='+str(linthresh)
-         +', rtol='+str(rtol)
-        ) 
+# title = ("Python; "
+#           + title1
+#          + "\n difference in "+r"$\psi$ for "
+#          # + "G and H(t)"
+#           + "$\phi =$" +phistring(phi1) + r"and $\phi = $" + phistring(phi2)
+#          + r', $[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
+#          + phistring("phi")
+#          + r'$) $'+' |25><25|]'  
+#          +', log scale, linthresh='+str(linthresh)
+#          +', rtol='+str(rtol)
+#         )
+
+title = (r"$|\psi_{\phi="+phistringnum(phi1)+"}(t)>"
+         +"-|\psi_{\phi="+phistringnum(phi2)+"}(t)>$"
+         +"\n"
+         + r"given $H(t)=H_0 + "+str(a)
+         +r"\cos (" + "{:.2f}".format(omega)+ r"t + \phi"
+         + r") |"+str(centre)+r"><"+str(centre) +r"|,"
+         +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
+        )  
+
 plotPsi(psi_phi1 - psi_phi2, x_positions, x_labels, title,
       normaliser)
 
@@ -184,13 +203,20 @@ title = ("Python; "
 plotPsi(psi_phi1, x_positions, x_labels,  title,
       normaliser)
 
-title = ("Python; "
-          + title1
-          +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
-          + phistring(phi2)
-          + r'$) $'+' |25><25|]'  
-          +', log scale, linthresh='+str(linthresh)
-          +', rtol='+str(rtol)
+# title = ("Python; "
+#           + title1
+#           +  "\n" + r'$[ V(t) = '+str(a)+r'\cos( $' + str(round( omega, 2)) + r'$t$'
+#           + phistring(phi2)
+#           + r'$) $'+' |25><25|]'  
+#           +', log scale, linthresh='+str(linthresh)
+#           +', rtol='+str(rtol)
+#          ) 
+
+title = (r"$|\psi (t)>$"+  "\n"
+         + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega)
+             + r"t" + phistring(phi2) 
+             + r") |"+str(centre)+r"><"+str(centre) +r"|,"
+             +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
          ) 
 
 plotPsi(psi_phi2, x_positions, x_labels,  title,

@@ -21,6 +21,11 @@ import pandas as pd
 
 import matplotlib as mpl
 import seaborn as sns
+from numpy import sin, cos, exp, pi
+
+import sys
+sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
+from hamiltonians import  hoppingHF
 
 def filter_duplicates(x):
     """
@@ -69,28 +74,26 @@ def phistring(phi):
     if phi == 0:
         return ""
     elif phi == "phi":
-        return r'+ $\phi$' 
+        return r'+ \phi' 
     else:
-        return  r'$+ \pi /$' + str(int(1/(phi/pi)))
+        return  r'+ \pi /' + str(int(1/(phi/pi)))
     
     
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=20
+size=25
 params = {
             'legend.fontsize': size*0.75,
-#          'figure.figsize': (20,8),
           'axes.labelsize': size,
           'axes.titlesize': size,
           'xtick.labelsize': size*0.75,
           'ytick.labelsize': size*0.75,
-          'font.size': size*1.2,
+          'font.size': size,
           'font.family': 'STIXGeneral',
 #          'axes.titlepad': 25,
           'mathtext.fontset': 'stix'
           }
-
 
 
 mpl.rcParams.update(params)
@@ -130,24 +133,26 @@ df = pd.read_csv(sh+'data/analysis-G.csv',
                                               })
 
 
+
 #%%                           
 """
 Plot General
 """
 
 N = 51; 
+centre = 25
 
 forms=[
         # 'SS-m',
         'SS-p',
         # 'linear-m',
         # "linear"
+        # "toy-model"
        ]
 
-rtols=[1e-9]
+rtols=[1e-11]
 aas = [35]
 phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-# phis =  [pi/7, pi/6, pi/5, pi/4]
 apply = [np.abs, np.real, np.imag]
 
 
@@ -164,58 +169,75 @@ labels = [r'$|$'+indices+r'$|$',
           r'$\mathrm{Real} \{$'+indices+r'$\}$',
           r'$\mathrm{Imag} \{$'+indices+r'$\}$']
 
-sz =17
+sz =24
 
-fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62*1.4),
+fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62*1.6),
                        constrained_layout=True, sharey=True)
+
 
 for nc, phi in enumerate(phis):
     for form in forms:
         for a in aas: 
             for rtol in rtols:
-
-                for n1, f in enumerate(apply):
-
-                    if form=='OSC' or form=='OSC_conj' or form =="SS-p" or form == 'linear':
-                        df_plot = df[(df['form']==form)&
-                                     (df['N']==N)&
-                                          (df['a']==a) &
-                                          (df['phi']==phi)&
-                                          (df['rtol']==rtol)]
-                        
-
-                    elif form == 'theoretical' or form == 'theoretical_hermitian':
-                        df_plot = df[(df['form']==form)&
-                                     (df['N']==N)&
-                                          (df['a']==a)
-                                          &
-                                          (df['phi']==phi)]
-                    elif form =='OSC-mathematica'or form =="SS-m" or form == "linear-m":
-                        df_plot = df[(df['form']==form)&
-                                     (df['N']==N)&
-                                          (df['a']==a) &
-                                          (df['phi']==phi)]
+                if form=='OSC' or form=='OSC_conj' or form =="SS-p" or form == 'linear':
+                    df_plot = df[(df['form']==form)&
+                                 (df['N']==N)&
+                                      (df['a']==a) &
+                                      (df['phi']==phi)
+                                      # (df['rtol']==rtol)
+                                      ]
                     
 
-                    else:
-                        raise ValueError
+                elif form == 'toy-model':
+                    centre=25
+                    df_plot = pd.DataFrame(columns=["form", "rtol",
+                                "a", 
+                                "omega", "phi", "N", 
+                                "hopping", "onsite", 
+                                "next onsite", "NNN",
+                                "NNN overtop"])
+                    df_dtype_dict = {'form':str, "rtol":np.float64,
+                             'a':np.float64, 
+                        'omega':np.float64, 'phi':np.float64, 'N':int,
+                        'hopping':np.complex128,
+                        'onsite':np.complex128, 'next onsite':np.complex128,
+                        'NNN':np.complex128, 'NNN overtop':np.complex128}
+                    for i, omega in enumerate(np.linspace(3.7, 20, 164)):
+                        entry = -exp(-1j*a*sin(phi)/omega)*jv(0, a/omega)
+                        df_plot.loc[i] = [form, None,a,omega,phi, N,
+                                      entry,
+                                      0,
+                                      0,
+                                      0,
+                                      0]
+                    df_plot= df_plot.astype(dtype=df_dtype_dict)
                     
+                elif form =='OSC-mathematica'or form =="SS-m" or form == "linear-m":
+                    df_plot = df[(df['form']==form)&
+                                 (df['N']==N)&
+                                      (df['a']==a) &
+                                      (df['phi']==phi)]
                     
-                    if not df_plot.empty:
-                        df_plot = df_plot.sort_values(by=['omega'])
-                        
-                        
-                        ax[n1].plot(df_plot['omega'], f(df_plot[look]), 
+
+                else:
+                    raise ValueError
+                
+                    
+                if not df_plot.empty:
+                    
+                    df_plot = df_plot.sort_values(by=['omega'])
+                    
+                    for n1, f in enumerate(apply):
+                        ax[n1].plot(df_plot['omega'], f(df_plot[look].values), 
                                     label=
-                                       r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
-                                        +', '+
-                                        form
+                                        r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
+                                        # +', '+
+                                        # form
                                       # + ' rtol='+str(rtol)
                                      # color='Blue'
                                     )
                         ax[n1].set_xlabel(r'$\omega$')
                         ax[n1].set_title(labels[n1])
-
 
 
 # if form == 'OSC':
@@ -246,16 +268,28 @@ else:
     
 handles_legend, labels_legend = ax[1].get_legend_handles_labels()    
 fig.legend(handles_legend, labels_legend, loc='upper right')
-fig.suptitle(title1+', '
-             + title + ' (' +indices+')'
-             + r', $V(t) = $'
-             +eq
-             + str(a)
-             +r'$ \cos( \omega t$'
-             + phistring("phi")
-             + r'$) $'
-             + ', rtol = '+str(rtol)
-             , fontsize = 20)
+# fig.suptitle(
+#     # title1+', '
+#              title + ' (' +indices+')'
+#              + r' for Floquet potential $V(t) = $'
+#              # +eq
+#               + str(a)
+#              +r'$ \cos( \omega t$'
+#              + phistring("phi")
+#              + r'$) $'
+#              + r"$ |25><25| $"
+#              + ', rtol = '+str(rtol)
+#              + r', $N_{sites} = $'+str(N))
+
+fig.suptitle(""+
+             # "Next nearest neighbour tunnelling"
+             "Tunnelling"
+             +" (" +indices+')\n'
+              + r"given $H(t)=H_0 + " +str(a) 
+              + r" \cos (\omega "
+             + r"t" + phistring(phi) 
+             + r") |"+str(centre)+r"><"+str(centre) +r"|$",
+              )
 
 # fig.savefig(sh+'graphs/test.png', 
 #             format='png', bbox_inches='tight')

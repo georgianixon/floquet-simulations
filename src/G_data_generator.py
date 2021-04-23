@@ -17,7 +17,7 @@ from scipy.integrate import solve_ivp
 import pandas as pd 
 import time
 import sys
-sys.path.append('/Users/Georgia Nixon/Code/MBQD/floquet-simulations/src')
+sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
 from hamiltonians import  create_HF, solve_schrodinger
 
 
@@ -44,8 +44,8 @@ def filter_duplicates(x):
 def convert_complex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
-sh = '/Users/Georgia Nixon/Code/MBQD/floquet-simulations/'
-dfname = "data/analysis-G-py-rtol1e-9-SS.csv"
+sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
+dfname = "data/analysis-G.csv"
 
 
 df = pd.DataFrame(columns=["form", "rtol",
@@ -85,8 +85,8 @@ df = pd.read_csv(sh+dfname,
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='SS-p' 
-rtol = 1e-9
+form='linear-p' 
+rtol = 1e-11
 aas = [35]
 phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
 
@@ -107,7 +107,7 @@ for a in aas:
             """
             HF
             """  
-            UT, HF = create_HF(form, rtol, N, centre, a,None, None,phi, omega)
+            UT, HF = create_HF(form, rtol, N, centre, a,phi, omega)
             
             hopping=HF[centre][centre+1]
             onsite = HF[centre][centre]
