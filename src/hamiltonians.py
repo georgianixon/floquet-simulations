@@ -84,7 +84,7 @@ def solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, n_timesteps, 
     t_eval = np.linspace(tspan[0], tspan[1], n_timesteps+1)
     
     if form == 'SS-p':
-        sol= solve_ivp(lambda t,psi: F_SS(t, psi, 
+        sol = solve_ivp(lambda t,psi: F_SS(t, psi, 
                            N, centre,
                              a,
                              omega, phi), 
