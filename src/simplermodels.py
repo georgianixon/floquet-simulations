@@ -207,9 +207,9 @@ Comparing simpler models
 """
 
 
-N=49; centre=24; a=35; phi=pi/2;
-omega = 11
-# omega=a/jn_zeros(0,1)[0]-0.1
+N=49; centre=24; a=35; phi=0;
+omega = 9.6
+omega=a/jn_zeros(0,1)[0]-0.1
 # omega=a/jn_zeros(0,1)[0]
 # omega=9.6
 form='SS-p'
@@ -222,14 +222,14 @@ evalsSS, evecsSS = getevalsandevecs(HFSS)
 evalsHO, evecsHO = getevalsandevecs(HFHO)
 evecsSS = OrderEvecs(evecsSS, N)
 evecsHO = OrderEvecs(evecsHO, N)
-evecsHO = AlignEvecs(evecsSS, evecsHO, N)
+# evecsHO = AlignEvecs(evecsSS, evecsHO, N)
 
 # for i in range(N):
 #     if np.all(np.real(evecsHO[:,i])==-np.real(evecsSS[:,i])):
 #         evecsSS[:,i] = -evecsSS[:,i]
         
     
-func = np.real
+func = np.abs
 colourSS = "dodgerblue"#"#613DC1"#
 colourHO = "1"#"0.7"#'#9D2EC5'
 
@@ -245,17 +245,25 @@ for i in range(num):
         evec1HO = evecsHO[:,num*i + j]
 
         ax[i,j].plot(range(N), func(evec1SS), color=colourSS,
-                     label="single site oscillation", linewidth = 5)
+                     # label="single site oscillation", 
+                     label="H(t)",
+                     linewidth = 5)
         ax[i,j].plot(range(N), func(evec1HO), color=colourHO, 
-                     label="hopping toy model")
+                      label="Toy model; tunnelling only")
+                      # label="hopping toy model")
 
 handles_legend, labels_legend = ax[0,0].get_legend_handles_labels()    
 fig.legend(handles_legend, labels_legend, loc="right")
-fig.suptitle(func.__name__+"(evecs) ordered by " + "real(evals)\nN="
-             +str(N)
-              + ", a = "+str(a)+ r", $\omega = $" +"{:.2f}".format(omega)
+# fig.suptitle(func.__name__+"(evecs) ordered by " + "real(evals)\nN="
+#              +str(N)
+#               + ", a = "+str(a)+ r", $\omega = $" +"{:.2f}".format(omega)
+#               +r", $\phi = $"+phistring(phi)
+#               +", effective tunneling = "+formatcomplex(entry, 3)
+#               , y=0.934)
+
+fig.suptitle("Abs(evecs)\n"
+              + "A = "+str(a)+ r", $\omega = $" +"{:.2f}".format(omega)
               +r", $\phi = $"+phistring(phi)
-              +", effective tunneling = "+formatcomplex(entry, 3)
               , y=0.934)
 plt.show()
 
@@ -265,9 +273,10 @@ assert(np.all(0 == np.imag(evalsHO)))
 sz = 8
 fig, ax = plt.subplots(figsize=(sz*1.4,sz))
 ax.plot(range(N), np.real(evalsSS), 'x', markersize=10, color=colourSS, 
-        label="single site oscillation")
+        label="H(t)")
+        # label="single site oscillation")
 ax.plot(range(N), np.real(evalsHO),  'o', markersize = 3, color=colourHO, 
-        label="hopping toy model")
+        label="Toy model; tunnelling only")
 fig.legend()
 # fig.suptitle(title, y=ypos)
 plt.show()

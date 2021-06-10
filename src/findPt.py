@@ -56,41 +56,7 @@ def phistring(phi):
     else:
         return  r'$\pi /$' + str(int(1/(phi/pi)))
     
-#order evecs0 to
-def OrderEvecs(evecs0, N):
-    """
-    Make first nonzero element of evecs real and positive
-    """
-    evecs0_R = roundcomplex(evecs0, 5)
-    for vec in range(N):
-        #index of first non zero element of this vector
-        firstnonzero = (evecs0_R[:,vec]!=0).argmax()
-        #make this value real and positive, so arg(this value)=2*pi*n for integer n
-        angle = np.angle(evecs0[firstnonzero,vec])
-        evecs0[:,vec] = evecs0[:,vec]*exp(-1j*angle)
-    return evecs0
 
-
-def AlignEvecs(evecs0, evecsP, N):
-    evecs0_R = roundcomplex(evecs0, 5)
-    evecsP_R = roundcomplex(evecsP, 5)
-    
-    #flip if needed
-    for vec in range(N):
-        #if one is negative of the other, for rounded evecs, flip one,
-        #could both start at zero
-        if np.all(evecs0_R[:,vec]==-evecsP_R[:,vec]):
-            evecsP[:,vec] = -evecsP[:,vec]
-            #redefine rounded evecsP
-            evecsP_R[:,vec] = roundcomplex(evecsP[:,vec], 5)
-        # else, make them start at the same value
-        elif evecs0_R[0,vec] != evecsP_R[0,vec]:
-            frac = evecs0[0,vec] / evecsP[0,vec]
-            evecsP[:,vec] = evecsP[:,vec] * frac
-            #redefine evecsP_R
-            evecsP_R[:,vec] = roundcomplex(evecsP[:,vec], 5)
-            
-    return evecsP
 
 #%%
 

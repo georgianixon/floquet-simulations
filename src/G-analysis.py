@@ -24,7 +24,7 @@ import seaborn as sns
 from numpy import sin, cos, exp, pi
 
 import sys
-sys.path.append('/Users/Georgia Nixon/Code/MBQD/floquet-simulations/src')
+sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
 from hamiltonians import  hoppingHF
 
 def filter_duplicates(x):
@@ -54,7 +54,10 @@ def formatplot(look):
         
     if look == 'hopping':
         indices = r'$G_{n, n+1}$'
-        title = 'Hopping'
+        title = "Hopping"
+    elif look == 'hopping back':
+        indices = r'$G_{n-1, n}$'
+        title = 'Hopping Back'
     elif look == 'onsite':
         indices =  r'$G_{n, n}$'
         title = 'Onsite'
@@ -64,6 +67,12 @@ def formatplot(look):
     elif look == 'NNN':
         indices =  r'$G_{n, n+2}$'
         title = 'Next nearest neighbour'
+    elif look == 'NNN star':
+        indices =  r'$G_{n, n+2}$'
+        title = 'NNN star'
+    elif look == 'NNN square':
+        indices =  r'$G_{n-2, n}$'
+        title = 'NNN square'
     elif look == 'NNN overtop':
         indices =  r'$G_{n-1, n+1}$'
         title = 'Next nearest neighbour overtop'
@@ -82,7 +91,7 @@ def phistring(phi):
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=16
+size=26
 params = {
             'legend.fontsize': size*0.75,
           'axes.labelsize': size,
@@ -120,18 +129,21 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
-sh = '/Users/Georgia Nixon/Code/MBQD/floquet-simulations/'
+sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
+dfname = "data/analysis-G-withnewgauge.csv"
+# dfname = "data/analysis-G.csv"
 
-df = pd.read_csv(sh+'data/analysis-G.csv', 
-                  index_col=False, 
-                  converters={
-                       'hopping': convert_complex,
-                                'onsite':convert_complex,
-                                'next onsite':convert_complex,
-                                'NNN':convert_complex, 
-                              'NNN overtop':convert_complex,
+df = pd.read_csv(sh+dfname, 
+                 index_col=False, 
+                 converters={'hopping': convert_complex,
+                              'hopping back': convert_complex,
+                             'onsite':convert_complex,
+                             'next onsite':convert_complex, 
+                             'NNN overtop':convert_complex,
+                              'NNN star':convert_complex,
+                              'NNN square':convert_complex,
+                             # 'NNN':convert_complex,
                                               })
-
 
 
 #%%                           
@@ -153,15 +165,17 @@ forms=[
 rtols=[1e-11]
 aas = [35]
 phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-#phis =  [0]
+# phis =  [pi/7, pi/6]
 apply = [np.abs, np.real, np.imag]
-omegaMin = 100
+omegaMin = 80
 
 look = 'hopping'
-look = 'onsite'
-#look = 'next onsite'
-#look = 'NNN'
-#look = 'NNN overtop'
+look = "hopping back"
+# look = 'onsite'
+# look = 'next onsite'
+# look = 'NNN overtop'
+# look = "NNN star"
+# look = "NNN square"
 
 title, indices = formatplot(look)
 
@@ -170,7 +184,7 @@ labels = [r'$|$'+indices+r'$|$',
           r'$\mathrm{Real} \{$'+indices+r'$\}$',
           r'$\mathrm{Imag} \{$'+indices+r'$\}$']
 
-sz =10
+sz =25
 
 fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)*1.6),
                        constrained_layout=True, sharey=True)
@@ -189,29 +203,29 @@ for nc, phi in enumerate(phis):
                                       ]
                     
 
-                elif form == 'toy-model':
-                    centre=25
-                    df_plot = pd.DataFrame(columns=["form", "rtol",
-                                "a", 
-                                "omega", "phi", "N", 
-                                "hopping", "onsite", 
-                                "next onsite", "NNN",
-                                "NNN overtop"])
-                    df_dtype_dict = {'form':str, "rtol":np.float64,
-                             'a':np.float64, 
-                        'omega':np.float64, 'phi':np.float64, 'N':int,
-                        'hopping':np.complex128,
-                        'onsite':np.complex128, 'next onsite':np.complex128,
-                        'NNN':np.complex128, 'NNN overtop':np.complex128}
-                    for i, omega in enumerate(np.linspace(3.7, 20, 164)):
-                        entry = -exp(-1j*a*sin(phi)/omega)*jv(0, a/omega)
-                        df_plot.loc[i] = [form, None,a,omega,phi, N,
-                                      entry,
-                                      0,
-                                      0,
-                                      0,
-                                      0]
-                    df_plot= df_plot.astype(dtype=df_dtype_dict)
+                # elif form == 'toy-model':
+                #     centre=25
+                #     df_plot = pd.DataFrame(columns=["form", "rtol",
+                #                 "a", 
+                #                 "omega", "phi", "N", 
+                #                 "hopping", "onsite", 
+                #                 "next onsite", "NNN",
+                #                 "NNN overtop"])
+                #     df_dtype_dict = {'form':str, "rtol":np.float64,
+                #              'a':np.float64, 
+                #         'omega':np.float64, 'phi':np.float64, 'N':int,
+                #         'hopping':np.complex128,
+                #         'onsite':np.complex128, 'next onsite':np.complex128,
+                #         'NNN':np.complex128, 'NNN overtop':np.complex128}
+                #     for i, omega in enumerate(np.linspace(3.7, 20, 164)):
+                #         entry = -exp(-1j*a*sin(phi)/omega)*jv(0, a/omega)
+                #         df_plot.loc[i] = [form, None,a,omega,phi, N,
+                #                       entry,
+                #                       0,
+                #                       0,
+                #                       0,
+                #                       0]
+                #     df_plot= df_plot.astype(dtype=df_dtype_dict)
                     
                 elif form =='OSC-mathematica'or form =="SS-m" or form == "linear-m":
                     df_plot = df[(df['form']==form)&
