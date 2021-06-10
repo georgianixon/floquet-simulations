@@ -17,7 +17,7 @@ from scipy.integrate import solve_ivp
 import pandas as pd 
 import time
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
+sys.path.append('/Users/Georgia Nixon/Code/MBQD/floquet-simulations/src')
 from hamiltonians import  create_HF, solve_schrodinger
 
 
@@ -44,23 +44,23 @@ def filter_duplicates(x):
 def convert_complex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
-sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
+sh = '/Users/Georgia Nixon/Code/MBQD/floquet-simulations/'
 dfname = "data/analysis-G.csv"
 
 
-df = pd.DataFrame(columns=["form", "rtol",
-                                    "a", 
-                                    "omega", "phi", "N", 
-                                    "hopping", "onsite", 
-                                    "next onsite", "NNN",
-                                    "NNN overtop"])
-    
-df.to_csv(sh+dfname,
-                  index=False, 
-                  columns=['form', 'rtol', 'a', 'omega', 'phi',
-                          'N', 'hopping', 
-                          'onsite', 'next onsite', 'NNN',
-                            'NNN overtop'])
+#df = pd.DataFrame(columns=["form", "rtol",
+#                                    "a", 
+#                                    "omega", "phi", "N", 
+#                                    "hopping", "onsite", 
+#                                    "next onsite", "NNN",
+#                                    "NNN overtop"])
+#    
+#df.to_csv(sh+dfname,
+#                  index=False, 
+#                  columns=['form', 'rtol', 'a', 'omega', 'phi',
+#                          'N', 'hopping', 
+#                          'onsite', 'next onsite', 'NNN',
+#                            'NNN overtop'])
 
 #%%
 df_dtype_dict = {'form':str, "rtol":np.float64,
@@ -80,12 +80,13 @@ df = pd.read_csv(sh+dfname,
                                               })
 
 
+
 #%%
 
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='linear-p' 
+form='SS-p' 
 rtol = 1e-11
 aas = [35]
 phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
@@ -99,7 +100,7 @@ for a in aas:
                                     "hopping", "onsite", 
                                     "next onsite", "NNN",
                                     "NNN overtop"])
-        for i, omega in enumerate(np.linspace(3.7, 20, 164)):
+        for i, omega in enumerate(np.linspace(100, 180, 801)):
             omega = round(omega, 1)
             print(omega)
             

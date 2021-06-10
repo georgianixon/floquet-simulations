@@ -24,7 +24,7 @@ import seaborn as sns
 from numpy import sin, cos, exp, pi
 
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
+sys.path.append('/Users/Georgia Nixon/Code/MBQD/floquet-simulations/src')
 from hamiltonians import  hoppingHF
 
 def filter_duplicates(x):
@@ -82,7 +82,7 @@ def phistring(phi):
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=25
+size=16
 params = {
             'legend.fontsize': size*0.75,
           'axes.labelsize': size,
@@ -120,7 +120,7 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
-sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
+sh = '/Users/Georgia Nixon/Code/MBQD/floquet-simulations/'
 
 df = pd.read_csv(sh+'data/analysis-G.csv', 
                   index_col=False, 
@@ -153,14 +153,15 @@ forms=[
 rtols=[1e-11]
 aas = [35]
 phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+#phis =  [0]
 apply = [np.abs, np.real, np.imag]
-
+omegaMin = 100
 
 look = 'hopping'
-# look = 'onsite'
-# look = 'next onsite'
-# look = 'NNN'
-# look = 'NNN overtop'
+look = 'onsite'
+#look = 'next onsite'
+#look = 'NNN'
+#look = 'NNN overtop'
 
 title, indices = formatplot(look)
 
@@ -169,9 +170,9 @@ labels = [r'$|$'+indices+r'$|$',
           r'$\mathrm{Real} \{$'+indices+r'$\}$',
           r'$\mathrm{Imag} \{$'+indices+r'$\}$']
 
-sz =24
+sz =10
 
-fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)/1.62*1.6),
+fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)*1.6),
                        constrained_layout=True, sharey=True)
 
 
@@ -226,6 +227,7 @@ for nc, phi in enumerate(phis):
                 if not df_plot.empty:
                     
                     df_plot = df_plot.sort_values(by=['omega'])
+                    df_plot = df_plot[df_plot.omega < omegaMin]
                     
                     for n1, f in enumerate(apply):
                         ax[n1].plot(df_plot['omega'], f(df_plot[look].values), 
@@ -283,8 +285,8 @@ fig.legend(handles_legend, labels_legend, loc='upper right')
 
 fig.suptitle(""+
              # "Next nearest neighbour tunnelling"
-             "Tunnelling"
-             +" (" +indices+')\n'
+#             "Tunnelling"
+             " (" +indices+')\n'
               + r"given $H(t)=H_0 + " +str(a) 
               + r" \cos (\omega "
              + r"t" + phistring(phi) 
