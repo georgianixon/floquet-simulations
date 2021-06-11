@@ -126,37 +126,44 @@ def GetResults(Func, phis, omegas, nres):
 #%%
     
 
+
 A = 35
 
 nres = 160
 omegas = np.linspace(3.7, 60, nres, endpoint=True)
 phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 
-xResultsPhis = GetResults(XIntegrandSimplifiedT1, phis, omegas, nres)
+xResultsPhis0 = GetResults(XIntegrandSimplifiedT1, phis, omegas, nres)
 
 fig, ax = plt.subplots()
 for j, phi in enumerate(phis):
-    ax.plot(omegas, np.real(xResultsPhis[j]), label=r"$\phi=$"+phistring(phi) + "  2")
+    ax.plot(omegas, np.real(xResultsPhis0[j]), label=r"$\phi=$"+phistring(phi) + "  2")
 fig.legend()
 plt.show()
 
-xResultsPhis = GetResults(XIntegrandSimplifiedT2, phis, omegas, nres)
+xResultsPhis1 = GetResults(XIntegrandSimplifiedT2, phis, omegas, nres)
 
 fig, ax = plt.subplots()
 for j, phi in enumerate(phis):
-    ax.plot(omegas, np.real(xResultsPhis[j]), label=r"$\phi=$"+phistring(phi) + "  2")
+    ax.plot(omegas, np.real(xResultsPhis1[j]), label=r"$\phi=$"+phistring(phi) + "  2")
 fig.legend()
 plt.show()
 
-xResultsPhis = GetResults(XIntegrandSimplified, phis, omegas, nres)
+xResultsPhis2 = GetResults(XIntegrandSimplified, phis, omegas, nres)
 
 fig, ax = plt.subplots()
 for j, phi in enumerate(phis):
-    ax.plot(omegas, np.real(xResultsPhis[j]), label=r"$\phi=$"+phistring(phi) + "  2")
+    ax.plot(omegas, np.real(xResultsPhis2[j]), label=r"$\phi=$"+phistring(phi) + "  2")
 fig.legend()
 plt.show()
 
+#%%
 
+from mpmath import nsum, inf
+from mpmath import exp as mpmathexp
+from scipy.special import jv
+
+a = nsum(lambda k: jv(2*k + 1, 1)/(2*k + 1), [0, inf])
 
 #%%
 
@@ -213,16 +220,20 @@ plt.show()
 results3 = [quad(lambda x: sin(2*x)*sin(A*sin(x)), 0,pi) for A in As]
 results3 = np.array([jv(0, A) for A in As])
 
-n = 1
-A = 1
-plt.plot(As, results)
-plt.plot(As, pi*jv(2,As))
+#%%
+fig, ax = plt.subplots(figsize=(10,10))
+jvplot = np.zeros(len(As))
+for n in np.linspace(1, 51, 6, endpoint=True):
+    plt.plot(As, jv(n,As), label=str(n))
+    jvplot = jvplot + jv(n, As)
+  
+plt.legend()
+plt.show()
+
+plt.plot(As, jvplot)
 plt.show()
 
 
-
-plt.plot(As, results3)
-plt.show()
     
 #plt.plot(As, jv(0,As))
 #plt.show()
