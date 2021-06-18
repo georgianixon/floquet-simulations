@@ -10,6 +10,7 @@ Create csv that gives hopping as a function of a, omega, type of hamiltonian,
 and other parameters
 """
 
+place = "Georgia Nixon"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -24,8 +25,10 @@ import seaborn as sns
 from numpy import sin, cos, exp, pi
 
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
+sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
 from hamiltonians import  hoppingHF
+
+
 
 def filter_duplicates(x):
     """
@@ -91,7 +94,7 @@ def phistring(phi):
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=26
+size=20
 params = {
             'legend.fontsize': size*0.75,
           'axes.labelsize': size,
@@ -129,9 +132,10 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
-sh = '/Users/Georgia/Code/MBQD/floquet-simulations/'
-dfname = "data/analysis-G-withnewgauge.csv"
+sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
+dfname = "data/analysis-G.csv"
 # dfname = "data/analysis-G.csv"
+
 
 df = pd.read_csv(sh+dfname, 
                  index_col=False, 
@@ -167,15 +171,16 @@ aas = [35]
 phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 # phis =  [pi/7, pi/6]
 apply = [np.abs, np.real, np.imag]
-omegaMin = 80
+omegaMin = 50
 
-look = 'hopping'
-look = "hopping back"
-# look = 'onsite'
-# look = 'next onsite'
-# look = 'NNN overtop'
-# look = "NNN star"
+#look = 'hopping'
+#look = "hopping back"
+#look = 'onsite'
+#look = 'next onsite'
+look = 'NNN overtop'
+#look = "NNN star"
 # look = "NNN square"
+#look = "NNN"
 
 title, indices = formatplot(look)
 
@@ -184,7 +189,7 @@ labels = [r'$|$'+indices+r'$|$',
           r'$\mathrm{Real} \{$'+indices+r'$\}$',
           r'$\mathrm{Imag} \{$'+indices+r'$\}$']
 
-sz =25
+sz =15
 
 fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)*1.6),
                        constrained_layout=True, sharey=True)
@@ -299,16 +304,17 @@ fig.legend(handles_legend, labels_legend, loc='upper right')
 
 fig.suptitle(""+
              # "Next nearest neighbour tunnelling"
-#             "Tunnelling"
+             title+
              " (" +indices+')\n'
               + r"given $H(t)=H_0 + " +str(a) 
               + r" \cos (\omega "
              + r"t" + phistring(phi) 
-             + r") |"+str(centre)+r"><"+str(centre) +r"|$",
+             + r") |n><n|$",
               )
 
-# fig.savefig(sh+'graphs/test.png', 
-#             format='png', bbox_inches='tight')
+notesFolder = "/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/"
+fig.savefig(notesFolder+"NNNOvertop.pdf", 
+             format='pdf', bbox_inches='tight')
 
 plt.grid(True)
 plt.show()

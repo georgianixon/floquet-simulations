@@ -9,7 +9,7 @@ Created on Tue Oct 27 14:08:09 2020
 Create csv that gives hopping as a function of a, omega, type of hamiltonian,
 and other parameters
 """
-place = "Georgia"
+place = "Georgia Nixon"
 
 from numpy.linalg import eig
 from numpy import  pi, log, exp, sin
@@ -46,35 +46,36 @@ def convert_complex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-withnewgauge.csv"
+dfname = "data/analysis-G-newelements.csv"
 
 
-# df = pd.DataFrame(columns=["form", "rtol",
-#                                     "a", 
-#                                     "omega", "phi", "N", 
-#                                     "hopping",
-#                                     "hopping back",
-#                                     "onsite",
-#                                     "next onsite",
-#                                     "NNN overtop",
-#                                     "NNN star",
-#                                     "NNN square"])
+df = pd.DataFrame(columns=["form", "rtol",
+                                     "a", 
+                                     "omega", "phi", "N", 
+                                     "hopping",
+                                     "hopping back",
+                                     "onsite",
+                                     "next onsite",
+                                     "NNN overtop",
+                                     "NNN star",
+                                     "NNN square"])
     
-# df.to_csv(sh+dfname,
-#                   index=False, 
-#                   columns=['form', 'rtol', 'a', 'omega', 'phi',
-#                           'N', "hopping",
-#                                     "hopping back",
-#                                     "onsite",
-#                                     "next onsite",
-#                                     "NNN overtop",
-#                                     "NNN star",
-#                                     "NNN square"])
+df.to_csv(sh+dfname,
+                   index=False, 
+                   columns=['form', 'rtol', 'a', 'omega', 'phi',
+                           'N', "hopping",
+                                     "hopping back",
+                                     "onsite",
+                                     "next onsite",
+                                     "NNN overtop",
+                                     "NNN star",
+                                     "NNN square"])
 
 #%%
 df_dtype_dict = {'form':str, "rtol":np.float64,
-                 'a':np.float64, 
-            'omega':np.float64, 'phi':np.float64, 'N':int,
+#                 'a':np.float64, 
+#            'omega':np.float64, 
+            'phi':np.float64, 'N':int,
             'hopping':np.complex128,
             'hopping back':np.complex128,
             'onsite':np.complex128, 
@@ -99,19 +100,19 @@ df = pd.read_csv(sh+dfname,
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='SS-p' 
+form='DS-p' 
 rtol = 1e-11
-aas = [35]
-phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
-# phis = [ pi/2, 0]
+aas = [[35,35]]
+#phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
+phis = [ pi/2, 0]
 
 
 
-def RGaugeMatrix(N, centre, a, omega, phi):
-    matrix = np.zeros((N, N), dtype=np.complex128)
-    np.fill_diagonal(matrix, 1)  
-    matrix[centre][centre] = exp(-1j*a*sin(phi)/omega)
-    return matrix
+#def RGaugeMatrix(N, centre, a, omega, phi):
+#    matrix = np.zeros((N, N), dtype=np.complex128)
+#    np.fill_diagonal(matrix, 1)  
+#    matrix[centre][centre] = exp(-1j*a*sin(phi)/omega)
+#    return matrix
 
 
 
@@ -128,8 +129,12 @@ for a in aas:
                                     "NNN overtop",
                                     "NNN star",
                                     "NNN square"])
-        for i, omega in enumerate(np.linspace(20.1, 200, 10*180, endpoint=True)):
-            omega = round(omega, 1)
+        for i, omegaF in enumerate(np.linspace(3.7, 20, 20*10-37+1, endpoint=True)):
+            omegaF = round(omegaF, 1)
+            if form=="DS-p":
+                omega = [omegaF, 2*omegaF]
+            else:
+                omega = omegaF
             print(omega)
             
             start = time.time()
@@ -138,8 +143,8 @@ for a in aas:
             """  
             UT, HF = create_HF(form, rtol, N, centre, a,phi, omega)
             
-            R = RGaugeMatrix(N, centre, a, omega, phi)
-            HF = np.dot(np.conj(R.T), np.dot(HF, R))
+#            R = RGaugeMatrix(N, centre, a, omega, phi)
+#            HF = np.dot(np.conj(R.T), np.dot(HF, R))
             
             
             hopping=HF[centre][centre+1]
