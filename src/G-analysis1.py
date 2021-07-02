@@ -146,7 +146,7 @@ df = pd.read_csv(sh+dfname,
                              'NNN overtop':convert_complex,
                               'NNN star':convert_complex,
                               'NNN square':convert_complex,
-                             # 'NNN':convert_complex,
+                              'NNN':convert_complex,
                                               })
 
 
@@ -177,10 +177,10 @@ omegaMin = 50
 #look = "hopping back"
 #look = 'onsite'
 #look = 'next onsite'
-look = 'NNN overtop'
+#look = 'NNN overtop'
 #look = "NNN star"
 # look = "NNN square"
-#look = "NNN"
+look = "NNN"
 
 title, indices = formatplot(look)
 
@@ -313,7 +313,7 @@ fig.suptitle(""+
               )
 
 notesFolder = "/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/"
-fig.savefig(notesFolder+"NNNOvertop.pdf", 
+fig.savefig(notesFolder+"NNN.pdf", 
              format='pdf', bbox_inches='tight')
 
 plt.grid(True)

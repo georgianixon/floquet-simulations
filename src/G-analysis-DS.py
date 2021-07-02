@@ -111,7 +111,7 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
 sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-newelements-1.csv"
+dfname = "data/analysis-G-newelements-2.csv"
 # dfname = "data/analysis-G.csv"
 
 df = pd.read_csv(sh+dfname, 
@@ -145,15 +145,16 @@ a2 = 35
 #phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phi1s =  [0, pi/2]
 phiOffset = pi/4
+omegaMultiplier = 2
 apply = [np.abs, np.real, np.imag]
 omegaMin = 80
 
 #look = "square"
 look ="chi"
-#look ="gamma"
+look ="gamma"
 #look ="triangle"
 #look ="alpha"
-#look ="tilde"
+look ="tilde"
 #look ="star"
 #look ="beta"
 #look ="rho"
@@ -176,8 +177,9 @@ for nc, phi1 in enumerate(phi1s):
                  (df['N']==N)&
                   (df['a1']==a1)&
                   (df['a2']==a2)&
-                  (df['phi1']==phi1)]
-#                  (df['phi2']==phi1+phiOffset)
+                  (df['phi1']==phi1)&
+                  (df["omega multiplier"]==omegaMultiplier)&
+                  (df['phi offset']==phiOffset)]
 
         
     if not df_plot.empty:
@@ -212,8 +214,11 @@ plt.show()
 
 x = np.linspace(-4*pi,4*pi, 40)
 y = cos(x)
-y1 = cos(x+pi/7)
-plt.plot(x, y+y1)
+y1 = cos(2*x+pi/4)
+#plt.plot(x, y1)
+#plt.plot(x,y)
+plt.plot(x,y+y1)
+plt.show()
 
 
                                                          

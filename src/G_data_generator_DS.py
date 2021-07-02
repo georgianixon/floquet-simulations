@@ -42,48 +42,48 @@ def convert_complex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-newelements-1.csv"
+dfname = "data/analysis-G-newelements-2.csv"
 
 
-#df = pd.DataFrame(columns=["form", "rtol","N", 
-#                           "a1", "a2", 
-#                           "omega1", "omega2",
-#                           "phi1", "phi2"
-#                            "square",
-#                            "chi",
-#                            "gamma",
-#                            "triangle",
-#                            "alpha",
-#                            "tilde",
-#                            "star",
-#                            "beta",
-#                            "rho",
-#                            "epsilon",
-#                            "delta"])
-#    
-#df.to_csv(sh+dfname,
-#                   index=False, 
-#                   columns=['form', 'rtol', 'N', 
-#                            'a1', "a2", 
-#                            "omega1", "omega2",
-#                           "phi1", "phi2",
-#                            "square",
-#                            "chi",
-#                            "gamma",
-#                            "triangle",
-#                            "alpha",
-#                            "tilde",
-#                            "star",
-#                            "beta",
-#                            "rho",
-#                            "epsilon",
-#                            "delta"])
+df = pd.DataFrame(columns=["form", "rtol","N", 
+                           "a1", "a2", 
+                           "omega1", "omega multiplier",
+                           "phi1", "phi offset"
+                            "square",
+                            "chi",
+                            "gamma",
+                            "triangle",
+                            "alpha",
+                            "tilde",
+                            "star",
+                            "beta",
+                            "rho",
+                            "epsilon",
+                            "delta"])
+    
+df.to_csv(sh+dfname,
+                   index=False, 
+                   columns=['form', 'rtol', 'N', 
+                            'a1', "a2", 
+                            "omega1", "omega multiplier",
+                           "phi1", "phi offset",
+                            "square",
+                            "chi",
+                            "gamma",
+                            "triangle",
+                            "alpha",
+                            "tilde",
+                            "star",
+                            "beta",
+                            "rho",
+                            "epsilon",
+                            "delta"])
 
 #%%
 df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int,
                  'a1':np.float64, 'a2':np.float64,
-                 'omega1':np.float64, 'omega2':np.float64,
-                 'phi1':np.float64, 'phi2':np.float64,
+                 'omega1':np.float64, 'omega multiplier':np.float64,
+                 'phi1':np.float64, 'phi offset':np.float64,
                  "square": np.complex128,
                     "chi": np.complex128,
                     "gamma": np.complex128,
@@ -123,8 +123,9 @@ rtol = 1e-11
 a1 = 35
 a2 = 35
 #phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
-phis = [ pi/2, 0]
+phis = [ pi/4, pi/8, 3*pi/8]
 phiOffset = pi/4
+omegaMultiplier = 2
 
 
 
@@ -142,9 +143,9 @@ for phi in phis:
                                 "a1", 
                                 "a2",
                                 "omega1",
-                                "omega2",
+                                "omega multiplier",
                                 "phi1",
-                                "phi2",
+                                "phi offset",
                                 "square",
                                 "chi",
                                 "gamma",
@@ -156,9 +157,9 @@ for phi in phis:
                                 "rho",
                                 "epsilon",
                                 "delta"])
-    for i, omega1 in enumerate(np.linspace(3.7, 20, 20*10-37+1, endpoint=True)):
+    for i, omega1 in enumerate(np.linspace(3.7, 200, 200*10-37+1, endpoint=True)):
         omega1 = round(omega1, 1)
-        omega2 = 2*omega1
+        omega2 = omegaMultiplier*omega1
         print(omega1)
         
         start = time.time()
@@ -195,9 +196,9 @@ for phi in phis:
                       a1,
                       a2,
                       omega1,
-                      omega2,
+                      omegaMultiplier,
                       phi,
-                      phi+phiOffset,
+                      phiOffset,
                       square,
                       chi,
                       gamma,
@@ -229,8 +230,8 @@ for phi in phis:
               index=False, 
               columns=['form', 'rtol','N',
                        'a1', 'a2', 
-                       'omega1', 'omega2', 
-                       'phi1', "phi2",
+                       'omega1', 'omega multiplier', 
+                       'phi1', "phi offset",
                       "square",
                         "chi",
                         "gamma",
