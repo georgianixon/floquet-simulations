@@ -40,6 +40,12 @@ def HT_SS(N, centre, a, omega, t, phi):
     matrix[centre][centre] = a*cos(omega*t + phi)
     return matrix
 
+def HT_DS(N, centre, a1, a2, omega1, omega2, t, phi1, phi2):
+    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
+    matrix[centre][centre] = a1*cos(omega1*t + phi1)
+    matrix[centre+1][centre+1] = a2*cos(omega2*t + phi2)
+    return matrix
+
 
 """
 No energy offset
@@ -56,6 +62,9 @@ Functions to Solve Schrodinger eq
 # one site cosine 
 def F_SS(t, psi, N, centre, a, omega, phi):
     return -1j*np.dot(HT_SS(N, centre, a, omega, t, phi),psi)
+
+def F_DS(t, psi, N, centre, a1, a2, omega1, omega2, phi1, phi2):
+    return -1j*np.dot(HT_DS(N, centre, a1, a2, omega1, omega2, t, phi1, phi2),psi)
 
 # linear moving potential
 def F_Linear(t, psi, N, a, omega, phi):
@@ -81,6 +90,14 @@ def solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, n_timesteps, 
     time tspan, for Hamiltonian signified by 'form'
     """
     
+    if form=="DS-p":
+        a1 = a[0]
+        a2 = a[1]
+        omega1 = omega[0]
+        omega2 = omega[1]
+        phi1 = phi[0]
+        phi2 = phi[1]
+        
     t_eval = np.linspace(tspan[0], tspan[1], n_timesteps+1)
     
     if form == 'SS-p':
@@ -88,6 +105,17 @@ def solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, n_timesteps, 
                            N, centre,
                              a,
                              omega, phi), 
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+        sol=sol.y
+        
+    elif form == 'DS-p':
+        sol = solve_ivp(lambda t,psi: F_DS(t, psi, 
+                           N, centre,
+                             a1, a2,
+                             omega1, omega2,
+                             phi1, phi2), 
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
@@ -119,9 +147,13 @@ def solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, n_timesteps, 
 
 def create_HF(form, rtol, N, centre, a,phi, omega): 
 
-
-    assert(form in ['linear', "linear-p", "SS-p"])
-    T=2*pi/omega
+    
+    
+    assert(form in ['linear', "linear-p", "SS-p", "DS-p"])
+    if form == "DS-p":
+        T = 2*pi/omega[0]
+    else:
+        T=2*pi/omega
     tspan = (0,T)
     UT = np.zeros([N,N], dtype=np.complex_)
     
