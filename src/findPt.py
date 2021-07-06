@@ -5,9 +5,10 @@ Created on Mon Mar 29 18:53:18 2021
 @author: Georgia
 """
 
+place = "Georgia Nixon"
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
-from hamiltonians import create_HF, hoppingHF, roundcomplex, getevalsandevecs, formatcomplex
+sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
+from hamiltonians import create_HF, hoppingHF, roundcomplex, GetEvalsAndEvecs, formatcomplex, OrderEvecs
 from scipy.linalg import eig 
 from numpy import pi
 import numpy as np
@@ -76,14 +77,14 @@ phis = [0, pi/2]
 form='SS-p'
 rtol=1e-11
 
-_, HF1 = create_HF(form, rtol, N, centre, a,phis[0], omega)
-_, HF2 = create_HF(form, rtol, N, centre, a,phis[1], omega)
+_, HF1 = create_HF(form, rtol, N, centre, a, phis[0], omega)
+_, HF2 = create_HF(form, rtol, N, centre, a, phis[1], omega)
 
 _, hopping1 = hoppingHF(N, centre, a, omega, phis[0])
 _, hopping2 = hoppingHF(N, centre, a, omega, phis[1])
 
-evals1, evecs1 = getevalsandevecs(HF1)
-evals2, evecs2 = getevalsandevecs(HF2)
+evals1, evecs1 = GetEvalsAndEvecs(HF1)
+evals2, evecs2 = GetEvalsAndEvecs(HF2)
 
 #flip if needed
 for i in range(N):
@@ -216,7 +217,7 @@ form='SS-p'
 rtol=1e-11
 
 _, HF0 = create_HF(form, rtol, N, centre, a,0, omega)
-evals0, evecs0 = getevalsandevecs(HF0)
+evals0, evecs0 = GetEvalsAndEvecs(HF0)
 
 
 #order evecs to make first nonzero element real and positive 
@@ -234,7 +235,7 @@ Ps = np.zeros((len(phis), N, N), dtype=np.complex128)
 for i, phi in enumerate(phis):
     print("{:.2f}".format(phi))
     _, HFP = create_HF(form, rtol, N, centre, a,phi, omega)
-    evalsP, evecsP = getevalsandevecs(HFP)
+    evalsP, evecsP = GetEvalsAndEvecs(HFP)
     evecsP_R = roundcomplex(evecsP, 5)
 
     # align evecsP

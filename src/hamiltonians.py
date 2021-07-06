@@ -17,6 +17,36 @@ import pandas as pd
 from scipy.linalg import eig as eig
 from scipy.linalg import expm
 
+def GetEvalsAndEvecs(HF):
+    """
+    Get e-vals and e-vecs of Hamiltonian HF.
+    Order Evals and correspoinding evecs by smallest eval first.
+    Set the gauge for each evec; choosing the first non-zero element to be real and positive.
+    Note that the gauge may be changed later by multiplying any vec arbitrarily by a phase. 
+    """
+    #order by evals, also order corresponding evecs
+    evals, evecs = eig(HF)
+    idx = np.real(evals).argsort()
+    evals = evals[idx]
+    evecs = evecs[:,idx]
+    
+    #make first element of evecs real and positive
+    for vec in range(np.size(HF[0])):
+        
+        # Find first element of the first eigenvector that is not zero
+        firstNonZero = (evecs[:,vec]!=0).argmax()
+        #find the conjugate phase of this element
+        conjugatePhase = np.conj(evecs[firstNonZero,vec])/np.abs(evecs[firstNonZero,vec])
+        #multiply all elements by the conjugate phase
+        evecs[:,vec] = conjugatePhase*evecs[:,vec]
+
+    # check that the evals are real
+    if np.all((np.round(np.imag(evals),7) == 0)) == True:
+        return np.real(evals), evecs
+    else:
+        print('evals are imaginary!')
+        return evals, evecs
+
 
 
 """
@@ -84,10 +114,19 @@ def F_HF(t, psi, HF):
 def roundcomplex(num, dp):
     return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
 
-def solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, n_timesteps, psi0):
+def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, psi0):
     """
-    solve time dependent schrodinger eq given initial conditions psi0, over
-    time tspan, for Hamiltonian signified by 'form'
+    Solve Schrodinger Equation for oscilating Hamiltonian
+    Oscillating single site energy, H[centre][centre] = a cos(omega t + phi) (when form = "SS-p")
+    tspan = [tstart, tend]
+    Initial conditions given by psi0 (initial matter wave)
+    
+    form = "DS-p" gives double site shaking
+    
+    form = "linear" will shake whole lattice. This is useful to check known results.
+    
+    IMPORTANT - nTimesteps is how many steps. This is not how many points we need to calculate the matter wave at;
+        we calculate the matter wave at nTimesteps + 1 points. This gives nTimesteps steps. 
     """
     
     if form=="DS-p":
@@ -98,7 +137,8 @@ def solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, n_timesteps, 
         phi1 = phi[0]
         phi2 = phi[1]
         
-    t_eval = np.linspace(tspan[0], tspan[1], n_timesteps+1)
+    # points to calculate the matter wave at
+    t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
     
     if form == 'SS-p':
         sol = solve_ivp(lambda t,psi: F_SS(t, psi, 
@@ -131,10 +171,11 @@ def solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, n_timesteps, 
         
         
     elif form == 'numericalG-SS-p':
-        _, HF = create_HF('SS-p', rtol, N, centre, a, None, None, phi, omega)
-        HFr = roundcomplex(HF, 5)
-        assert(np.all(0 == (HFr - np.conj(HFr.T))))
-        evals, evecs= eig(HFr)
+        #get numerically calculated effective Hamiltonian
+        _, HF = create_HF('SS-p', rtol, N, centre, a, phi, omega)
+        #diagonalise
+        evals, evecs= GetEvalsAndEvecs(HF)
+        # get initial state, psi0, written in basis of evecs, find coefficients
         coeffs =  np.dot(np.conj(evecs.T), psi0)
         sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
         sol = np.vstack(sol).T
@@ -147,8 +188,6 @@ def solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, n_timesteps, 
 
 def create_HF(form, rtol, N, centre, a,phi, omega): 
 
-    
-    
     assert(form in ['linear', "linear-p", "SS-p", "DS-p"])
     if form == "DS-p":
         T = 2*pi/omega[0]
@@ -160,7 +199,7 @@ def create_HF(form, rtol, N, centre, a,phi, omega):
     for A_site_start in range(N):
     #    print(A_site_start)
         psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = solve_schrodinger(form, rtol, N, centre, a, omega, phi, tspan, 100, psi0)
+        sol = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, 100, psi0)
         UT[:,A_site_start]=sol[:,-1] 
     
     # print(time.time()-start, 'seconds.')
@@ -200,17 +239,6 @@ def hoppingHF(N, centre, a, omega, phi):
 def roundcomplex(num, dp):
     return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
 
-
-def getevalsandevecs(HF):
-    evals, evecs = eig(HF)
-    idx = np.real(evals).argsort()
-    evals = evals[idx]
-    evecs = evecs[:,idx]
-    # evecsR = roundcomplex(evecs, 5)
-    evalsR = roundcomplex(evals, 5)
-    assert(np.all(np.imag(evalsR)==0))
-    evals = np.real(evals)
-    return evals, evecs
 
 def formatcomplex(num, dp):
     return ("{:."+str(dp)+"f}").format(num.real) + " + " + ("{:."+str(dp)+"f}").format(num.imag) + "i"

@@ -153,23 +153,7 @@ fig.suptitle("Representation of Floquet Hamiltonian, G\n"
 plt.show()
 
 
-#%%
 
-diff = 5
-a = roundcomplex(np.sum([HF[i,i] for i in range(25-diff, 25+diff+1)]), 9)
-b = roundcomplex(np.sum([HF[i,i-1] for i in range(26-diff, 26+diff)]), 9)
-c= roundcomplex(np.sum([HF[i,i-2] for i in range(26-diff, 26+diff+1)]), 9)
-d = roundcomplex(np.sum([HF[i,i-3] for i in range(27-diff, 27+diff)]), 9)
-e = roundcomplex(np.sum([HF[i,i-4] for i in range(27-diff, 27+diff+1)]), 9)
-f = roundcomplex(np.sum([HF[i,i-5] for i in range(28-diff, 28+diff)]), 9)
-g = roundcomplex(np.sum([HF[i,i-6] for i in range(28-diff, 28+diff+1)]), 9)
-h = roundcomplex(np.sum([HF[i,i-7] for i in range(29-diff, 29+diff)]), 9)
-i = roundcomplex(np.sum([HF[i,i-8] for i in range(29-diff, 29+diff+1)]), 9)
-
-
-print(a+b+c+d+e+f+g+h+i)
-
-# lowertriangle = 
 
 
 
