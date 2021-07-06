@@ -273,7 +273,7 @@ def plotevals(evals, N, title, ypos=1.06):
 #order evecs0 to
 def OrderEvecs(evecs0, N):
     """
-    Make first nonzero element of evecs real and positive
+    Make first nonzero element of an evec real and positive
     """
     evecs0_R = roundcomplex(evecs0, 5)
     for vec in range(N):
