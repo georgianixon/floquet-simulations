@@ -5,17 +5,6 @@ Created on Thu Jun 17 19:34:11 2021
 @author: Georgia Nixon
 """
 
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug 24 12:47:31 2020
-
-@author: Georgia
-"""
-
-"""
-Create csv that gives hopping as a function of a, omega, type of hamiltonian,
-and other parameters
-"""
 
 place = "Georgia Nixon"
 import matplotlib.colors as col

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 17 19:03:19 2021
+Created on Wed Jul  7 09:45:45 2021
 
 @author: Georgia Nixon
 """
@@ -15,7 +15,7 @@ import pandas as pd
 import time
 import sys
 sys.path.append('/Users/'+place+'/Code/MBQD/floquet-simulations/src')
-from hamiltonians import  create_HF, solve_schrodinger
+from hamiltonians import  CreateHF, SolveSchrodinger
 
 
 def filter_duplicates(x):
@@ -38,11 +38,11 @@ def filter_duplicates(x):
             return np.nan
         
 
-def convert_complex(s):
+def ConvertComplex(s):
     return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-newelements-2.csv"
+dfname = "data/analysis-G-SSDF.csv"
 
 
 df = pd.DataFrame(columns=["form", "rtol","N", 
@@ -77,7 +77,8 @@ df.to_csv(sh+dfname,
                             "beta",
                             "rho",
                             "epsilon",
-                            "delta"])
+                            "delta"]
+                   )
 
 #%%
 df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int,
@@ -98,17 +99,17 @@ df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int,
 
 df = pd.read_csv(sh+dfname, 
                  index_col=False, 
-                 converters={"square": convert_complex,
-                            "chi": convert_complex,
-                            "gamma": convert_complex,
-                            "triangle": convert_complex,
-                            "alpha": convert_complex,
-                            "tilde": convert_complex,
-                            "star": convert_complex,
-                            "beta": convert_complex,
-                            "rho": convert_complex,
-                            "epsilon": convert_complex,
-                            "delta": convert_complex
+                 converters={"square": ConvertComplex,
+                            "chi": ConvertComplex,
+                            "gamma": ConvertComplex,
+                            "triangle": ConvertComplex,
+                            "alpha": ConvertComplex,
+                            "tilde": ConvertComplex,
+                            "star": ConvertComplex,
+                            "beta": ConvertComplex,
+                            "rho": ConvertComplex,
+                            "epsilon": ConvertComplex,
+                            "delta": ConvertComplex,
                             })
 
 
@@ -118,13 +119,13 @@ df = pd.read_csv(sh+dfname,
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='DS-p' 
+form='SSDF-p' 
 rtol = 1e-11
 a1 = 35
 a2 = 35
 #phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
-phis = [ pi/4, pi/8, 3*pi/8]
-phiOffset = pi/4
+phis = [0]
+phiOffset = pi/2
 omegaMultiplier = 2
 
 
@@ -169,7 +170,7 @@ for phi in phis:
         aInput = [a1,a2]
         omegaInput = [omega1,omega2]
         phiInput = [phi, phi+phiOffset]
-        UT, HF = create_HF(form, rtol, N, centre, aInput,phiInput, omegaInput)
+        UT, HF = CreateHF(form, rtol, N, centre, aInput,phiInput, omegaInput)
         
 #            R = RGaugeMatrix(N, centre, a, omega, phi)
 #            HF = np.dot(np.conj(R.T), np.dot(HF, R))
@@ -243,4 +244,3 @@ for phi in phis:
                         "rho",
                         "epsilon",
                         "delta"])
-    

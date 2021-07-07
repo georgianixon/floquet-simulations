@@ -76,6 +76,10 @@ def HT_DS(N, centre, a1, a2, omega1, omega2, t, phi1, phi2):
     matrix[centre+1][centre+1] = a2*cos(omega2*t + phi2)
     return matrix
 
+def HT_SSDF(N, centre, a1, a2, omega1, omega2, t, phi1, phi2):
+    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
+    matrix[centre][centre] = a1*cos(omega1*t + phi1) + a2*cos(omega2*t + phi2)
+    return matrix
 
 """
 No energy offset
@@ -96,6 +100,9 @@ def F_SS(t, psi, N, centre, a, omega, phi):
 def F_DS(t, psi, N, centre, a1, a2, omega1, omega2, phi1, phi2):
     return -1j*np.dot(HT_DS(N, centre, a1, a2, omega1, omega2, t, phi1, phi2),psi)
 
+def F_SSDF(t, psi, N, centre, a1, a2, omega1, omega2, phi1, phi2):
+    return -1j*np.dot(HT_SSDF(N, centre, a1, a2, omega1, omega2, t, phi1, phi2) ,psi)
+
 # linear moving potential
 def F_Linear(t, psi, N, a, omega, phi):
     return -1j*np.dot(HT_Linear(N, a, omega, t, phi), psi)
@@ -111,7 +118,7 @@ def F_HF(t, psi, HF):
 
 
 
-def roundcomplex(num, dp):
+def RoundComplex(num, dp):
     return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
 
 def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, psi0):
@@ -125,11 +132,13 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
     
     form = "linear" will shake whole lattice. This is useful to check known results.
     
+    form = "SSDF-p" will shake single site with two frequencies (non time reversal symmetric)
+    
     IMPORTANT - nTimesteps is how many steps. This is not how many points we need to calculate the matter wave at;
         we calculate the matter wave at nTimesteps + 1 points. This gives nTimesteps steps. 
     """
     
-    if form=="DS-p":
+    if form=="DS-p" or form == "SSDF-p":
         a1 = a[0]
         a2 = a[1]
         omega1 = omega[0]
@@ -160,6 +169,17 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
             atol=rtol, t_eval=t_eval,
             method='RK45')
         sol=sol.y
+    
+    elif form == 'SSDF-p':
+        sol = solve_ivp(lambda t,psi: F_SSDF(t, psi, 
+                           N, centre,
+                             a1, a2,
+                             omega1, omega2,
+                             phi1, phi2), 
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+        sol=sol.y
         
         
     elif form =='linear' or form == "linear-p":
@@ -172,7 +192,7 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
         
     elif form == 'numericalG-SS-p':
         #get numerically calculated effective Hamiltonian
-        _, HF = create_HF('SS-p', rtol, N, centre, a, phi, omega)
+        _, HF = CreateHF('SS-p', rtol, N, centre, a, phi, omega)
         #diagonalise
         evals, evecs= GetEvalsAndEvecs(HF)
         # get initial state, psi0, written in basis of evecs, find coefficients
@@ -186,10 +206,10 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
 
 
 
-def create_HF(form, rtol, N, centre, a,phi, omega): 
+def CreateHF(form, rtol, N, centre, a,phi, omega): 
 
-    assert(form in ['linear', "linear-p", "SS-p", "DS-p"])
-    if form == "DS-p":
+    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p"])
+    if form == "DS-p" or form =="SSDF-p":
         T = 2*pi/omega[0]
     else:
         T=2*pi/omega
@@ -213,7 +233,7 @@ def create_HF(form, rtol, N, centre, a,phi, omega):
         HF = HF+term
         
     # print('   ',time.time()-start, 's')
-    HFr = roundcomplex(HF, 5)
+    HFr = RoundComplex(HF, 5)
     assert(np.all(0 == (HFr - np.conj(HFr.T))))
 
     return UT, HF
@@ -229,15 +249,12 @@ def hoppingHF(N, centre, a, omega, phi):
     HF[centre][centre-1] = entry
     HF[centre+1][centre] = np.conj(entry)
     HF[centre-1][centre] = np.conj(entry)
-    HFr = roundcomplex(HF, 7)
+    HFr = RoundComplex(HF, 7)
     assert(np.all(0 == (HFr - np.conj(HFr.T))))
     return HF, entry
 
 
 #%%
-
-def roundcomplex(num, dp):
-    return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
 
 
 def formatcomplex(num, dp):
@@ -275,7 +292,7 @@ def OrderEvecs(evecs0, N):
     """
     Make first nonzero element of an evec real and positive
     """
-    evecs0_R = roundcomplex(evecs0, 5)
+    evecs0_R = RoundComplex(evecs0, 5)
     for vec in range(N):
         #index of first non zero element of this vector
         firstnonzero = (evecs0_R[:,vec]!=0).argmax()
@@ -286,8 +303,8 @@ def OrderEvecs(evecs0, N):
 
 
 def AlignEvecs(evecs0, evecsP, N):
-    evecs0_R = roundcomplex(evecs0, 5)
-    evecsP_R = roundcomplex(evecsP, 5)
+    evecs0_R = RoundComplex(evecs0, 5)
+    evecsP_R = RoundComplex(evecsP, 5)
     
     #flip if needed
     for vec in range(N):
@@ -296,12 +313,12 @@ def AlignEvecs(evecs0, evecsP, N):
         if np.all(evecs0_R[:,vec]==-evecsP_R[:,vec]):
             evecsP[:,vec] = -evecsP[:,vec]
             #redefine rounded evecsP
-            evecsP_R[:,vec] = roundcomplex(evecsP[:,vec], 5)
+            evecsP_R[:,vec] = RoundComplex(evecsP[:,vec], 5)
         # else, make them start at the same value
         elif evecs0_R[0,vec] != evecsP_R[0,vec]:
             frac = evecs0[0,vec] / evecsP[0,vec]
             evecsP[:,vec] = evecsP[:,vec] * frac
             #redefine evecsP_R
-            evecsP_R[:,vec] = roundcomplex(evecsP[:,vec], 5)
+            evecsP_R[:,vec] = RoundComplex(evecsP[:,vec], 5)
             
     return evecsP
