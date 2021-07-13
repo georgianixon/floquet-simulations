@@ -116,7 +116,11 @@ def F_HF(t, psi, HF):
     return -1j*np.dot(HF, psi)
 
 
-
+def ConvertComplex(s):
+    """
+    For retrieving complex numbers from csv's
+    """
+    return np.complex128(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 def RoundComplex(num, dp):
     return np.round(num.real, dp) + np.round(num.imag, dp) * 1j

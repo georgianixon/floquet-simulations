@@ -70,7 +70,7 @@ def PlotPsi(psi, x_positions, x_labels, title, normaliser):
     cmapcol = 'PuOr' #PiYG_r
     cmap= mpl.cm.get_cmap(cmapcol)
     
-    sz = 5
+    sz = 6
     fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
                             figsize=(sz*len(apply),sz))
     
@@ -146,13 +146,13 @@ def PhiString(phi):
     else:
         return  r'+ \pi /' + str(int(1/(phi/pi)))
     
-def phistringnum(phi):
+def PhiStringNum(phi):
     if phi == 0:
         return "0"
     elif phi == "phi":
-        return r'\phi' 
+        return r"$\phi$" 
     else:
-        return  r'\pi /' + str(int(1/(phi/pi)))
+        return  r"$\pi /" + str(int(1/(phi/pi))) + r"$"
     
     
 #%%
@@ -160,37 +160,54 @@ def phistringnum(phi):
 
 # choose particular HF
 
-N = 91; A_site_start = 40;
-centre = 40;
-a = 35;
+N = 91; A_site_start = 50;
+centre = 45;
+# a = 35;
+# phi1=pi/2;
+# phi2=0;
+# omega= a /jn_zeros(0,1)[0]
+# # omega = 10
+# T=2*pi/omega
+
+
+#for SSDF
+a1 = 35; a2=35;
 phi1=pi/2;
-phi2=0;
-omega= a /jn_zeros(0,1)[0]
+phiOffset=pi/2
+phi2=phi1+phiOffset
+omega1= a1 /jn_zeros(0,1)[0]
+omegaMultiplier=2
+omega2=omega1*omegaMultiplier
+
+a = [a1,a2]
+phi=[phi1,phi2]
+omega=[omega1,omega2]
 # omega = 10
-T=2*pi/omega
+T=2*pi/omega1
 
 #when we solve scrodinger eq, how many timesteps do we want
 
 nOscillations = 30
 #how many steps we want. NB, this means we will solve for nTimesteps+1 times 
-nTimesteps = nOscillations
+nTimesteps = nOscillations*100
 n_osc_divisions = 2
 
 tspan = (0,nOscillations*T)
 
 # form1 = 'SS-p'
-form2 = 'numericalG-SS-p'
+# form2 = 'numericalG-SS-p'
+form3="SSDF-p"
 rtol=1e-11
 
 t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
 
 
-psi1 = SolveSchrodinger(form2, rtol, N, centre, a, omega, phi1, 
+psi1 = SolveSchrodinger(form3, rtol, N, centre, a, omega, phi, 
                                   tspan, nTimesteps, psi0)
 
-psi2 = SolveSchrodinger(form2, rtol, N, centre, a,omega, phi2,
-                                  tspan, nTimesteps, psi0)
+# psi2 = SolveSchrodinger(form3, rtol, N, centre, a,omega, phi2,
+#                                   tspan, nTimesteps, psi0)
     
 
 
@@ -199,48 +216,58 @@ psi2 = SolveSchrodinger(form2, rtol, N, centre, a,omega, phi2,
 
     
 # normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-3
+linthresh = 1e-2
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
 
-title = (r"$|\psi_1> = |\psi_{\phi="+phistringnum(phi1)+"}(t)>, \>"
-         +"|\psi_2> = |\psi_{\phi="+phistringnum(phi2)+"}(t)>$"
-         +"\n"
-         +r"evolution via G, "
-         + r"given $H(t)=H_0 + "+str(a)
-         +r"\cos (" + "{:.2f}".format(omega)+ r"t + \phi"
-         + r") |"+str(centre)+r"><"+str(centre) +r"|,"
-         +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
-        )  
+# title = (r"$|\psi_1> = |\psi_{\phi="+PhiStringNum(phi1)+"}(t)>, \>"
+#          +"|\psi_2> = |\psi_{\phi="+PhiStringNum(phi2)+"}(t)>$"
+#          +"\n"
+#          +r"evolution via G, "
+#          + r"given $H(t)=H_0 + "+str(a)
+#          +r"\cos (" + "{:.2f}".format(omega)+ r"t + \phi"
+#          + r") |"+str(centre)+r"><"+str(centre) +r"|,"
+#          +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
+#         )  
 
-PlotTwoPsi(psi1, psi2, x_positions, x_labels, title,
-      normaliser)
+# PlotTwoPsi(psi1, psi2, x_positions, x_labels, title,
+#       normaliser)
 
 
 title = (r"$|\psi (t)>$"+  "\n"
-         +r"evolution via G, "
-         + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega)
-             + r"t" + PhiString(phi1) 
-             + r") |"+str(centre)+r"><"+str(centre) +r"|,"
-             +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
+         # +r"evolution via G, "
+         # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
+         #     + r"t" + PhiString(phi1) 
+         #     + r") |"+str(centre)+r"><"+str(centre) +r"|,"
+         +form3+", "+r"$a_1=$"+str(a1)
+              +", "+r"$a_2=$"+str(a2)
+             +", "+r"$\omega_1=$"+"{:.2f}".format(omega1)
+              +", "+r"$\omega_2=$"+"{:.2f}".format(omega2)
+              +", "+r"$\phi_1=$"+ PhiStringNum(phi1)
+              +", "+r"$\phi_2=$"+ PhiStringNum(phi2)
+              +", "+"b="+str(centre)
+              
+              +r", $\quad |\psi (t=0)> = |"+str(A_site_start)+r">$"
+         
+         
          ) 
 
 PlotPsi(psi1, x_positions, x_labels,  title,
       normaliser)
 
 
-title = (r"$|\psi (t)>$"+  "\n"
-         +r"evolution via G, "
-         + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega)
-             + r"t" + PhiString(phi2) 
-             + r") |"+str(centre)+r"><"+str(centre) +r"|,"
-             +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
-         ) 
+# title = (r"$|\psi (t)>$"+  "\n"
+#          +r"evolution via G, "
+#          + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega)
+#              + r"t" + PhiString(phi2) 
+#              + r") |"+str(centre)+r"><"+str(centre) +r"|,"
+#              +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
+#          ) 
 
-PlotPsi(psi2, x_positions, x_labels,  title,
-      normaliser)
+# PlotPsi(psi2, x_positions, x_labels,  title,
+#       normaliser)
 
 
 

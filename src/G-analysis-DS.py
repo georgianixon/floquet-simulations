@@ -22,7 +22,7 @@ from numpy import sin, cos, exp, pi
 
 import sys
 sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
-from hamiltonians import  hoppingHF
+from hamiltonians import  hoppingHF, ConvertComplex
 
 
 
@@ -44,9 +44,6 @@ def filter_duplicates(x):
             return np.mean(xx)
         else:
             return np.nan
-
-def convert_complex(s):
-    return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 
 def phistring(phi):
@@ -71,16 +68,17 @@ params = {
           'font.size': size,
           'font.family': 'STIXGeneral',
 #          'axes.titlepad': 25,
-          'mathtext.fontset': 'stix'
+          'mathtext.fontset': 'stix',
+          
+          # 'axes.facecolor': 'white',
+          'axes.edgecolor': 'white',
+          'axes.grid': True,
+          'grid.alpha': 1,
+          # 'grid.color': "0.9"
           }
 
 
 mpl.rcParams.update(params)
-# plt.rcParams['axes.facecolor'] = 'white'
-plt.rcParams['axes.edgecolor'] = 'white'
-plt.rcParams['axes.grid'] = True
-plt.rcParams['grid.alpha'] = 1
-# plt.rcParams['grid.color'] = "0.9" # grid axis colour
 
 
 CB91_Blue = 'darkblue'#'#2CBDFE'
@@ -100,22 +98,22 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
 sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-newelements-2.csv"
+dfname = "data/analysis-G-SSDF.csv"
 # dfname = "data/analysis-G.csv"
 
 df = pd.read_csv(sh+dfname, 
                  index_col=False, 
-                 converters={"square": convert_complex,
-                            "chi": convert_complex,
-                            "gamma": convert_complex,
-                            "triangle": convert_complex,
-                            "alpha": convert_complex,
-                            "tilde": convert_complex,
-                            "star": convert_complex,
-                            "beta": convert_complex,
-                            "rho": convert_complex,
-                            "epsilon": convert_complex,
-                            "delta": convert_complex
+                 converters={"square": ConvertComplex,
+                            "chi": ConvertComplex,
+                            "gamma": ConvertComplex,
+                            "triangle": ConvertComplex,
+                            "alpha": ConvertComplex,
+                            "tilde": ConvertComplex,
+                            "star": ConvertComplex,
+                            "beta": ConvertComplex,
+                            "rho": ConvertComplex,
+                            "epsilon": ConvertComplex,
+                            "delta": ConvertComplex,
                             })
 
 
@@ -127,37 +125,37 @@ Plot General
 
 N = 51; 
 centre = 25
-form = "DS-p"
+form = "SSDF-p" #"DS-p"
 rtol=1e-11
 a1 = 35
 a2 = 35
-#phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phi1s =  [0, pi/2]
-phiOffset = pi/4
+phi1s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+# phi1s =  [0]
+phiOffset = pi/2
 omegaMultiplier = 2
 apply = [np.abs, np.real, np.imag]
-omegaMin = 80
+omegaMin = 50
 
-#look = "square"
-look ="chi"
-look ="gamma"
-#look ="triangle"
-#look ="alpha"
-look ="tilde"
-#look ="star"
-#look ="beta"
-#look ="rho"
-#look ="epsilon"
-#look ="delta"
+# look = "square"
+# look ="chi"
+# look ="gamma"
+# look ="triangle"
+# look ="alpha"
+# look ="tilde"
+look ="star"
+# look ="beta"
+# look ="rho"
+# look ="epsilon"
+# look ="delta"
 
 
-labels = [r"$|\mathrm{"+look+"}|$", 
-          r'$\mathrm{Real} \{$'+look+r'$\}$',
-          r'$\mathrm{Imag} \{$'+look+r'$\}$']
+labels = [r"$|" +look+"|$", 
+          r"$\mathrm{Real} \{\ "+look+r"\}$",
+          r"$\mathrm{Imag} \{\ "+look+r"\}$"]
 
-sz =10
+sz =15
 
-fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)*1.6),
+fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)),
                        constrained_layout=True, sharey=True)
 
 
@@ -180,7 +178,7 @@ for nc, phi1 in enumerate(phi1s):
         for n1, f in enumerate(apply):
             ax[n1].plot(df_plot['omega1'], f(df_plot[look].values), 
                         label=
-                            r'$\phi1=$'+str(round(phi1/pi, 2))+r'$\pi$'
+                            r'$\phi_1=$'+str(round(phi1/pi, 2))+r'$\pi$'
                             # +', '+
                             # form
                           # + ' rtol='+str(rtol)
@@ -196,17 +194,35 @@ for nc, phi1 in enumerate(phi1s):
 handles_legend, labels_legend = ax[1].get_legend_handles_labels()    
 fig.legend(handles_legend, labels_legend, loc='upper right')
 plt.grid(True)
+fig.suptitle(""
+             # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
+             # + r"t" + phistring(phi1) 
+             # + r") |"+str(centre)+r"><"+str(centre) +r"|$",
+             +form+", "+r"$a_1=$"+str(a1)
+              +", "+r"$a_2=$"+str(a2)
+             , y=1.1)
+             
 plt.show()
 
 
 #%%
 
-x = np.linspace(-4*pi,4*pi, 40)
-y = cos(x)
-y1 = cos(2*x+pi/4)
-#plt.plot(x, y1)
-#plt.plot(x,y)
-plt.plot(x,y+y1)
+a1 = 20
+a2 = 20
+#phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phi1 =0
+phiOffset = pi/2
+omegaMultiplier = 2
+omega1 = 10
+omega2 = omega1*omegaMultiplier
+phi2 = phi1+phiOffset
+T = 2*pi/omega1
+
+t = np.linspace(-2*T,2*T, 300)
+y = a1*cos(omega1*t + phi1) + a2*cos(omega2*t + phi2)
+plt.plot(t,y)
+plt.xlabel("t")
+plt.ylabel("V(t)")
 plt.show()
 
 

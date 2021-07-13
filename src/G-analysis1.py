@@ -26,7 +26,7 @@ from numpy import sin, cos, exp, pi
 
 import sys
 sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
-from hamiltonians import  hoppingHF
+from hamiltonians import  hoppingHF, ConvertComplex
 
 
 
@@ -49,8 +49,6 @@ def filter_duplicates(x):
         else:
             return np.nan
 
-def convert_complex(s):
-    return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 
 def formatplot(look):
@@ -139,14 +137,14 @@ dfname = "data/analysis-G.csv"
 
 df = pd.read_csv(sh+dfname, 
                  index_col=False, 
-                 converters={'hopping': convert_complex,
-                              'hopping back': convert_complex,
-                             'onsite':convert_complex,
-                             'next onsite':convert_complex, 
-                             'NNN overtop':convert_complex,
-                              'NNN star':convert_complex,
-                              'NNN square':convert_complex,
-                              'NNN':convert_complex,
+                 converters={'hopping': ConvertComplex, 
+                              'hopping back': ConvertComplex, 
+                             'onsite':ConvertComplex, 
+                             'next onsite':ConvertComplex, 
+                             'NNN overtop':ConvertComplex, 
+                              'NNN star':ConvertComplex, 
+                              'NNN square':ConvertComplex, 
+                              'NNN':ConvertComplex, 
                                               })
 
 

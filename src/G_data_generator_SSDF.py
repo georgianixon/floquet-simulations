@@ -39,46 +39,46 @@ def filter_duplicates(x):
         
 
 def ConvertComplex(s):
-    return np.complex(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
+    return np.complex128(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
 dfname = "data/analysis-G-SSDF.csv"
 
 
-df = pd.DataFrame(columns=["form", "rtol","N", 
-                           "a1", "a2", 
-                           "omega1", "omega multiplier",
-                           "phi1", "phi offset",
-                            "square",
-                            "chi",
-                            "gamma",
-                            "triangle",
-                            "alpha",
-                            "tilde",
-                            "star",
-                            "beta",
-                            "rho",
-                            "epsilon",
-                            "delta"])
+# df = pd.DataFrame(columns=["form", "rtol","N", 
+#                            "a1", "a2", 
+#                            "omega1", "omega multiplier",
+#                            "phi1", "phi offset",
+#                             "square",
+#                             "chi",
+#                             "gamma",
+#                             "triangle",
+#                             "alpha",
+#                             "tilde",
+#                             "star",
+#                             "beta",
+#                             "rho",
+#                             "epsilon",
+#                             "delta"])
     
-df.to_csv(sh+dfname,
-                   index=False, 
-                   columns=['form', 'rtol', 'N', 
-                            'a1', "a2", 
-                            "omega1", "omega multiplier",
-                           "phi1", "phi offset",
-                            "square",
-                            "chi",
-                            "gamma",
-                            "triangle",
-                            "alpha",
-                            "tilde",
-                            "star",
-                            "beta",
-                            "rho",
-                            "epsilon",
-                            "delta"]
-                   )
+# df.to_csv(sh+dfname,
+#                    index=False, 
+#                    columns=['form', 'rtol', 'N', 
+#                             'a1', "a2", 
+#                             "omega1", "omega multiplier",
+#                            "phi1", "phi offset",
+#                             "square",
+#                             "chi",
+#                             "gamma",
+#                             "triangle",
+#                             "alpha",
+#                             "tilde",
+#                             "star",
+#                             "beta",
+#                             "rho",
+#                             "epsilon",
+#                             "delta"]
+#                    )
 
 #%%
 df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int,
@@ -124,7 +124,7 @@ rtol = 1e-11
 a1 = 35
 a2 = 35
 #phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
-phis = [0]
+phis = [pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phiOffset = pi/2
 omegaMultiplier = 2
 
