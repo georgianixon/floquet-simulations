@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -98,7 +98,7 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
 sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-SSDF.csv"
+dfname = "data/analysis-G.csv"
 # dfname = "data/analysis-G.csv"
 
 df = pd.read_csv(sh+dfname, 
@@ -125,7 +125,7 @@ Plot General
 
 N = 51; 
 centre = 25
-form = "SSDF-p" #"DS-p"
+form = "DS-p" #"SSDF-p"
 rtol=1e-11
 a1 = 35
 a2 = 35
@@ -134,15 +134,15 @@ phi1s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phiOffset = pi/2
 omegaMultiplier = 2
 apply = [np.abs, np.real, np.imag]
-omegaMin = 50
+omegaMin = 200
 
 # look = "square"
 # look ="chi"
-# look ="gamma"
+look ="gamma"
 # look ="triangle"
 # look ="alpha"
 # look ="tilde"
-look ="star"
+# look ="star"
 # look ="beta"
 # look ="rho"
 # look ="epsilon"
@@ -230,11 +230,8 @@ plt.show()
                                                               
                                                               
                                                               
-                                                              
-                                                              
-                                                              
-                                                              
-                                                              
+#%%
+df_plot = df[(df['form']==form)].phi1.unique()
                                                               
                                                               
                                                               
