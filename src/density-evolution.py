@@ -1,0 +1,453 @@
+
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 10 15:55:49 2020
+|
+@author: Georgia
+"""
+
+place = "Georgia Nixon"
+from numpy import exp, sin, cos, pi, log
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import sys
+sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
+from hamiltonians import SolveSchrodinger
+
+import matplotlib as mpl
+import seaborn as sns
+from scipy.special import jv, jn_zeros
+from fractions import Fraction
+
+sh = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/"
+
+size=25
+params = {
+            'legend.fontsize': size*0.75,
+          'axes.labelsize': size,
+          'axes.titlesize': size,
+          'xtick.labelsize': size*0.75,
+          'ytick.labelsize': size*0.75,
+          'font.size': size,
+          'axes.edgecolor' :'white',
+          'xtick.minor.visible': False,
+          'axes.grid':False,
+          'font.family' : 'STIXGeneral',
+          'mathtext.fontset':'stix'
+          }
+mpl.rcParams.update(params)
+
+
+def PlotPsi(psi, x_positions, x_labels, title, normaliser):
+    """
+    Parameters
+    ----------
+    psi : TYPE
+        Wavefunction to plot
+    n_timesteps : TYPE
+        number of timesteps generated between t0 and t_final
+    n_oscillations : TYPE
+        numer of full cycles
+    title : TYPE
+        title of graph
+
+    Returns
+    -------
+    
+    Graph
+
+    """
+    
+    mpl.rcParams.update({
+          'mathtext.fontset':'stix'
+          })
+    
+    apply = [lambda x: np.abs(x)**2, np.real, np.imag]
+    labels = [r'$|\psi(t)|^2$', r'$\mathrm{Re}\{\psi(t)\}$', r'$\mathrm{Imag}\{\psi(t)\}$']
+    
+    
+    cmapcol = 'PuOr' #PiYG_r
+    cmap= mpl.cm.get_cmap(cmapcol)
+    
+    sz = 6
+    fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
+                            figsize=(sz*len(apply),sz))
+    
+    for i, f in enumerate(apply):
+        ax[i].matshow(f(psi), interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
+        ax[i].set_title(labels[i],  fontfamily='STIXGeneral')
+        ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+          labeltop=False)  
+        ax[i].set_xticks(x_positions)
+        ax[i].set_xlabel('t/T', fontfamily='STIXGeneral')
+        ax[i].set_xticklabels(x_labels)
+        for side in ["bottom", "top", "left", "right"]:
+            ax[i].spines[side].set_visible(False)
+        if i == 0:
+            ax[i].set_ylabel('site', fontfamily='STIXGeneral')
+    
+    cax = plt.axes([1.03, 0.1, 0.03, 0.8])
+    fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
+    fig.suptitle(title, y = 1.2,  fontfamily='STIXGeneral')
+    
+    plt.show()
+    
+def PlotTwoPsi(psi1, psi2, x_positions, x_labels, title, normaliser):
+    """
+    Plot the difference between two wavefunctison
+    |psi1|^2 - |psi2|^2
+    Re[psi1 - psi2]
+    Im[psi1 - psi2]
+
+    """
+    
+    apply = [lambda x,y: np.abs(x)**2 - np.abs(y)**2, 
+             lambda x,y: np.abs(x - y)**2, 
+             lambda x,y: np.real(x - y),
+             lambda x,y: np.imag(x - y)]
+    labels = [r'$|\psi_1(t)|^2 - |\psi_2(t)|^2$', 
+              r'$|\psi_1(t) - \psi_2(t)|^2$',
+              r'$\mathrm{Re}\{\psi_1(t) - \psi_2(t)\}$', r'$\mathrm{Imag}\{\psi_1(t) - \psi_2(t)\}$']
+    
+    
+    cmapcol = 'PuOr' #PiYG_r
+    cmap= mpl.cm.get_cmap(cmapcol)
+    
+    sz = 5
+    fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
+                            figsize=(sz*len(apply),sz))
+    
+    for i, f in enumerate(apply):
+        ax[i].matshow(f(psi1, psi2), interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
+        ax[i].set_title(labels[i])
+        ax[i].tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+          labeltop=False)  
+        ax[i].set_xticks(x_positions)
+        ax[i].set_xlabel('t/T')
+        ax[i].set_xticklabels(x_labels)
+        for side in ["bottom", "top", "left", "right"]:
+            ax[i].spines[side].set_visible(False)
+        if i == 0:
+            ax[i].set_ylabel('site')
+    
+    cax = plt.axes([1.03, 0.1, 0.03, 0.8])
+    fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
+    fig.suptitle(title, y = 1.2)
+    plt.show()
+    
+
+
+def PhiString(phi):
+    if phi == 0:
+        return ""
+    elif phi == "phi":
+        return r'+ \phi' 
+    else:
+        return  r'+ \pi /' + str(int(1/(phi/pi)))
+    
+def PhiStringNum(phi):
+    if phi == 0:
+        return "0"
+    elif phi == "phi":
+        return r"$\phi$" 
+    else:
+        return  r"\pi /" + str(int(1/(phi/pi)))
+    
+    
+#%%
+
+"""
+Calculate matter wave
+"""
+# choose particular HF
+
+N = 91; A_site_start = 50;
+centre = 45;
+# a = 35;
+# phi1=pi/2;
+# phi2=0;
+# omega= a /jn_zeros(0,1)[0]
+# # omega = 10
+# T=2*pi/omega
+
+
+#for SSDF
+a1 = 35; a2=35;
+phi1=pi/2;
+phiOffset=pi/2
+phi2=phi1+phiOffset
+omega1= a1 /jn_zeros(0,1)[0]
+omegaMultiplier=2
+omega2=omega1*omegaMultiplier
+
+a = [a1,a2]
+phi=[phi1,phi2]
+omega=[omega1,omega2]
+# omega = 10
+T=2*pi/omega1
+
+#when we solve scrodinger eq, how many timesteps do we want
+
+nOscillations = 30
+#how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
+nTimesteps = nOscillations*100
+n_osc_divisions = 2
+
+tspan = (0,nOscillations*T)
+
+# form1 = 'SS-p'
+# form2 = 'numericalG-SS-p'
+form3="SSDF-p"
+rtol=1e-11
+
+t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
+psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
+
+
+psi1 = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, 
+                                  tspan, nTimesteps, psi0)
+    
+
+
+#%%
+
+"""
+Plot matter wave
+"""
+    
+# normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
+linthresh = 1e-2
+normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+
+x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
+x_labels = list(range(0, nOscillations+1, n_osc_divisions))
+
+# title = (r"$|\psi_1> = |\psi_{\phi="+PhiStringNum(phi1)+"}(t)>, \>"
+#          +"|\psi_2> = |\psi_{\phi="+PhiStringNum(phi2)+"}(t)>$"
+#          +"\n"
+#          +r"evolution via G, "
+#          + r"given $H(t)=H_0 + "+str(a)
+#          +r"\cos (" + "{:.2f}".format(omega)+ r"t + \phi"
+#          + r") |"+str(centre)+r"><"+str(centre) +r"|,"
+#          +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
+#         )  
+
+# PlotTwoPsi(psi1, psi2, x_positions, x_labels, title,
+#       normaliser)
+
+
+title = (r"$|\psi (t)>$"+  "\n"
+         # +r"evolution via G, "
+         # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
+         #     + r"t" + PhiString(phi1) 
+         #     + r") |"+str(centre)+r"><"+str(centre) +r"|,"
+         +form3+", "+r"$a_1=$"+str(a1)
+              +", "+r"$a_2=$"+str(a2)
+             +", "+r"$\omega_1=$"+"{:.2f}".format(omega1)
+              +", "+r"$\omega_2=$"+"{:.2f}".format(omega2)
+              +", "+r"$\phi_1=$"+ PhiStringNum(phi1)
+              +", "+r"$\phi_2=$"+ PhiStringNum(phi2)
+              +", "+"b="+str(centre)
+              
+              +r", $\quad |\psi (t=0)> = |"+str(A_site_start)+r">$"
+         
+         
+         ) 
+
+PlotPsi(psi1, x_positions, x_labels,  title,
+      normaliser)
+
+
+# title = (r"$|\psi (t)>$"+  "\n"
+#          +r"evolution via G, "
+#          + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega)
+#              + r"t" + PhiString(phi2) 
+#              + r") |"+str(centre)+r"><"+str(centre) +r"|,"
+#              +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
+#          ) 
+
+# PlotPsi(psi2, x_positions, x_labels,  title,
+#       normaliser)
+
+
+
+
+
+
+
+
+
+#%%
+"""
+Compare two matter waves
+"""
+
+
+""""Global parameters"""
+N = 91; 
+centre = 45;
+rtol=1e-11
+
+#DS-p
+a1 = 35; a2=35;
+phi1=pi/2;
+phiOffset=pi/2
+phi2=phi1+phiOffset
+omega1= 10#a1 /jn_zeros(0,1)[0]
+omegaMultiplier=2
+omega2=omega1*omegaMultiplier
+a = [a1,a2]
+phi=[phi1,phi2]
+omega=[omega1,omega2]
+# omega = 10
+T=2*pi/omega1
+paramsString = (r"$a="+str(a1)+", "+r"\> \omega_1="+str(omega1)+", \omega_2 = 2 \omega_1, \> \phi_1 = "+
+                PhiStringNum(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b="+str(centre)+r"$")
+
+
+#SS-p
+# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"; paramsString = r"$a=$"+str(a)
+# a = 35
+# omega = 10#a /jn_zeros(0,1)[0]
+# phi = pi/10
+
+
+"""wave 1 parameters""" # for ssdf
+A_site_start1 = 50;
+
+"""wave 2 params"""
+A_site_start2 = 40;
+
+
+# form = "DS-p"; 
+# hamiltonianString = ("$H(t)=H_0 + a \>\hat{n}_b \cos (\omega_1 t + \phi_1) "+" + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"); 
+
+form = "SSDF-p"; 
+hamiltonianString = ("$H(t)=H_0 + a \>\hat{n}_b [\cos (\omega_1 t + \phi_1)+"+" \cos (\omega_2 t + \phi_2)]$")
+           
+
+
+"""solver params"""
+nOscillations = 30
+#how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
+nTimesteps = nOscillations*100
+n_osc_divisions = 2
+tspan = (0,nOscillations*T)
+t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
+
+
+
+
+
+
+psi0_1 = np.zeros(N, dtype=np.complex_); psi0_1[A_site_start1] = 1;
+psi0_2 = np.zeros(N, dtype=np.complex_); psi0_2[A_site_start2] = 1;
+
+psi1 = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, 
+                                  tspan, nTimesteps, psi0_1)
+psi2 = SolveSchrodinger(form, rtol, N, centre, a,omega, phi,
+                                  tspan, nTimesteps, psi0_2)
+
+"""plot"""
+
+
+# normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
+linthresh = 1e-2
+normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+
+x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
+x_labels = list(range(0, nOscillations+1, n_osc_divisions))
+
+PlotPsi(psi1, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString+r"$,\> \psi_{start site} = " +str(A_site_start1)+r"$",
+      normaliser)
+PlotPsi(psi2, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString+r"$,\> \psi_{start site} = " +str(A_site_start2)+r"$",
+      normaliser)
+
+#flip one
+psi2 = np.flip(psi2, axis=0)
+
+# PlotPsi(psi1-psi2, x_positions, x_labels,  "title",
+#       normaliser)
+
+#plot difference
+title = form+", "+hamiltonianString+"\n"+paramsString+r"$,\>\psi_{start site 1}=" +str(A_site_start1)+r",\> \psi_{start site 2} = " +str(A_site_start2)+r"$"
+PlotTwoPsi(psi1, psi2, x_positions, x_labels, title,
+      normaliser)
+
+
+    
+#%%
+
+"""
+Homogeneous expansion
+"""
+
+def H_0(N, centre, el):
+    H = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
+    H[centre][centre-1] = el
+    H[centre-1][centre] = el
+    return H
+
+# no energy offset at all
+def F_0(t, psi, N, centre, el):
+    return -1j*np.dot(H_0(N, centre, el), psi)
+
+from scipy.integrate import solve_ivp
+
+def SolveSchrodingerH(N, centre, el, rtol, tspan, nTimesteps, psi0):
+
+    # points to calculate the matter wave at
+    t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
+
+    sol = solve_ivp(lambda t,psi: F_0(t, psi, 
+                           N, centre, el), 
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+    sol=sol.y
+        
+    return sol
+
+
+N = 91; 
+centre = 45;
+rtol=1e-11
+T = 1
+
+nOscillations = 30
+#how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
+nTimesteps = nOscillations*100
+n_osc_divisions = 2
+tspan = (0,nOscillations*T)
+t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
+
+psi0 = np.zeros(N, dtype=np.complex_); psi0[50] = 1;
+
+el = 1
+psi1 = SolveSchrodingerH(N, centre, el, rtol, tspan, nTimesteps, psi0)
+
+el = -1
+psi2 = SolveSchrodingerH(N, centre, el, rtol, tspan, nTimesteps, psi0)
+        
+# normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
+linthresh = 1e-4
+normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+
+x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
+x_labels = list(range(0, nOscillations+1, n_osc_divisions))
+
+PlotPsi(psi1, x_positions, x_labels,  "title",
+      normaliser)
+
+PlotPsi(psi2, x_positions, x_labels,  "title",
+      normaliser)
+
+# PlotPsi(psi1-psi2, x_positions, x_labels,  "title",
+#       normaliser)
+
+#plot difference
+PlotTwoPsi(psi1, psi2, x_positions, x_labels, "Difference in ballistic expansion when tunneling at site 45 is 1 vs -1 \n (particles starts at site 50)",
+      normaliser)
+
+        

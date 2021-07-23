@@ -5,7 +5,7 @@ Created on Wed Jul  7 09:45:45 2021
 @author: Georgia Nixon
 """
 
-place = "Georgia"
+place = "Georgia Nixon"
 
 from numpy.linalg import eig
 from numpy import  pi, log, exp, sin
@@ -119,13 +119,13 @@ df = pd.read_csv(sh+dfname,
  # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='DS-p' 
+form='SS-p' 
 
 rtol = 1e-11
 a1 = 35
 a2 = 35
-#phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
-phis = [ pi/3, pi/2]
+# phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
+phis = [ pi/6, pi/5, pi/4,  pi/3, pi/2, 0]
 phiOffset = pi/2
 omegaMultiplier = 2
 
@@ -159,24 +159,31 @@ for phi in phis:
                                 "rho",
                                 "epsilon",
                                 "delta"])
-    for i, omega1 in enumerate(np.linspace(3.7, 200, 200*10-37+1, endpoint=True)):
-        omega1 = round(omega1, 1)
-        omega2 = omegaMultiplier*omega1
-        print(omega1)
+    for i, omega1 in enumerate(np.linspace(20.1, 100, 80*10, endpoint=True)):
         
         start = time.time()
-        """
-        HF
-        """  
-        aInput = [a1,a2]
-        omegaInput = [omega1,omega2]
-        phiInput = [phi, phi+phiOffset]
+        
+        omega1 = round(omega1, 1)
+        print(omega1)
+        
+        if form == "SS-p":
+            aInput = a1
+            omegaInput = omega1
+            phiInput = phi
+            
+        elif form =="DS-p" or form == "SSDF-p":
+            omega2 = omegaMultiplier*omega1
+            aInput = [a1,a2]
+            omegaInput = [omega1,omega2]
+            phiInput = [phi, phi+phiOffset]
+
+        # calculate effective Hamiltonian 
         UT, HF = CreateHF(form, rtol, N, centre, aInput, phiInput, omegaInput)
         
 #            R = RGaugeMatrix(N, centre, a, omega, phi)
 #            HF = np.dot(np.conj(R.T), np.dot(HF, R))
         
-        
+        # log matrix elements
         square = HF[centre-2][centre]
         chi = HF[centre-1][centre-1]
         gamma = HF[centre-1][centre]
