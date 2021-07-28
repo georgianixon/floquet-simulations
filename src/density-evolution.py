@@ -173,15 +173,15 @@ centre = 45;
 
 
 #for SSDF
-a1 = 35; a2=35;
+form = "DS-p"
+a = 35;
 phi1=pi/2;
-phiOffset=pi/2
+phiOffset=0
 phi2=phi1+phiOffset
 omega1= a1 /jn_zeros(0,1)[0]
 omegaMultiplier=2
 omega2=omega1*omegaMultiplier
 
-a = [a1,a2]
 phi=[phi1,phi2]
 omega=[omega1,omega2]
 # omega = 10
@@ -198,7 +198,7 @@ tspan = (0,nOscillations*T)
 
 # form1 = 'SS-p'
 # form2 = 'numericalG-SS-p'
-form3="SSDF-p"
+
 rtol=1e-11
 
 t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
@@ -242,8 +242,7 @@ title = (r"$|\psi (t)>$"+  "\n"
          # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
          #     + r"t" + PhiString(phi1) 
          #     + r") |"+str(centre)+r"><"+str(centre) +r"|,"
-         +form3+", "+r"$a_1=$"+str(a1)
-              +", "+r"$a_2=$"+str(a2)
+         +form3+", "+r"$a_1=$"+str(a)
              +", "+r"$\omega_1=$"+"{:.2f}".format(omega1)
               +", "+r"$\omega_2=$"+"{:.2f}".format(omega2)
               +", "+r"$\phi_1=$"+ PhiStringNum(phi1)
@@ -285,24 +284,23 @@ Compare two matter waves
 
 
 """"Global parameters"""
-N = 91; 
+N = 92; 
 centre = 45;
 rtol=1e-11
 
-#DS-p
-a1 = 35; a2=35;
+#DS-p params
+a = 35;
 phi1=pi/2;
-phiOffset=pi/2
+phiOffset=0
 phi2=phi1+phiOffset
 omega1= 10#a1 /jn_zeros(0,1)[0]
 omegaMultiplier=2
 omega2=omega1*omegaMultiplier
-a = [a1,a2]
 phi=[phi1,phi2]
 omega=[omega1,omega2]
 # omega = 10
 T=2*pi/omega1
-paramsString = (r"$a="+str(a1)+", "+r"\> \omega_1="+str(omega1)+", \omega_2 = 2 \omega_1, \> \phi_1 = "+
+paramsString = (r"$a="+str(a)+", "+r"\> \omega_1="+str(omega1)+", \omega_2 = 2 \omega_1, \> \phi_1 = "+
                 PhiStringNum(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b="+str(centre)+r"$")
 
 
@@ -314,18 +312,17 @@ paramsString = (r"$a="+str(a1)+", "+r"\> \omega_1="+str(omega1)+", \omega_2 = 2 
 
 
 """wave 1 parameters""" # for ssdf
-A_site_start1 = 50;
+A_site_start1 = 51;
 
 """wave 2 params"""
 A_site_start2 = 40;
 
 
-# form = "DS-p"; 
-# hamiltonianString = ("$H(t)=H_0 + a \>\hat{n}_b \cos (\omega_1 t + \phi_1) "+" + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"); 
 
-form = "SSDF-p"; 
-hamiltonianString = ("$H(t)=H_0 + a \>\hat{n}_b [\cos (\omega_1 t + \phi_1)+"+" \cos (\omega_2 t + \phi_2)]$")
-           
+
+form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"; paramsString = r"$a=$"+str(a)
+# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2,  N = "+str(N)+", b="+str(centre)+r"$"
+# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2,  N = "+str(N)+", b="+str(centre)+r"$"
 
 
 """solver params"""
@@ -353,7 +350,7 @@ psi2 = SolveSchrodinger(form, rtol, N, centre, a,omega, phi,
 
 
 # normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-2
+linthresh = 1e-1
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
