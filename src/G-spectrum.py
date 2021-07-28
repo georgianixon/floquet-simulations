@@ -4,11 +4,14 @@ Created on Tue Mar  2 13:01:46 2021
 
 @author: Georgia
 """
+
+place = "Georgia Nixon"
 from numpy import  pi
 import sys
-sys.path.append('/Users/Georgia/Code/MBQD/floquet-simulations/src')
-from hamiltonians import create_HF, getevalsandevecs, plotevecs
-from hamiltonians import formatcomplex, roundcomplex
+# C:\Users\Georgia Nixon\Code\MBQD\floquet-simulations\src
+sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
+from hamiltonians import CreateHF, GetEvalsAndEvecs, plotevecs
+from hamiltonians import formatcomplex, RoundComplex
 from hamiltonians import OrderEvecs, AlignEvecs
 from scipy.special import jn_zeros
 from scipy.linalg import eig as eig
@@ -66,34 +69,48 @@ mpl.rcParams.update(params)
 Full Simulation
 """
 
-N=49; centre=24; a=35; phi=pi/6;
-omega=9.6
+N=49; centre=24; a=35; rtol=1e-11
 
-form='SS-p'
-rtol=1e-11
-UT, HF = create_HF(form, rtol, N, centre, a,phi, omega)
-evals, evecs = getevalsandevecs(HF)
-evecs = OrderEvecs(evecs, N)
 
-func = np.abs
+
+phi1=0;
+phiOffset = pi/2
+phi2 = phi1+phiOffset
+omega1=a /jn_zeros(0,1)[0]
+omegaMultiplier = 2
+omega2 = omega1*omegaMultiplier
+phi = [phi1, phi2]
+omega = [omega1, omega2]
+
+# omega = a /jn_zeros(0,1)[0]
+# phi = 0 
+
+
+# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos ("+"{:.2f}".format(omega)+" t + "+"{:.2f}".format(phi)+") $"; paramsString = r"$a=$"+str(a)
+form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+"{:.2f}".format(omega1)+", \omega_2 = 2 \omega_1, \phi_1 = "+"{:.2f}".format(phi1)+", \phi_2 = \phi_1 + \pi/2$ "
+# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = 2 \omega_1, \phi_1 ="+"{:.2f}".format(phi1)+", \phi_2 = \phi_1 + \pi/2$ "
+
+
+
+UT, HF = CreateHF(form, rtol, N, centre, a,phi, omega)
+evals, evecs = GetEvalsAndEvecs(HF)
+# evecs = OrderEvecs(evecs, N)
+
+func = np.real
 colour = "dodgerblue"
-title = (func.__name__+"(evecs) ordered by " + "evals\nN="
-             +str(N)+r", $V_{(n,n)} = $"
-             + str(a)
-             + r"$ \cos( $"
-             + "{:.2f}".format(omega)
-             + r'$ t$'
-             + " + " + phistring(phi)
-             + r'$) $'
-             + ', rtol = '+str(rtol))
+
+title = ("real(evecs); "
+             + form +r";  "+hamiltonianString+"\n"
+             +paramsString)
 
 
 plotevecs(evecs, N, func, colour, title, ypos=0.955)    
 
 
-fig, ax = plt.subplots(figsize=(6*1.4,6))
+fig, ax = plt.subplots(figsize=(11*1.4,11 ))
 ax.plot(range(N), func(evals), 'x', color=colour)
-fig.suptitle(func.__name__+"(evals)  ordered by " + "real(evals)")
+fig.suptitle(r"evals;  "+ form +r";  "+hamiltonianString+"\n"
+             +paramsString, y=1)
 plt.show()
 
 #%%

@@ -143,8 +143,8 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
     """
     
     if form=="DS-p" or form == "SSDF-p":
-        a1 = a[0]
-        a2 = a[1]
+        a1 = a
+        a2 = a
         omega1 = omega[0]
         omega2 = omega[1]
         phi1 = phi[0]
