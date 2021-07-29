@@ -5,7 +5,7 @@ Created on Tue Mar  2 13:01:46 2021
 @author: Georgia
 """
 
-place = "Georgia Nixon"
+place = "Georgia"
 from numpy import  pi
 import sys
 # C:\Users\Georgia Nixon\Code\MBQD\floquet-simulations\src
@@ -87,8 +87,8 @@ omega = [omega1, omega2]
 
 
 # form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos ("+"{:.2f}".format(omega)+" t + "+"{:.2f}".format(phi)+") $"; paramsString = r"$a=$"+str(a)
-form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+"{:.2f}".format(omega1)+", \omega_2 = 2 \omega_1, \phi_1 = "+"{:.2f}".format(phi1)+", \phi_2 = \phi_1 + \pi/2$ "
-# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = 2 \omega_1, \phi_1 ="+"{:.2f}".format(phi1)+", \phi_2 = \phi_1 + \pi/2$ "
+# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+"{:.2f}".format(omega1)+", \omega_2 = 2 \omega_1, \phi_1 = "+"{:.2f}".format(phi1)+", \phi_2 = \phi_1 + \pi/2$ "
+form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = 2 \omega_1, \phi_1 ="+"{:.2f}".format(phi1)+", \phi_2 = \phi_1 + \pi/2$ "
 
 
 
