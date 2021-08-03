@@ -65,20 +65,27 @@ def HT_Linear(N, a, omega, t, phi):
 Create one site cosine modulated energy offset hamiltonian
 Centre indexed from 0
 """
-def HT_SS(N, centre, a, omega, t, phi):
+def HT_SS(N, centre, a, omega, phi, onsite, t):
     matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
-    matrix[centre][centre] = a*cos(omega*t + phi)
+    matrix[centre][centre] = a*cos(omega*t + phi) + onite
     return matrix
 
-def HT_DS(N, centre, a1, a2, omega1, omega2, t, phi1, phi2):
+def HT_DS(N, centre, a, omega1, omega2, phi1, phi2, onsite1, onsite2, t):
     matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
-    matrix[centre][centre] = a1*cos(omega1*t + phi1)
-    matrix[centre+1][centre+1] = a2*cos(omega2*t + phi2)
+    matrix[centre][centre] = a*cos(omega1*t + phi1) + onsite1
+    matrix[centre+1][centre+1] = a*cos(omega2*t + phi2) + onsite2
     return matrix
 
-def HT_SSDF(N, centre, a1, a2, omega1, omega2, t, phi1, phi2):
+def HT_TS(N, centre, a, omega, phi, onsite, t):
     matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
-    matrix[centre][centre] = a1*cos(omega1*t + phi1) + a2*cos(omega2*t + phi2)
+    matrix[centre][centre] = a*cos(omega[0]*t + phi[0]) + onsite[0]
+    matrix[centre+1][centre+1] = a*cos(omega[1]*t + phi[1]) + onsite[1]
+    matrix[centre+2][centre+2] = a*cos(omega[2]*t + phi[2]) + onsite[2]
+    return matrix
+
+def HT_SSDF(N, centre, a, omega1, omega2, phi1, phi2, onsite,  t):
+    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
+    matrix[centre][centre] = a*cos(omega1*t + phi1) + a*cos(omega2*t + phi2) + onsite
     return matrix
 
 """
@@ -94,14 +101,18 @@ Functions to Solve Schrodinger eq
 
 
 # one site cosine 
-def F_SS(t, psi, N, centre, a, omega, phi):
-    return -1j*np.dot(HT_SS(N, centre, a, omega, t, phi),psi)
+def F_SS(t, psi, N, centre, a, omega, phi, onsite):
+    return -1j*np.dot(HT_SS(N, centre, a, omega, phi, onsite, t), psi)
 
-def F_DS(t, psi, N, centre, a1, a2, omega1, omega2, phi1, phi2):
-    return -1j*np.dot(HT_DS(N, centre, a1, a2, omega1, omega2, t, phi1, phi2),psi)
+def F_DS(t, psi, N, centre, a, omega1, omega2, phi1, phi2, onsite1, onsite2):
+    return -1j*np.dot(HT_DS(N, centre, a, omega1, omega2, phi1, phi2, onsite1, onsite2, t), psi)
 
-def F_SSDF(t, psi, N, centre, a1, a2, omega1, omega2, phi1, phi2):
-    return -1j*np.dot(HT_SSDF(N, centre, a1, a2, omega1, omega2, t, phi1, phi2) ,psi)
+def F_SSDF(t, psi, N, centre, a, omega1, omega2, phi1, phi2, onsite):
+    return -1j*np.dot(HT_SSDF(N, centre, a, omega1, omega2, phi1, phi2, onsite, t), psi)
+
+
+def F_TS(t, psi, N, centre, a, omega, phi, onsite):
+    return -1j*np.dot(HT_TS(N, centre, a, omega, phi, onsite, t), psi)
 
 # linear moving potential
 def F_Linear(t, psi, N, a, omega, phi):
@@ -125,7 +136,7 @@ def ConvertComplex(s):
 def RoundComplex(num, dp):
     return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
 
-def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, psi0):
+def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, psi0, onsite=0):
     """
     Solve Schrodinger Equation for oscilating Hamiltonian
     Oscillating single site energy, H[centre][centre] = a cos(omega t + phi) (when form = "SS-p")
@@ -142,33 +153,38 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
         we calculate the matter wave at nTimesteps + 1 points. This gives nTimesteps steps. 
     """
     
+        
     if form=="DS-p" or form == "SSDF-p":
-        a1 = a
-        a2 = a
         omega1 = omega[0]
         omega2 = omega[1]
         phi1 = phi[0]
         phi2 = phi[1]
+        onsite1 = onsite[0]
+        onsite2 = onsite[1]
         
     # points to calculate the matter wave at
     t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
     
-    if form == 'SS-p':
+    if form == "TS-p":
+        sol = solve_ivp(lambda t,psi: F_TS(t, psi, 
+                                          N, centre, a, omega, phi, onsite), 
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+        sol=sol.y
+        
+    elif form == 'SS-p':
         sol = solve_ivp(lambda t,psi: F_SS(t, psi, 
-                           N, centre,
-                             a,
-                             omega, phi), 
+                                           N, centre, a, omega, phi, onsite), 
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
         sol=sol.y
         
     elif form == 'DS-p':
-        sol = solve_ivp(lambda t,psi: F_DS(t, psi, 
-                           N, centre,
-                             a1, a2,
-                             omega1, omega2,
-                             phi1, phi2), 
+        sol = solve_ivp(lambda t,psi: F_DS(t, psi,
+                                           N, centre, a, omega1, omega2, 
+                                           phi1, phi2, onsite1, onsite2), 
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
@@ -176,10 +192,8 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
     
     elif form == 'SSDF-p':
         sol = solve_ivp(lambda t,psi: F_SSDF(t, psi, 
-                           N, centre,
-                             a1, a2,
-                             omega1, omega2,
-                             phi1, phi2), 
+                                             N, centre, a, omega1, omega2,
+                                             phi1, phi2, onsite), 
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
@@ -326,3 +340,21 @@ def AlignEvecs(evecs0, evecsP, N):
             evecsP_R[:,vec] = RoundComplex(evecsP[:,vec], 5)
             
     return evecsP
+
+#%%
+
+from fractions import Fraction 
+
+def PhiString(phi):
+    fraction = phi/pi
+    fraction = Fraction(fraction).limit_denominator(100)
+    numerator = fraction.numerator
+    denominator = fraction.denominator
+    if numerator == 0:
+        return "0"
+    elif numerator ==1:
+        return r"\pi /"+str(denominator)
+    else:
+        str(numerator)+r"\pi / "+str(denominator)
+        
+        

@@ -11,7 +11,7 @@ import sys
 # C:\Users\Georgia Nixon\Code\MBQD\floquet-simulations\src
 sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
 from hamiltonians import CreateHF, GetEvalsAndEvecs, plotevecs
-from hamiltonians import formatcomplex, RoundComplex
+from hamiltonians import formatcomplex, RoundComplex, PhiString
 from hamiltonians import OrderEvecs, AlignEvecs
 from scipy.special import jn_zeros
 from scipy.linalg import eig as eig
@@ -19,14 +19,6 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 
-
-def phistring(phi):
-    if phi == 0:
-        return "0"
-    elif phi == "phi":
-        return r'$\phi$' 
-    else:
-        return  r'$\pi /$' + str(int(1/(phi/pi)))
 
 
 size = 25
@@ -66,29 +58,29 @@ mpl.rcParams.update(params)
 #%%
 
 """
-Full Simulation
+Plot Evals and Evecs
 """
 
 N=49; centre=24; a=35; rtol=1e-11
 
 
-
-phi1=0;
-phiOffset = pi/2
-phi2 = phi1+phiOffset
-omega1=a /jn_zeros(0,1)[0]
-omegaMultiplier = 2
-omega2 = omega1*omegaMultiplier
-phi = [phi1, phi2]
-omega = [omega1, omega2]
-
-# omega = a /jn_zeros(0,1)[0]
-# phi = 0 
+# phi1=0;
+# phiOffset = pi/2
+# phi2 = phi1+phiOffset
+# omega1=a /jn_zeros(0,1)[0]
+# omegaMultiplier = 2
+# omega2 = omega1*omegaMultiplier
+# phi = [phi1, phi2]
+# omega = [omega1, omega2]
 
 
-# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos ("+"{:.2f}".format(omega)+" t + "+"{:.2f}".format(phi)+") $"; paramsString = r"$a=$"+str(a)
-# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+"{:.2f}".format(omega1)+", \omega_2 = 2 \omega_1, \phi_1 = "+"{:.2f}".format(phi1)+", \phi_2 = \phi_1 + \pi/2$ "
-form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = 2 \omega_1, \phi_1 ="+"{:.2f}".format(phi1)+", \phi_2 = \phi_1 + \pi/2$ "
+omega = a /jn_zeros(0,1)[0]
+phi = 0 
+
+
+form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+"{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
+# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 ="+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
 
 
 

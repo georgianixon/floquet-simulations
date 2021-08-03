@@ -6,14 +6,14 @@ Created on Thu Sep 10 15:55:49 2020
 @author: Georgia
 """
 
-place = "Georgia Nixon"
-from numpy import exp, sin, cos, pi, log
+place = "Georgia"
+from numpy import exp, sin, cos, pi, log, sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
 sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
-from hamiltonians import SolveSchrodinger
+from hamiltonians import SolveSchrodinger, PhiString
 
 import matplotlib as mpl
 import seaborn as sns
@@ -41,22 +41,7 @@ mpl.rcParams.update(params)
 
 def PlotPsi(psi, x_positions, x_labels, title, normaliser):
     """
-    Parameters
-    ----------
-    psi : TYPE
-        Wavefunction to plot
-    n_timesteps : TYPE
-        number of timesteps generated between t0 and t_final
-    n_oscillations : TYPE
-        numer of full cycles
-    title : TYPE
-        title of graph
-
-    Returns
-    -------
-    
-    Graph
-
+    Plot Matter Wave
     """
     
     mpl.rcParams.update({
@@ -137,14 +122,6 @@ def PlotTwoPsi(psi1, psi2, x_positions, x_labels, title, normaliser):
     plt.show()
     
 
-
-def PhiString(phi):
-    if phi == 0:
-        return ""
-    elif phi == "phi":
-        return r'+ \phi' 
-    else:
-        return  r'+ \pi /' + str(int(1/(phi/pi)))
     
 def PhiStringNum(phi):
     if phi == 0:
@@ -178,7 +155,7 @@ a = 35;
 phi1=pi/2;
 phiOffset=0
 phi2=phi1+phiOffset
-omega1= a1 /jn_zeros(0,1)[0]
+omega1= a /jn_zeros(0,1)[0]
 omegaMultiplier=2
 omega2=omega1*omegaMultiplier
 
@@ -242,7 +219,7 @@ title = (r"$|\psi (t)>$"+  "\n"
          # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
          #     + r"t" + PhiString(phi1) 
          #     + r") |"+str(centre)+r"><"+str(centre) +r"|,"
-         +form3+", "+r"$a_1=$"+str(a)
+         +form+", "+r"$a_1=$"+str(a)
              +", "+r"$\omega_1=$"+"{:.2f}".format(omega1)
               +", "+r"$\omega_2=$"+"{:.2f}".format(omega2)
               +", "+r"$\phi_1=$"+ PhiStringNum(phi1)
@@ -284,45 +261,97 @@ Compare two matter waves
 
 
 """"Global parameters"""
-N = 92; 
-centre = 45;
+N = 93#182; 
+centre = 45#90;
 rtol=1e-11
 
-#DS-p params
-a = 35;
-phi1=pi/2;
-phiOffset=0
-phi2=phi1+phiOffset
-omega1= 10#a1 /jn_zeros(0,1)[0]
-omegaMultiplier=2
-omega2=omega1*omegaMultiplier
-phi=[phi1,phi2]
-omega=[omega1,omega2]
-# omega = 10
-T=2*pi/omega1
-paramsString = (r"$a="+str(a)+", "+r"\> \omega_1="+str(omega1)+", \omega_2 = 2 \omega_1, \> \phi_1 = "+
-                PhiStringNum(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b="+str(centre)+r"$")
-
-
-#SS-p
-# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"; paramsString = r"$a=$"+str(a)
+#SS-p params
 # a = 35
 # omega = 10#a /jn_zeros(0,1)[0]
-# phi = pi/10
+# phi = 0
+# T = 2*pi / omega
+
+#DS-p params
+# a = 35
+# phi1=0;
+# phiOffset=pi/2
+# phi2=phi1+phiOffset
+# onsite1 = 0
+# onsite2 = 20
+# onsite = [onsite1, onsite2]
+# omega1= 9.1#a/jn_zeros(0,1)[0]
+# omegaMultiplier=2
+# omega2=omega1*omegaMultiplier
+# phi=[phi1,phi2]
+# omega=[omega1,omega2]
+# T=2*pi/omega1
 
 
+#TS params
+a = 35
+phi1=0;
+phiOffset2=pi/2
+phiOffset3 = pi/4
+phi2=phi1+phiOffset2
+phi3 = phi1+phiOffset3
+phi=[phi1,phi2, phi3]
+onsite1 = 0
+onsite2 = 20
+onsite3 = 5
+onsite = [onsite1, onsite2, onsite3]
+omega1= a/jn_zeros(0,1)[0]
+omegaMultiplier2=2
+omegaMultiplier3 = 3
+omega2=omega1*omegaMultiplier2
+omega3 = omega1*omegaMultiplier3
+omega=[omega1,omega2, omega3]
+T=2*pi/min(omega)
+form = "TS-p"; 
+hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
+                     +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2] + "
+                     +r"\hat{n}_{b+2} [a \> \cos (\omega_3 t + \phi_3) + s_3]  $"); 
+paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
+                ", \omega_2 = "+str(omegaMultiplier2)+" \omega_1, \omega_3 = "+str(omegaMultiplier3)+"\omega_1, "
+                +r"\phi_1 = "+PhiString(phi1) +", \phi_2 = \phi_1 + "+PhiString(phiOffset2) + r", \phi_3 = \phi_1 + "+PhiString(phiOffset3)
+                +r", s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2) +r", s_3 = "+str(onsite3)
+                + r", N = "+str(N)+", b = "+str(centre)+"$ ")
 """wave 1 parameters""" # for ssdf
-A_site_start1 = 51;
-
+A_site_start1 = 40#85;
 """wave 2 params"""
-A_site_start2 = 40;
+A_site_start2 = 52#96;
 
 
 
 
-form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"; paramsString = r"$a=$"+str(a)
-# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2,  N = "+str(N)+", b="+str(centre)+r"$"
-# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2,  N = "+str(N)+", b="+str(centre)+r"$"
+# paramsString = r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+"\omega_1, \phi_1 = "+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2$"
+# potentialString = r"$V(t)=a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)$"
+t = np.linspace(0, 4*2*pi/omega1, 100)
+shake1 = a*cos(omega1*t + phi1) + onsite1
+shake2 = a*cos(omega2*t + phi2) + onsite2
+shake3 = a*cos(omega3*t + phi3) + onsite3
+plt.plot(t, shake1+shake2+shake3)
+plt.plot(t, np.abs(shake1+shake2+shake3))
+plt.ylabel("V")
+plt.xlabel("t")
+plt.show()
+
+
+
+
+
+# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+
+# form = "DS-p"; 
+# hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
+#                      +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2]$"); 
+# paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
+#                 ", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)
+#                 +", \phi_2 = \phi_1 + \pi/2, s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2)
+#                 + r", N = "+str(N)+", b = "+str(centre)+"$ ")
+
+
+# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 ="+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
+
 
 
 """solver params"""
@@ -336,41 +365,80 @@ t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 
 
 
-
-
 psi0_1 = np.zeros(N, dtype=np.complex_); psi0_1[A_site_start1] = 1;
 psi0_2 = np.zeros(N, dtype=np.complex_); psi0_2[A_site_start2] = 1;
-
 psi1 = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, 
-                                  tspan, nTimesteps, psi0_1)
+                                  tspan, nTimesteps, psi0_1, onsite)
 psi2 = SolveSchrodinger(form, rtol, N, centre, a,omega, phi,
-                                  tspan, nTimesteps, psi0_2)
+                                  tspan, nTimesteps, psi0_2, onsite)
 
 """plot"""
 
 
 # normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-1
+linthresh = 1e-2
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
-
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
+
+
+
+#flip one
+psi2 = np.flip(psi2, axis=0)
 
 PlotPsi(psi1, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString+r"$,\> \psi_{start site} = " +str(A_site_start1)+r"$",
       normaliser)
 PlotPsi(psi2, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString+r"$,\> \psi_{start site} = " +str(A_site_start2)+r"$",
       normaliser)
 
-#flip one
-psi2 = np.flip(psi2, axis=0)
-
-# PlotPsi(psi1-psi2, x_positions, x_labels,  "title",
-#       normaliser)
 
 #plot difference
 title = form+", "+hamiltonianString+"\n"+paramsString+r"$,\>\psi_{start site 1}=" +str(A_site_start1)+r",\> \psi_{start site 2} = " +str(A_site_start2)+r"$"
 PlotTwoPsi(psi1, psi2, x_positions, x_labels, title,
       normaliser)
+
+
+""" Is there a diode? """
+
+psi1AboveBorder = psi1[:centre,:-1]
+psi2AboveBorder = psi2[:centre,:-1]
+psi1BelowBorder = psi1[centre+2:,:-1]
+psi2BelowBorder = psi2[centre+2:,:-1]
+psi1AtShake = psi1[centre:centre+2,:-1]
+psi2AtShake = psi2[centre:centre+2,:-1]
+
+psiDiffAboveBorder = np.abs(psi1AboveBorder)**2 - np.abs(psi2AboveBorder)**2
+psiDiffBelowBorder = np.abs(psi1BelowBorder)**2 - np.abs(psi2BelowBorder)**2
+psiDiffAtShake = np.abs(psi1AtShake)**2 - np.abs(psi2AtShake)**2
+psiDiff =  np.abs(psi1[:,:-1])**2 - np.abs(psi2[:,:-1])**2
+psiOverallDiffAboveBorder = np.sum(psiDiffAboveBorder, axis=0)
+psiOverallDiffBelowBorder = np.sum(psiDiffBelowBorder, axis=0)
+psiOverallDiff = np.sum(psiDiff, axis=0)
+psiDiffAtShake = np.sum(psiDiffAtShake, axis=0)
+
+fig, ax = plt.subplots(figsize = (12,8))
+plt.plot(t_eval, psiOverallDiffAboveBorder)
+plt.title("Psi Diff Above Border [:45]\n"+form+", "+paramsString, y=1.02)
+plt.show()
+
+
+fig, ax = plt.subplots(figsize = (12,8))
+plt.plot(t_eval, psiDiffAtShake)
+plt.title("Psi Diff At Shake [45:47]\n"+form+", "+paramsString, y=1.02)
+plt.show()
+
+
+fig, ax = plt.subplots(figsize = (12,8))
+plt.plot(t_eval, psiOverallDiffBelowBorder)
+plt.title("Psi Diff Below Border [47:]\n"+form+", "+paramsString, y=1.06)
+plt.show()
+
+# fig, ax = plt.subplots(figsize = (12,8))
+# plt.plot(t_eval, psiOverallDiff)
+# plt.title("Psi Overall Diff\n"+form+", "+paramsString)
+# plt.show()
+
+
 
 
     
@@ -381,32 +449,61 @@ Homogeneous expansion
 """
 
 def H_0(N, centre, el):
-    H = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
-    H[centre][centre-1] = el
-    H[centre-1][centre] = el
+    H = np.zeros((N, N), dtype=np.complex128)
+    H = H + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
+    H[centre][centre-1] = -exp(1j*el)
+    H[centre-1][centre] = -exp(-1j*el)
+    H[centre+1][centre] = -exp(-1j*el)
+    H[centre][centre+1]= -exp(1j*el)
+    assert(np.all(0 == (np.conj(H.T) -H)))
+    return H
+
+
+
+def H_0_T(N, centre, t):
+    omega = 0.01*2*pi #want omega = 2\pi / J and J is 1
+    H = np.zeros((N, N), dtype=np.complex128)
+    H = H + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
+    H[centre][centre-1] = -exp(1j*omega*t)
+    H[centre-1][centre] = -exp(-1j*omega*t)
+    H[centre+1][centre] = -exp(-1j*omega*t)
+    H[centre][centre+1]= -exp(1j*omega*t)
+    assert(np.all(0 == (np.conj(H.T) -H)))
     return H
 
 # no energy offset at all
 def F_0(t, psi, N, centre, el):
     return -1j*np.dot(H_0(N, centre, el), psi)
 
+def F_0_T(t, psi, N, centre):
+    return -1j*np.dot(H_0_T(N, centre, t), psi)
+
 from scipy.integrate import solve_ivp
 
-def SolveSchrodingerH(N, centre, el, rtol, tspan, nTimesteps, psi0):
-
+def SolveSchrodingerH(form, N, centre, rtol, tspan, nTimesteps, psi0, el=0):
     # points to calculate the matter wave at
     t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
-
-    sol = solve_ivp(lambda t,psi: F_0(t, psi, 
-                           N, centre, el), 
-            t_span=tspan, y0=psi0, rtol=rtol, 
-            atol=rtol, t_eval=t_eval,
-            method='RK45')
+    
+    if form == "H0":
+        sol = solve_ivp(lambda t,psi: F_0(t, psi, 
+                               N, centre, el), 
+                t_span=tspan, y0=psi0, rtol=rtol, 
+                atol=rtol, t_eval=t_eval,
+                method='RK45')
+        
+    elif form == "H0T":
+        sol = solve_ivp(lambda t,psi: F_0_T(t, psi, 
+                               N, centre), 
+                t_span=tspan, y0=psi0, rtol=rtol, 
+                atol=rtol, t_eval=t_eval,
+                method='RK45')
+    
     sol=sol.y
         
     return sol
 
 
+form = "H0T"
 N = 91; 
 centre = 45;
 rtol=1e-11
@@ -419,32 +516,31 @@ n_osc_divisions = 2
 tspan = (0,nOscillations*T)
 t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 
-psi0 = np.zeros(N, dtype=np.complex_); psi0[50] = 1;
+aSiteStart = 45
+psi0 = np.zeros(N, dtype=np.complex_); psi0[aSiteStart] = 1;
 
-el = 1
-psi1 = SolveSchrodingerH(N, centre, el, rtol, tspan, nTimesteps, psi0)
+psi1 = SolveSchrodingerH("H0", N, centre, rtol, tspan, nTimesteps, psi0, el=0)
 
-el = -1
-psi2 = SolveSchrodingerH(N, centre, el, rtol, tspan, nTimesteps, psi0)
+psi2 = SolveSchrodingerH("H0T", N, centre, rtol, tspan, nTimesteps, psi0)
         
 # normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-4
+linthresh = 1e-3
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
 
-PlotPsi(psi1, x_positions, x_labels,  "title",
+PlotPsi(psi1, x_positions, x_labels, r"Hamiltonian with hoppings around site 45 moving in complex plane with frequency $\omega = 2 \pi$"+"\n"+r"atom starts at site 45",
       normaliser)
 
-PlotPsi(psi2, x_positions, x_labels,  "title",
+PlotPsi(psi2, x_positions, x_labels,   r"Hamiltonian with hoppings around site 45 moving in complex plane with frequency $\omega = 2 \pi$"+"\n"+r"atom starts at site 45",
       normaliser)
 
 # PlotPsi(psi1-psi2, x_positions, x_labels,  "title",
 #       normaliser)
 
 #plot difference
-PlotTwoPsi(psi1, psi2, x_positions, x_labels, "Difference in ballistic expansion when tunneling at site 45 is 1 vs -1 \n (particles starts at site 50)",
+PlotTwoPsi(psi1, psi2, x_positions, x_labels, r"$|\psi_1>; \phi = 0, |\psi_2>; \phi = \pi$"+"\n"+"b="+str(centre)+", atom starts at site "+str(aSiteStart),
       normaliser)
 
         

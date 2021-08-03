@@ -54,6 +54,19 @@ def phistring(phi):
     else:
         return  r'+ \pi /' + str(int(1/(phi/pi)))
     
+from fractions import Fraction 
+
+def PhiString(phi):
+    fraction = phi/pi
+    fraction = Fraction(fraction).limit_denominator(100)
+    numerator = fraction.numerator
+    denominator = fraction.denominator
+    if numerator ==1:
+        return r"\pi /"+str(denominator)
+    else:
+        str(numerator)+r"\pi / "+str(denominator)
+    
+    
     
 
 sns.set(style="darkgrid")
