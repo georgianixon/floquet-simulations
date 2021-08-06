@@ -270,6 +270,8 @@ rtol=1e-11
 # omega = 10#a /jn_zeros(0,1)[0]
 # phi = 0
 # T = 2*pi / omega
+# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+
 
 #DS-p params
 # a = 35
@@ -286,20 +288,30 @@ rtol=1e-11
 # omega=[omega1,omega2]
 # T=2*pi/omega1
 
+# form = "DS-p"; 
+# hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
+#                      +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2]$"); 
+# paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
+#                 ", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)
+#                 +", \phi_2 = \phi_1 + \pi/2, s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2)
+#                 + r", N = "+str(N)+", b = "+str(centre)+"$ ")
+# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 ="+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
+
+
 
 #TS params
 a = 35
 phi1=0;
-phiOffset2=pi/2
+phiOffset2=pi/4
 phiOffset3 = pi/4
 phi2=phi1+phiOffset2
 phi3 = phi1+phiOffset3
 phi=[phi1,phi2, phi3]
 onsite1 = 0
-onsite2 = 20
-onsite3 = 5
+onsite2 = 10
+onsite3 = 20
 onsite = [onsite1, onsite2, onsite3]
-omega1= a/jn_zeros(0,1)[0]
+omega1= 10#a/jn_zeros(0,1)[0]
 omegaMultiplier2=2
 omegaMultiplier3 = 3
 omega2=omega1*omegaMultiplier2
@@ -322,35 +334,22 @@ A_site_start2 = 52#96;
 
 
 
-
-# paramsString = r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+"\omega_1, \phi_1 = "+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2$"
-# potentialString = r"$V(t)=a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)$"
+# plot potential
 t = np.linspace(0, 4*2*pi/omega1, 100)
 shake1 = a*cos(omega1*t + phi1) + onsite1
 shake2 = a*cos(omega2*t + phi2) + onsite2
 shake3 = a*cos(omega3*t + phi3) + onsite3
-plt.plot(t, shake1+shake2+shake3)
-plt.plot(t, np.abs(shake1+shake2+shake3))
+plt.plot(t, shake1+shake2+shake3, label="V(t)")
+plt.plot(t, np.abs(shake1+shake2+shake3), label = "abs(V(t))")
 plt.ylabel("V")
 plt.xlabel("t")
+plt.legend()
 plt.show()
 
 
 
 
 
-# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
-
-# form = "DS-p"; 
-# hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
-#                      +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2]$"); 
-# paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
-#                 ", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)
-#                 +", \phi_2 = \phi_1 + \pi/2, s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2)
-#                 + r", N = "+str(N)+", b = "+str(centre)+"$ ")
-
-
-# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 ="+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
 
 
 
@@ -402,10 +401,10 @@ PlotTwoPsi(psi1, psi2, x_positions, x_labels, title,
 
 psi1AboveBorder = psi1[:centre,:-1]
 psi2AboveBorder = psi2[:centre,:-1]
-psi1BelowBorder = psi1[centre+2:,:-1]
-psi2BelowBorder = psi2[centre+2:,:-1]
-psi1AtShake = psi1[centre:centre+2,:-1]
-psi2AtShake = psi2[centre:centre+2,:-1]
+psi1BelowBorder = psi1[centre+3:,:-1]
+psi2BelowBorder = psi2[centre+3:,:-1]
+psi1AtShake = psi1[centre:centre+3,:-1]
+psi2AtShake = psi2[centre:centre+3,:-1]
 
 psiDiffAboveBorder = np.abs(psi1AboveBorder)**2 - np.abs(psi2AboveBorder)**2
 psiDiffBelowBorder = np.abs(psi1BelowBorder)**2 - np.abs(psi2BelowBorder)**2
@@ -417,20 +416,20 @@ psiOverallDiff = np.sum(psiDiff, axis=0)
 psiDiffAtShake = np.sum(psiDiffAtShake, axis=0)
 
 fig, ax = plt.subplots(figsize = (12,8))
-plt.plot(t_eval, psiOverallDiffAboveBorder)
+plt.plot(t_eval/T, psiOverallDiffAboveBorder)
 plt.title("Psi Diff Above Border [:45]\n"+form+", "+paramsString, y=1.02)
 plt.show()
 
 
 fig, ax = plt.subplots(figsize = (12,8))
-plt.plot(t_eval, psiDiffAtShake)
-plt.title("Psi Diff At Shake [45:47]\n"+form+", "+paramsString, y=1.02)
+plt.plot(t_eval/T, psiDiffAtShake)
+plt.title("Psi Diff At Shake [45:48]\n"+form+", "+paramsString, y=1.02)
 plt.show()
 
 
 fig, ax = plt.subplots(figsize = (12,8))
-plt.plot(t_eval, psiOverallDiffBelowBorder)
-plt.title("Psi Diff Below Border [47:]\n"+form+", "+paramsString, y=1.06)
+plt.plot(t_eval/T, psiOverallDiffBelowBorder)
+plt.title("Psi Diff Below Border [48:]\n"+form+", "+paramsString, y=1.06)
 plt.show()
 
 # fig, ax = plt.subplots(figsize = (12,8))
