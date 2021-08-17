@@ -92,7 +92,21 @@ def HT_SSDF(N, centre, a, omega1, omega2, phi1, phi2, onsite,  t):
 No energy offset
 """
 def H_0(N):
-    return np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
+    return np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)      
+
+
+
+def HT_General(N, centres, funcs, paramss, t):
+    H = H_0(N)
+    
+    numOfShakes = len(centres)
+    if numOfShakes == 1:
+        H[centres,centres] = funcs(paramss, t)
+    else:    
+        for i in range(numOfShakes):
+            func = funcs[i]
+            H[centres[i],centres[i]] = func(paramss[i], t)
+    return H
 
 
 """
@@ -126,6 +140,10 @@ def F_0(t, psi, N):
 def F_HF(t, psi, HF):
     return -1j*np.dot(HF, psi)
 
+def F_General(t, psi, N, centre, func, params):
+    H = HT_General(N, centre, func, params, t)
+    return -1j*np.dot(H, psi)
+
 
 def ConvertComplex(s):
     """
@@ -135,6 +153,20 @@ def ConvertComplex(s):
 
 def RoundComplex(num, dp):
     return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
+
+def SolveSchrodingerGeneral(N,centre,func,params, tspan, nTimesteps, psi0,):
+        
+    
+    rtol=1e-11
+    # points to calculate the matter wave at
+    t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
+    sol = solve_ivp(lambda t,psi: F_General(t, psi, 
+                                          N, centre, func, params), 
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+    sol=sol.y
+    return sol
 
 def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, psi0, onsite=0):
     """
