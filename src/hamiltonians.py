@@ -47,7 +47,27 @@ def GetEvalsAndEvecs(HF):
         print('evals are imaginary!')
         return evals, evecs
 
-
+    
+    
+def getevalsandevecs(HF):
+    """
+    for some reason, this is different to GetEvalsAndEvecs..
+    """
+    #order by evals, also order corresponding evecs
+    evals, evecs = eig(HF)
+    idx = np.real(evals).argsort()
+    evals = evals[idx]
+    evecs = evecs[:,idx]
+    
+    #make first element of evecs real and positive
+    for vec in range(np.size(HF[0])):
+        # phi = np.angle(evecs[0,vec])
+        # evecs[:,vec] = exp(-1j*phi)*evecs[:,vec]
+#        evecs[:,vec] = np.conj(evecs[0,vec])/np.abs(evecs[0,vec])*evecs[:,vec]
+        
+        #nurs normalisation
+        evecs[:,vec] = np.conj(evecs[1,vec])/np.abs(evecs[1,vec])*evecs[:,vec]
+    return evals, evecs
 
 """
 Time dependent linear energy offset
@@ -67,7 +87,7 @@ Centre indexed from 0
 """
 def HT_SS(N, centre, a, omega, phi, onsite, t):
     matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)          
-    matrix[centre][centre] = a*cos(omega*t + phi) + onite
+    matrix[centre][centre] = a*cos(omega*t + phi) + onsite
     return matrix
 
 def HT_DS(N, centre, a, omega1, omega2, phi1, phi2, onsite1, onsite2, t):
