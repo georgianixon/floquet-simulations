@@ -15,22 +15,34 @@ import sys
 sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 from hamiltonians import CreateHF, HT_SS, hoppingHF
 from scipy.special import jn_zeros, jv
+from fractions import Fraction 
 
-def PhiString(phi):
-    if phi == 0:
-        return ""
-    elif phi == "phi":
-        return r'+ \phi' 
-    else:
-        return  r'+ \pi /' + str(int(1/(phi/pi)))
+# def PhiString(phi):
+#     if phi == 0:
+#         return ""
+#     elif phi == "phi":
+#         return r'+ \phi' 
+#     else:
+#         return  r'+ \pi /' + str(int(1/(phi/pi)))
     
-def PhiStringNum(phi):
-    if phi == 0:
-        return "0"
-    elif phi == "phi":
-        return r"$\phi$" 
+# def PhiStringNum(phi):
+#     if phi == 0:
+#         return "0"
+#     elif phi == "phi":
+#         return r"$\phi$" 
+#     else:
+#         return  r"$\pi /" + str(int(1/(phi/pi))) + r"$"
+    
+    
+def PhiString(phi):
+    fraction = phi/pi
+    fraction = Fraction(fraction).limit_denominator(100)
+    numerator = fraction.numerator
+    denominator = fraction.denominator
+    if numerator ==1:
+        return r"\pi /"+str(denominator)
     else:
-        return  r"$\pi /" + str(int(1/(phi/pi))) + r"$"
+        str(numerator)+r"\pi / "+str(denominator)
 
 size=25
 params = {
@@ -67,30 +79,34 @@ Set form = ... and other parameters
 Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
+# common params
+N=51; centre=25;  rtol=1e-11
+a = 35
 
-N=51; centre=25; 
-a1 = 35
-a2 = 35
-aas=[a1,a2]
-phi1 = pi/4
-phiOffset = pi/2
-phi2 = phi1+phiOffset
-phis=[phi1, phi2];
-omega1 = a1/jn_zeros(0,1)[0]
-omegaMultiplier=2
-omega2 = omega1*omegaMultiplier
-omegas = [omega1, omega2]
-form="SSDF-p"
 # form="SS-p"
-rtol=1e-11
-UT, HF = CreateHF("SSDF-p", rtol, N, centre, aas,phis, omegas)
-# UT, HF = CreateHF("SS-p", rtol, N, centre, a1,phi1, omega1)
+# phi1 = pi/4
+# phiOffset = pi/2
+# phi2 = phi1+phiOffset
+# phis=[phi1, phi2];
+# omega1 = a1/jn_zeros(0,1)[0]
+# omegaMultiplier=2
+# omega2 = omega1*omegaMultiplier
+# omegas = [omega1, omega2]
+
+
+form="StepFunc"
+a = 35
+omega = 10
+phi = 0
+
+
+UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi)
 
 #%%
 
 
-norm = mpl.colors.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-2
+# norm = mpl.colors.Normalize(vmin=-1, vmax=1)
+linthresh = 1e-1
 norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 # 
 
@@ -141,17 +157,17 @@ fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
 #     + ', rtol='+str(rtol)
 #     , fontsize = 25, y=0.96)
 
-fig.suptitle("Representation of Floquet Hamiltonian, G\n"
-             # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
-             # + r"t" + phistring(phi1) 
-             # + r") |"+str(centre)+r"><"+str(centre) +r"|$",
-             +form+", "+r"$a_1=$"+str(a1)
-              +", "+r"$a_2=$"+str(a2)
-             +", "+r"$\omega_1=$"+"{:.2f}".format(omega1)
-              +", "+r"$\omega_2=$"+"{:.2f}".format(omega2)
-              +", "+r"$\phi_1=$"+ PhiStringNum(phi1)
-              +", "+r"$\phi_2=$"+ PhiStringNum(phi2)
-             , y=0.95)
+# fig.suptitle("Representation of Floquet Hamiltonian, G\n"
+#              # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
+#              # + r"t" + phistring(phi1) 
+#              # + r") |"+str(centre)+r"><"+str(centre) +r"|$",
+#              +form+", "+r"$a_1=$"+str(a1)
+#               +", "+r"$a_2=$"+str(a2)
+#              +", "+r"$\omega_1=$"+"{:.2f}".format(omega1)
+#               +", "+r"$\omega_2=$"+"{:.2f}".format(omega2)
+#               +", "+r"$\phi_1=$"+ PhiStringNum(phi1)
+#               +", "+r"$\phi_2=$"+ PhiStringNum(phi2)
+             # , y=0.95)
              
 #     + r', $V(t) = $'
 #     + r"$|25><25|$"

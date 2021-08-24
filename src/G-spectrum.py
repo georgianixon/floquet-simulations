@@ -84,7 +84,7 @@ form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \p
 
 
 
-UT, HF = CreateHF(form, rtol, N, centre, a,phi, omega)
+UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi)
 evals, evecs = GetEvalsAndEvecs(HF)
 # evecs = OrderEvecs(evecs, N)
 

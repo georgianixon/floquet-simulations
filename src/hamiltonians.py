@@ -108,6 +108,20 @@ def HT_SSDF(N, centre, a, omega1, omega2, phi1, phi2, onsite,  t):
     matrix[centre][centre] = a*cos(omega1*t + phi1) + a*cos(omega2*t + phi2) + onsite
     return matrix
 
+def HT_Circle(N, centre, a, omega,  phi, onsite,  t):
+    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
+    matrix[0,-1] = -1
+    matrix[-1,0] = -1
+    matrix[centre][centre] = a*cos(omega*t + phi)
+    return matrix
+
+
+def HT_StepFunc(N, centre, a, omega,  phi, onsite,  t):
+    matrix = np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
+    for i in range(centre, N):
+        matrix[i, i] = a*cos(omega*t + phi)
+    return matrix
+
 """
 No energy offset
 """
@@ -115,9 +129,11 @@ def H_0(N):
     return np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)      
 
 
-
-def HT_General(N, centres, funcs, paramss, t):
+def HT_General(N, centres, funcs, paramss, circleBoundary, t):
     H = H_0(N)
+    if circleBoundary:
+        H[0,-1]=-1
+        H[-1,0]=-1
     
     numOfShakes = len(centres)
     if numOfShakes == 1:
@@ -144,6 +160,11 @@ def F_DS(t, psi, N, centre, a, omega1, omega2, phi1, phi2, onsite1, onsite2):
 def F_SSDF(t, psi, N, centre, a, omega1, omega2, phi1, phi2, onsite):
     return -1j*np.dot(HT_SSDF(N, centre, a, omega1, omega2, phi1, phi2, onsite, t), psi)
 
+def F_Circle(t, psi, N, centre, a, omega,phi,  onsite):
+    return -1j*np.dot(HT_Circle(N, centre, a, omega,  phi,  onsite, t), psi)
+
+def F_StepFunc(t, psi, N, centre, a, omega, phi, onsite):
+    return -1j*np.dot(HT_StepFunc(N, centre, a, omega, phi, onsite, t), psi)
 
 def F_TS(t, psi, N, centre, a, omega, phi, onsite):
     return -1j*np.dot(HT_TS(N, centre, a, omega, phi, onsite, t), psi)
@@ -160,8 +181,8 @@ def F_0(t, psi, N):
 def F_HF(t, psi, HF):
     return -1j*np.dot(HF, psi)
 
-def F_General(t, psi, N, centre, func, params):
-    H = HT_General(N, centre, func, params, t)
+def F_General(t, psi, N, centre, func, params, circleBoundary):
+    H = HT_General(N, centre, func, params, circleBoundary, t)
     return -1j*np.dot(H, psi)
 
 
@@ -174,14 +195,13 @@ def ConvertComplex(s):
 def RoundComplex(num, dp):
     return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
 
-def SolveSchrodingerGeneral(N,centre,func,params, tspan, nTimesteps, psi0,):
-        
+def SolveSchrodingerGeneral(N,centre,func,params, tspan, nTimesteps, psi0, circleBoundary = 0):
     
     rtol=1e-11
     # points to calculate the matter wave at
     t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
     sol = solve_ivp(lambda t,psi: F_General(t, psi, 
-                                          N, centre, func, params), 
+                                          N, centre, func, params, circleBoundary), 
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
@@ -205,6 +225,8 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
         we calculate the matter wave at nTimesteps + 1 points. This gives nTimesteps steps. 
     """
     
+    # points to calculate the matter wave at
+    t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
         
     if form=="DS-p" or form == "SSDF-p":
         omega1 = omega[0]
@@ -214,8 +236,13 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
         onsite1 = onsite[0]
         onsite2 = onsite[1]
         
-    # points to calculate the matter wave at
-    t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
+    elif form == "StepFunc":
+         sol = solve_ivp(lambda t,psi: F_StepFunc(t, psi, 
+                                                  N, centre, a, omega, phi, onsite),
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+         sol=sol.y
     
     if form == "TS-p":
         sol = solve_ivp(lambda t,psi: F_TS(t, psi, 
@@ -232,6 +259,15 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
             atol=rtol, t_eval=t_eval,
             method='RK45')
         sol=sol.y
+    
+    elif form == "Circle":
+        sol = solve_ivp(lambda t,psi: F_Circle(t, psi, 
+                                           N, centre, a, omega, phi, onsite), 
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+        sol=sol.y
+    
         
     elif form == 'DS-p':
         sol = solve_ivp(lambda t,psi: F_DS(t, psi,
@@ -276,9 +312,9 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
 
 
 
-def CreateHF(form, rtol, N, centre, a,phi, omega): 
+def CreateHF(form, rtol, N, centre, a, omega, phi): 
 
-    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p"])
+    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p", "StepFunc"])
     if form == "DS-p" or form =="SSDF-p":
         T = 2*pi/omega[0]
     else:
@@ -294,7 +330,8 @@ def CreateHF(form, rtol, N, centre, a,phi, omega):
     
     # print(time.time()-start, 'seconds.')
     
-    evals_U, evecs = eig(UT)
+    # evals_U, evecs = eig(UT)
+    evals_U, evecs = GetEvalsAndEvecs(UT)
     evals_H = 1j / T *log(evals_U)
     
     HF = np.zeros([N,N], dtype=np.complex_)

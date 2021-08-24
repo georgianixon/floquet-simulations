@@ -178,7 +178,7 @@ for phi in phis:
             phiInput = [phi, phi+phiOffset]
 
         # calculate effective Hamiltonian 
-        UT, HF = CreateHF(form, rtol, N, centre, aInput, phiInput, omegaInput)
+        UT, HF = CreateHF(form, rtol, N, centre, aInput, omegaInput, phiInput)
         
 #            R = RGaugeMatrix(N, centre, a, omega, phi)
 #            HF = np.dot(np.conj(R.T), np.dot(HF, R))

@@ -58,7 +58,7 @@ def PlotPsi(psi, x_positions, x_labels, title, normaliser):
     
     sz = 6
     fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
-                            figsize=(sz*len(apply),sz))
+                            figsize=(sz*len(apply)*1.3,sz))
     
     for i, f in enumerate(apply):
         ax[i].matshow(f(psi), interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
@@ -76,6 +76,46 @@ def PlotPsi(psi, x_positions, x_labels, title, normaliser):
     cax = plt.axes([1.03, 0.1, 0.03, 0.8])
     fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
     fig.suptitle(title, y = 1.2,  fontfamily='STIXGeneral')
+    
+    plt.show()
+    
+def PlotProbCurrent(psi, x_positions, x_labels, title, normaliser):
+    """
+    Plot Probability current
+    needs real, abs
+    """
+    
+    mpl.rcParams.update({
+          'mathtext.fontset':'stix'
+          })
+    
+    apply = [np.real]
+    labels = [ r'$\mathrm{Re}\{j(x,t)\}$']
+    
+    
+    cmapcol = 'PuOr' #PiYG_r
+    cmap= mpl.cm.get_cmap(cmapcol)
+    
+    sz = 7
+    fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
+                            figsize=(sz*len(apply),sz))
+    
+
+    ax.matshow(np.real(psi), interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
+    ax.set_title(labels[0],  fontfamily='STIXGeneral')
+    ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+      labeltop=False)  
+    ax.set_xticks(x_positions)
+    ax.set_xlabel('t/T', fontfamily='STIXGeneral')
+    ax.set_xticklabels(x_labels)
+    for side in ["bottom", "top", "left", "right"]:
+        ax.spines[side].set_visible(False)
+
+    ax.set_ylabel('site', fontfamily='STIXGeneral')
+    
+    cax = plt.axes([1.03, 0.1, 0.03, 0.8])
+    fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
+    fig.suptitle(title, y = 1.1,  fontfamily='STIXGeneral')
     
     plt.show()
     
@@ -150,14 +190,13 @@ rtol=1e-11
 # omega = 10#a /jn_zeros(0,1)[0]
 # phi = 0
 # T = 2*pi / omega
-<<<<<<< HEAD
 # form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
 
-=======
+
 # form = "SS-p"; 
 # hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; 
 # paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
->>>>>>> 13ed4195f523f7e1b2a7650aac205da698cc3b37
+
 
 
 # form = "DS-p"; 
@@ -170,49 +209,25 @@ rtol=1e-11
 # form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 ="+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
 
 
-
-#DS-p params
-form = "DS-p"
-a = 35
-phi1=0;
-<<<<<<< HEAD
-phiOffset2=pi/4
-phiOffset3 = pi/4
-phi2=phi1+phiOffset2
-phi3 = phi1+phiOffset3
-phi=[phi1,phi2, phi3]
-onsite1 = 0
-onsite2 = 10
-onsite3 = 20
-onsite = [onsite1, onsite2, onsite3]
-omega1= 10#a/jn_zeros(0,1)[0]
-omegaMultiplier2=2
-omegaMultiplier3 = 3
-omega2=omega1*omegaMultiplier2
-omega3 = omega1*omegaMultiplier3
-omega=[omega1,omega2, omega3]
-T=2*pi/min(omega)
-form = "TS-p"; 
-=======
-phiOffset=pi/2
-phi2=phi1+phiOffset
-onsite1 = 0
-onsite2 = 20
-onsite = [onsite1, onsite2]
-omega1= 9.1#a/jn_zeros(0,1)[0]
-omegaMultiplier=2
-omega2=omega1*omegaMultiplier
-phi=[phi1,phi2]
-omega=[omega1,omega2]
-T=2*pi/omega1
-form = "DS-p"; 
->>>>>>> 13ed4195f523f7e1b2a7650aac205da698cc3b37
-hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
-                      +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2]$"); 
-paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
-                ", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)
-                +", \phi_2 = \phi_1 + \pi/2, s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2)
-                + r", N = "+str(N)+", b = "+str(centre)+"$ ")
+# #DS-p params
+# form = "DS-p"; 
+# phiOffset=pi/2
+# phi2=phi1+phiOffset
+# onsite1 = 0
+# onsite2 = 20
+# onsite = [onsite1, onsite2]
+# omega1= 9.1#a/jn_zeros(0,1)[0]
+# omegaMultiplier=2
+# omega2=omega1*omegaMultiplier
+# phi=[phi1,phi2]
+# omega=[omega1,omega2]
+# T=2*pi/omega1
+# hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
+#                       +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2]$"); 
+# paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
+#                 ", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)
+#                 +", \phi_2 = \phi_1 + \pi/2, s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2)
+#                 + r", N = "+str(N)+", b = "+str(centre)+"$ ")
 
 # form = "SSDF-p"; 
 # hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; 
@@ -222,33 +237,33 @@ paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
 
 
 #TS params
-# a = 35
-# phi1=0;
-# phiOffset2=pi/2
-# phiOffset3 = pi/4
-# phi2=phi1+phiOffset2
-# phi3 = phi1+phiOffset3
-# phi=[phi1,phi2, phi3]
-# onsite1 = 0
-# onsite2 = 20
-# onsite3 = 5
-# onsite = [onsite1, onsite2, onsite3]
-# omega1= a/jn_zeros(0,1)[0]
-# omegaMultiplier2=2
-# omegaMultiplier3 = 3
-# omega2=omega1*omegaMultiplier2
-# omega3 = omega1*omegaMultiplier3
-# omega=[omega1,omega2, omega3]
-# T=2*pi/min(omega)
-# form = "TS-p"; 
-# hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
-#                      +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2] + "
-#                      +r"\hat{n}_{b+2} [a \> \cos (\omega_3 t + \phi_3) + s_3]  $"); 
-# paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
-#                 ", \omega_2 = "+str(omegaMultiplier2)+" \omega_1, \omega_3 = "+str(omegaMultiplier3)+"\omega_1, "
-#                 +r"\phi_1 = "+PhiString(phi1) +", \phi_2 = \phi_1 + "+PhiString(phiOffset2) + r", \phi_3 = \phi_1 + "+PhiString(phiOffset3)
-#                 +r", s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2) +r", s_3 = "+str(onsite3)
-#                 + r", N = "+str(N)+", b = "+str(centre)+"$ ")
+a = 35
+phi1=0;
+phiOffset2=pi/2
+phiOffset3 = pi/4
+phi2=phi1+phiOffset2
+phi3 = phi1+phiOffset3
+phi=[phi1,phi2, phi3]
+onsite1 = 0
+onsite2 = 20
+onsite3 = 5
+onsite = [onsite1, onsite2, onsite3]
+omega1= a/jn_zeros(0,1)[0]
+omegaMultiplier2=2
+omegaMultiplier3 = 3
+omega2=omega1*omegaMultiplier2
+omega3 = omega1*omegaMultiplier3
+omega=[omega1,omega2, omega3]
+T=2*pi/min(omega)
+form = "TS-p"; 
+hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
+                      +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2] + "
+                      +r"\hat{n}_{b+2} [a \> \cos (\omega_3 t + \phi_3) + s_3]  $"); 
+paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
+                ", \omega_2 = "+str(omegaMultiplier2)+" \omega_1, \omega_3 = "+str(omegaMultiplier3)+"\omega_1, "
+                +r"\phi_1 = "+PhiString(phi1) +", \phi_2 = \phi_1 + "+PhiString(phiOffset2) + r", \phi_3 = \phi_1 + "+PhiString(phiOffset3)
+                +r", s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2) +r", s_3 = "+str(onsite3)
+                + r", N = "+str(N)+", b = "+str(centre)+"$ ")
 
 """wave 1 parameters""" # for ssdf
 A_site_start1 = 40#85;
@@ -256,8 +271,6 @@ A_site_start1 = 40#85;
 A_site_start2 = 51#96;
 
 
-
-<<<<<<< HEAD
 # plot potential
 t = np.linspace(0, 4*2*pi/omega1, 100)
 shake1 = a*cos(omega1*t + phi1) + onsite1
@@ -265,14 +278,6 @@ shake2 = a*cos(omega2*t + phi2) + onsite2
 shake3 = a*cos(omega3*t + phi3) + onsite3
 plt.plot(t, shake1+shake2+shake3, label="V(t)")
 plt.plot(t, np.abs(shake1+shake2+shake3), label = "abs(V(t))")
-=======
-t = np.linspace(0, 4*2*pi/omega1, 100)
-shake1 = a*cos(omega1*t + phi1) + onsite1
-shake2 = a*cos(omega2*t + phi2) + onsite2
-# shake3 = a*cos(omega3*t + phi3) + onsite3
-plt.plot(t, shake1+shake2)
-plt.plot(t, np.abs(shake1+shake2))
->>>>>>> 13ed4195f523f7e1b2a7650aac205da698cc3b37
 plt.ylabel("V")
 plt.xlabel("t")
 plt.legend()
@@ -280,14 +285,6 @@ plt.show()
 
 
 
-
-
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 13ed4195f523f7e1b2a7650aac205da698cc3b37
 """solver params"""
 nOscillations = 30
 #how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
@@ -342,17 +339,12 @@ shakeLen = len(omega)
 
 psi1AboveBorder = psi1[:centre,:-1]
 psi2AboveBorder = psi2[:centre,:-1]
-<<<<<<< HEAD
-psi1BelowBorder = psi1[centre+3:,:-1]
-psi2BelowBorder = psi2[centre+3:,:-1]
-psi1AtShake = psi1[centre:centre+3,:-1]
-psi2AtShake = psi2[centre:centre+3,:-1]
-=======
+
 psi1BelowBorder = psi1[centre+shakeLen:,:-1]
 psi2BelowBorder = psi2[centre+shakeLen:,:-1]
 psi1AtShake = psi1[centre:centre+shakeLen,:-1]
 psi2AtShake = psi2[centre:centre+shakeLen,:-1]
->>>>>>> 13ed4195f523f7e1b2a7650aac205da698cc3b37
+
 
 psiDiffAboveBorder = np.abs(psi1AboveBorder)**2 - np.abs(psi2AboveBorder)**2
 psiDiffBelowBorder = np.abs(psi1BelowBorder)**2 - np.abs(psi2BelowBorder)**2
@@ -384,55 +376,6 @@ plt.show()
 # plt.plot(t_eval, psiOverallDiff)
 # plt.title("Psi Overall Diff\n"+form+", "+paramsString)
 # plt.show()
-
-
-
-
-
-    
-#%%
-
-"""
-Old titles
-"""
-
-
-# title = (r"$|\psi_1> = |\psi_{\phi="+PhiStringNum(phi1)+"}(t)>, \>"
-#          +"|\psi_2> = |\psi_{\phi="+PhiStringNum(phi2)+"}(t)>$"
-#          +"\n"
-#          +r"evolution via G, "
-#          + r"given $H(t)=H_0 + "+str(a)
-#          +r"\cos (" + "{:.2f}".format(omega)+ r"t + \phi"
-#          + r") |"+str(centre)+r"><"+str(centre) +r"|,"
-#          +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
-#         )  
-
-
-
-# title = (r"$|\psi (t)>$"+  "\n"
-#          # +r"evolution via G, "
-#          # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
-#          #     + r"t" + PhiString(phi1) 
-#          #     + r") |"+str(centre)+r"><"+str(centre) +r"|,"
-#          +form+", "+r"$a_1=$"+str(a)
-#              +", "+r"$\omega_1=$"+"{:.2f}".format(omega1)
-#               +", "+r"$\omega_2=$"+"{:.2f}".format(omega2)
-#               +", "+r"$\phi_1=$"+ PhiStringNum(phi1)
-#               +", "+r"$\phi_2=$"+ PhiStringNum(phi2)
-#               +", "+"b="+str(centre)
-              
-#               +r", $\quad |\psi (t=0)> = |"+str(A_site_start)+r">$"
-         
-         
-#          ) 
-
-# title = (r"$|\psi (t)>$"+  "\n"
-#          +r"evolution via G, "
-#          + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega)
-#              + r"t" + PhiString(phi2) 
-#              + r") |"+str(centre)+r"><"+str(centre) +r"|,"
-#              +r" \quad  |\psi (t=0)> = |"+str(A_site_start)+r">$"
-#          ) 
 
 
     
@@ -594,14 +537,15 @@ def Cosine(params, t):
 
 
 a = 35
-omega1= 20; omega2=2*omega1; omega3=3*omega1
+omega1=10; omega2=2*omega1; omega3=omega1
 phi1=0; phi2=pi/4; phi3=pi/2
-onsite1=0; onsite2=10; onsite3=20
+onsite1=0; onsite2=5; onsite3=10
 T=2*pi/omega1
 centres = [45,46, 47]
+funcs = [RampHalf, RampHalf, RampHalf]
 
 params = [[a, omega1, phi1, onsite1], [a, omega2, phi2, onsite2], [a, omega3, phi3, onsite3]]
-funcs = [Blip, Blip, Blip]
+
 
 
 t = np.linspace(0, 4*2*pi/omega1, 100)
@@ -613,6 +557,15 @@ plt.plot(t, np.abs(shake1+shake2+shake3))
 plt.ylabel("V")
 plt.xlabel("t")
 plt.show()
+
+plt.plot(t, shake1, label="site 1")
+plt.plot(t, shake2, label="site 2")
+plt.plot(t, shake3, label="site 3")
+plt.ylabel("V")
+plt.xlabel("t")
+plt.legend()
+plt.show()
+
 
 
 """solver params"""
@@ -651,7 +604,6 @@ PlotPsi(psi2, x_positions, x_labels, "Ramp",
 
 
 #plot difference
-# title = form+", "+hamiltonianString+"\n"+paramsString+r"$,\>\psi_{start site 1}=" +str(A_site_start1)+r",\> \psi_{start site 2} = " +str(A_site_start2)+r"$"
 PlotTwoPsi(psi1, psi2, x_positions, x_labels, "Ramp",
       normaliser)
 
@@ -698,6 +650,192 @@ plt.show()
 # plt.plot(t_eval, psiOverallDiff)
 # plt.title("Psi Overall Diff\n"+form+", "+paramsString)
 # plt.show()
+
+
+#%%
+
+"""Circle"""
+
+"""General Params"""  
+N = 5#182; 
+rtol=1e-11
+form = "Circle"
+
+"""wave 1 parameters""" # for ssdf
+A_site_start1 = 0
+"""wave 2 params"""
+A_site_start2 = 4
+
+
+a = 35
+omega1=9.1; omega2=2*omega1; omega3 = omega1
+phi1=0; phi2=pi/2; phi2=pi/4
+onsite1=0; onsite2=5; onsite3 = 10
+T=2*pi/omega1
+centres = [1,2,3]
+funcs = [Cosine, Cosine, Cosine]
+
+params = [[a, omega1, phi1, onsite1], [a, omega2, phi2, onsite2], [a, omega3, phi3, onsite3]]
+
+
+t = np.linspace(0, 4*2*pi/omega1, 100)
+shake1 = funcs[0](params[0], t)
+shake2 = funcs[1](params[1], t)
+shake3 = funcs[2](params[2], t)
+plt.plot(t, shake1+shake2+shake3)
+plt.plot(t, np.abs(shake1+shake2+shake3))
+plt.ylabel("V")
+plt.xlabel("t")
+plt.show()
+
+plt.plot(t, shake1, label="site 1")
+plt.plot(t, shake2, label="site 2")
+plt.plot(t, shake3, label="site 3")
+plt.ylabel("V")
+plt.xlabel("t")
+plt.legend()
+plt.show()
+
+
+
+
+"""solver params"""
+nOscillations = 30
+#how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
+nTimesteps = nOscillations*100
+nTimes = nTimesteps+1
+n_osc_divisions = 2
+tspan = (0,nOscillations*T)
+t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
+
+
+"""Solve"""
+psi0_1 = np.zeros(N, dtype=np.complex_); psi0_1[A_site_start1] = 1;
+psi0_2 = np.zeros(N, dtype=np.complex_); psi0_2[A_site_start2] = 1;
+
+psi1 = SolveSchrodingerGeneral(N,centres,funcs,params, tspan, nTimesteps, psi0_1, circleBoundary = 1)
+psi2 = SolveSchrodingerGeneral(N,centres,funcs,params, tspan, nTimesteps, psi0_2, circleBoundary = 1)
+
+"""plot"""
+normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
+# linthresh = 1e-2
+# normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
+x_labels = list(range(0, nOscillations+1, n_osc_divisions))
+
+
+#flip one
+psi2 = np.flip(psi2, axis=0)
+
+PlotPsi(psi1, x_positions, x_labels,  "Circle 1",
+      normaliser)
+PlotPsi(psi2, x_positions, x_labels, "Circle 2",
+      normaliser)
+
+
+#plot difference
+# title = form+", "+hamiltonianString+"\n"+paramsString+r"$,\>\psi_{start site 1}=" +str(A_site_start1)+r",\> \psi_{start site 2} = " +str(A_site_start2)+r"$"
+PlotTwoPsi(psi1, psi2, x_positions, x_labels, "Circle diff",
+      normaliser)
+
+
+
+#%%
+"""Probability current"""
+
+def Differentiate(array, dx=1, circleBoundary = 0):
+    xDiff = np.zeros(len(array), dtype=np.complex128)
+    if circleBoundary:
+        xDiff[0] = (array[1] - array[-1])/dx
+        xDiff[-1] = (array[0] - array[-2])/dx
+    else:
+        xDiff[0] = (array[1] - array[0])/dx
+        xDiff[-1] = (array[-1] - array[-2])/dx
+    for i in range(len(array)-2):
+        xDiff[i+1] = (array[i+2] - array[i])/2/dx
+    return xDiff
+
+circleBoundary = 1
+
+psi1Diff = np.array([Differentiate(psi1[:,i], circleBoundary=circleBoundary) for i in range(nTimes)]).T
+psi2Diff = np.array([Differentiate(psi2[:,i], circleBoundary=circleBoundary) for i in range(nTimes)]).T
+psi1ConjDiff = np.array([Differentiate(np.conj(psi1[:,i]), circleBoundary=circleBoundary) for i in range(nTimes)]).T
+psi2ConjDiff = np.array([Differentiate(np.conj(psi2[:,i]), circleBoundary=circleBoundary) for i in range(nTimes)]).T
+
+probCurrent1 = (1/2/1j)*np.array([np.multiply(np.conj(psi1[:,i]), psi1Diff[:,i])
+                                  - np.multiply(psi1[:,i], psi1ConjDiff[:,i]) for i in range(nTimes)]).T
+probCurrent2 = (1/2/1j)*np.array([np.multiply(np.conj(psi2[:,i]), psi2Diff[:,i]) 
+                                  - np.multiply(psi2[:,i], psi2ConjDiff[:,i]) for i in range(nTimes)]).T
+
+assert(np.all(np.imag(probCurrent1)==0))
+assert(np.all(np.imag(probCurrent2)==0))
+probCurrent1 = np.real(probCurrent1)
+probCurrent2 = np.real(probCurrent2)
+PlotProbCurrent(probCurrent1, x_positions, x_labels,  r"prob current $\psi_1$",
+      normaliser)
+PlotProbCurrent(probCurrent2, x_positions, x_labels,  r"prob current $\psi_2$",
+      normaliser)
+
+#difference between probability currents
+PlotProbCurrent(probCurrent1 - probCurrent2, x_positions, x_labels, "prob current difference", normaliser)
+
+
+""" Look at probability current overall """
+
+# centre = centres[0]
+# shakeLen = len(centres)
+
+# currentAboveBorder1 = probCurrent1[:centre,:-1]
+# currentAboveBorder2 = probCurrent2[:centre,:-1]
+# currentBelowBorder1 = probCurrent1[centre+shakeLen:,:-1]
+# currentBelowBorder2 = probCurrent2[centre+shakeLen:,:-1]
+# currentAtShake1 = probCurrent1[centre:centre+shakeLen,:-1]
+# currentAtShake2 = probCurrent2[centre:centre+shakeLen,:-1]
+
+totalCurrent1 = np.sum(probCurrent1, axis=0)[:-1]
+totalCurrent2 = np.sum(probCurrent2, axis=0)[:-1]
+# totalCurrentAboveShake1 = np.sum(currentAboveBorder1,  axis=0)
+# totalCurrentAboveShake2 = np.sum(currentAboveBorder2,  axis=0)
+# totalCurrentBelowShake1 = np.sum(currentBelowBorder1,  axis=0)
+# totalCurrentBelowShake2 = np.sum(currentBelowBorder2,  axis=0)
+# totalCurrentAtShake1 = np.sum(currentAtShake1, axis=0)
+# totalCurrentAtShake2 = np.sum(currentAtShake2, axis=0)
+
+fig, ax = plt.subplots(figsize = (16,8))
+plt.plot(t_eval/T, totalCurrent1, label=r"$\sum_x j(x,t)_1$")
+plt.plot(t_eval/T, totalCurrent2, label=r"$\sum_x j(x,t)_2$")
+plt.xlabel("t/T")
+plt.legend()
+plt.title("total probability current", y=1.02)
+plt.show()
+
+
+# fig, ax = plt.subplots(figsize = (12,8))
+# plt.plot(t_eval/T, totalCurrentAboveShake1, label=r"$\sum_x j(x,t)_1$")
+# plt.plot(t_eval/T, totalCurrentAboveShake2, label=r"$\sum_x j(x,t)_2$")
+# plt.xlabel("t/T")
+# plt.legend()
+# plt.title("total probability current above shake [:45]", y=1.02)
+# plt.show()
+
+
+# fig, ax = plt.subplots(figsize = (12,8))
+# plt.plot(t_eval/T, totalCurrentAtShake1, label=r"$\sum_x j(x,t)_1$")
+# plt.plot(t_eval/T, totalCurrentAtShake2, label=r"$\sum_x j(x,t)_2$")
+# plt.xlabel("t/T")
+# plt.legend()
+# plt.title("total probability current at shake [45:47]", y=1.02)
+# plt.show()
+
+
+# fig, ax = plt.subplots(figsize = (12,8))
+# plt.plot(t_eval/T, totalCurrentBelowShake1, label=r"$\sum_x j(x,t)_1$")
+# plt.plot(t_eval/T, totalCurrentBelowShake2, label=r"$\sum_x j(x,t)_2$")
+# plt.xlabel("t/T")
+# plt.legend()
+# plt.title("total probability current below shake [47:]", y=1.02)
+# plt.show()
+
 
 
 
