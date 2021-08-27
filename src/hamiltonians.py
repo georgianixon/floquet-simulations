@@ -122,6 +122,14 @@ def HT_StepFunc(N, centre, a, omega,  phi, onsite,  t):
         matrix[i, i] = a*cos(omega*t + phi)
     return matrix
 
+def HT_StepFuncGen(N, centres, aas, omegas,  phis, onsites,  t):
+    H = H_0(N)
+    for centre, a, omega, phi, onsite in zip(centres, aas, omegas, phis, onsites):
+        for i in range(centre, N):
+            H[i, i] = H[i,i] + a*cos(omega*t + phi) + onsite
+    return H
+
+
 """
 No energy offset
 """
@@ -164,6 +172,9 @@ def F_Circle(t, psi, N, centre, a, omega,phi,  onsite):
     return -1j*np.dot(HT_Circle(N, centre, a, omega,  phi,  onsite, t), psi)
 
 def F_StepFunc(t, psi, N, centre, a, omega, phi, onsite):
+    return -1j*np.dot(HT_StepFunc(N, centre, a, omega, phi, onsite, t), psi)
+
+def F_StepFuncGen(t, psi, N, centres, aas, omegas, phis, onsites):
     return -1j*np.dot(HT_StepFunc(N, centre, a, omega, phi, onsite, t), psi)
 
 def F_TS(t, psi, N, centre, a, omega, phi, onsite):
