@@ -44,7 +44,8 @@ def GetEvalsAndEvecs(HF):
     if np.all((np.round(np.imag(evals),7) == 0)) == True:
         return np.real(evals), evecs
     else:
-        print('evals are imaginary!')
+        x =  evals[np.argsort(np.imag(evals))[0]]
+        print('evals are imaginary! e.g.', f"{x:.3}")
         return evals, evecs
 
     
@@ -175,7 +176,7 @@ def F_StepFunc(t, psi, N, centre, a, omega, phi, onsite):
     return -1j*np.dot(HT_StepFunc(N, centre, a, omega, phi, onsite, t), psi)
 
 def F_StepFuncGen(t, psi, N, centres, aas, omegas, phis, onsites):
-    return -1j*np.dot(HT_StepFunc(N, centre, a, omega, phi, onsite, t), psi)
+    return -1j*np.dot(HT_StepFuncGen(N, centres, aas, omegas,  phis, onsites,  t), psi)
 
 def F_TS(t, psi, N, centre, a, omega, phi, onsite):
     return -1j*np.dot(HT_TS(N, centre, a, omega, phi, onsite, t), psi)
@@ -205,6 +206,14 @@ def ConvertComplex(s):
 
 def RoundComplex(num, dp):
     return np.round(num.real, dp) + np.round(num.imag, dp) * 1j
+
+# import math
+
+# def SigFig(x, digits=6):
+#     if x == 0 or not math.isfinite(x):
+#         return x
+#     digits -= math.ceil(math.log10(np.real(x)))
+#     return np.round(x, digits)
 
 def SolveSchrodingerGeneral(N,centre,func,params, tspan, nTimesteps, psi0, circleBoundary = 0):
     
@@ -254,6 +263,16 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
             atol=rtol, t_eval=t_eval,
             method='RK45')
          sol=sol.y
+    
+    elif form == "StepFuncGen":
+        # NB: centre, a, omega, phi and onsite are lists of at least one object
+         sol = solve_ivp(lambda t,psi: F_StepFuncGen(t, psi, 
+                                                  N, centre, a, omega, phi, onsite),
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+         sol=sol.y
+        
     
     if form == "TS-p":
         sol = solve_ivp(lambda t,psi: F_TS(t, psi, 
@@ -323,20 +342,17 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
 
 
 
-def CreateHF(form, rtol, N, centre, a, omega, phi): 
+def CreateHF(form, rtol, N, centre, a, omega, phi, onsite): 
 
-    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p", "StepFunc"])
-    if form == "DS-p" or form =="SSDF-p":
-        T = 2*pi/omega[0]
-    else:
-        T=2*pi/omega
+    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p", "StepFunc", "StepFuncGen"])
+    T = 2*pi/np.min(omega)
     tspan = (0,T)
     UT = np.zeros([N,N], dtype=np.complex_)
     
     for A_site_start in range(N):
     #    print(A_site_start)
         psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, 100, psi0)
+        sol = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, 100, psi0, onsite)
         UT[:,A_site_start]=sol[:,-1] 
     
     # print(time.time()-start, 'seconds.')

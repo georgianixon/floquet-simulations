@@ -6,7 +6,7 @@ Created on Sat Aug 22 14:01:15 2020
 """
 
 import matplotlib as mpl
-place="Georgia Nixon"
+place="Georgia"
 from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,22 +16,6 @@ sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 from hamiltonians import CreateHF, HT_SS, hoppingHF
 from scipy.special import jn_zeros, jv
 from fractions import Fraction 
-
-# def PhiString(phi):
-#     if phi == 0:
-#         return ""
-#     elif phi == "phi":
-#         return r'+ \phi' 
-#     else:
-#         return  r'+ \pi /' + str(int(1/(phi/pi)))
-    
-# def PhiStringNum(phi):
-#     if phi == 0:
-#         return "0"
-#     elif phi == "phi":
-#         return r"$\phi$" 
-#     else:
-#         return  r"$\pi /" + str(int(1/(phi/pi))) + r"$"
     
     
 def PhiString(phi):
@@ -80,7 +64,7 @@ Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
 # common params
-N=51; centre=25;  rtol=1e-11
+N=51;   rtol=1e-11
 a = 35
 
 # form="SS-p"
@@ -94,20 +78,22 @@ a = 35
 # omegas = [omega1, omega2]
 
 
-form="StepFunc"
-a = 35
-omega = 10
-phi = 0
+form="StepFuncGen"
+centre=[ 25]
+a = [ 35]
+omega = [10]
+phi = [ 0]
+onsite = [0]
 
 
-UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi)
+UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
 #%%
 
 
-# norm = mpl.colors.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-1
-norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+norm = mpl.colors.Normalize(vmin=-1, vmax=1)
+# linthresh = 1e-1
+# norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 # 
 
 '''abs real imag'''
