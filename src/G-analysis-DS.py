@@ -46,13 +46,13 @@ def filter_duplicates(x):
             return np.nan
 
 
-def phistring(phi):
-    if phi == 0:
-        return ""
-    elif phi == "phi":
-        return r'+ \phi' 
-    else:
-        return  r'+ \pi /' + str(int(1/(phi/pi)))
+# def phistring(phi):
+#     if phi == 0:
+#         return ""
+#     elif phi == "phi":
+#         return r'+ \phi' 
+#     else:
+#         return  r'+ \pi /' + str(int(1/(phi/pi)))
     
 from fractions import Fraction 
 
@@ -150,7 +150,7 @@ apply = [np.abs, np.real, np.imag]
 omegaMin = 30
 
 form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"; paramsString = r"$a=$"+str(a)
-form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
+# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 # form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 
 
@@ -161,10 +161,10 @@ look ="triangle"; matrixEl = "G_{n-1, n+1}"
 look ="alpha"; matrixEl = "G_{n, n}"
 look ="tilde"; matrixEl = "G_{n, n+1}"
 look ="star"; matrixEl = "G_{n, n+2}"
-look ="beta"; matrixEl = "G_{n+1, n+1}"
-look ="rho"; matrixEl = "G_{n+1, n+2}"
-look ="epsilon";  matrixEl = "G_{n+1, n+3}"
-look ="delta";  matrixEl = "G_{n+2, n+2}"
+# look ="beta"; matrixEl = "G_{n+1, n+1}"
+# look ="rho"; matrixEl = "G_{n+1, n+2}"
+# look ="epsilon";  matrixEl = "G_{n+1, n+3}"
+# look ="delta";  matrixEl = "G_{n+2, n+2}"
 
 
 labels = [r"$|" +matrixEl+"|$", 

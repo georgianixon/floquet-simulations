@@ -131,6 +131,9 @@ def HT_StepFuncGen(N, centres, aas, omegas,  phis, onsites,  t):
     return H
 
 
+
+
+
 """
 No energy offset
 """
@@ -153,6 +156,58 @@ def HT_General(N, centres, funcs, paramss, circleBoundary, t):
             H[centres[i],centres[i]] = func(paramss[i], t)
     return H
 
+"""Moving phases"""
+
+def H_0_T(N, centre, t):
+    omega = 0.01*2*pi #want omega = 2\pi / J and J is 1
+    H = np.zeros((N, N), dtype=np.complex128)
+    H = H + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
+    H[centre][centre-1] = -exp(1j*omega*t)
+    H[centre-1][centre] = -exp(-1j*omega*t)
+    H[centre+1][centre] = -exp(-1j*omega*t)
+    H[centre][centre+1]= -exp(1j*omega*t)
+    assert(np.all(0 == (np.conj(H.T) -H)))
+    return H
+
+"""
+Time independent Hamiltonians
+"""
+
+def H_PhasesOnLoopsOneD(N, centre, p0, p1, p2, p3, p4=0):
+    H = np.zeros((N,N), dtype = np.complex128)
+    H = H + H_0(N)
+    for i in range(centre-2, centre+3):
+        H[i,i] = -exp(1j*p0)
+    for i in range(centre-2, centre+2):
+        #hopping
+        H[i, i+1] = -exp(1j*p1)
+        H[i+1,i] = -exp(-1j*p1)
+    for i in range(centre-2, centre+1):
+        #NNN hopping
+        H[i, i+2] = -exp(1j*p2)
+        H[i+2,i] = -exp(-1j*p2)
+    for i in range(centre-2, centre):
+        H[i, i+3] = -exp(1j*p3)
+        H[i+3,i] = -exp(-1j*p3)
+    for i in range(centre-2, centre-1):
+        H[i, i+4] = -exp(1j*p4)
+        H[i+4,i] = -exp(-1j*p4)
+    return H
+
+
+def H_0_Phases(N, centre, el):
+    H = np.zeros((N, N), dtype=np.complex128)
+    H = H + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
+    H[centre][centre-1] = -exp(1j*el)
+    H[centre-1][centre] = -exp(-1j*el)
+    H[centre+1][centre] = -exp(-1j*el)
+    H[centre][centre+1]= -exp(1j*el)
+    assert(np.all(0 == (np.conj(H.T) -H)))
+    return H
+
+
+
+
 
 """
 Functions to Solve Schrodinger eq
@@ -161,33 +216,42 @@ Functions to Solve Schrodinger eq
 
 # one site cosine 
 def F_SS(t, psi, N, centre, a, omega, phi, onsite):
-    return -1j*np.dot(HT_SS(N, centre, a, omega, phi, onsite, t), psi)
+    H = HT_SS(N, centre, a, omega, phi, onsite, t)
+    return -1j*np.dot(H, psi)
 
 def F_DS(t, psi, N, centre, a, omega1, omega2, phi1, phi2, onsite1, onsite2):
-    return -1j*np.dot(HT_DS(N, centre, a, omega1, omega2, phi1, phi2, onsite1, onsite2, t), psi)
+    H = HT_DS(N, centre, a, omega1, omega2, phi1, phi2, onsite1, onsite2, t)
+    return -1j*np.dot(H, psi)
 
 def F_SSDF(t, psi, N, centre, a, omega1, omega2, phi1, phi2, onsite):
-    return -1j*np.dot(HT_SSDF(N, centre, a, omega1, omega2, phi1, phi2, onsite, t), psi)
+    H = HT_SSDF(N, centre, a, omega1, omega2, phi1, phi2, onsite, t)
+    return -1j*np.dot(H, psi)
 
 def F_Circle(t, psi, N, centre, a, omega,phi,  onsite):
-    return -1j*np.dot(HT_Circle(N, centre, a, omega,  phi,  onsite, t), psi)
+    H = HT_Circle(N, centre, a, omega,  phi,  onsite, t)
+    return -1j*np.dot(H, psi)
 
 def F_StepFunc(t, psi, N, centre, a, omega, phi, onsite):
-    return -1j*np.dot(HT_StepFunc(N, centre, a, omega, phi, onsite, t), psi)
+    H = HT_StepFunc(N, centre, a, omega, phi, onsite, t)
+    return -1j*np.dot(H, psi)
 
 def F_StepFuncGen(t, psi, N, centres, aas, omegas, phis, onsites):
-    return -1j*np.dot(HT_StepFuncGen(N, centres, aas, omegas,  phis, onsites,  t), psi)
+    H = HT_StepFuncGen(N, centres, aas, omegas,  phis, onsites,  t)
+    return -1j*np.dot(H, psi)
 
 def F_TS(t, psi, N, centre, a, omega, phi, onsite):
-    return -1j*np.dot(HT_TS(N, centre, a, omega, phi, onsite, t), psi)
+    H = HT_TS(N, centre, a, omega, phi, onsite, t)
+    return -1j*np.dot(H, psi)
 
 # linear moving potential
 def F_Linear(t, psi, N, a, omega, phi):
-    return -1j*np.dot(HT_Linear(N, a, omega, t, phi), psi)
+    H = HT_Linear(N, a, omega, t, phi)
+    return -1j*np.dot(H, psi)
 
 # no energy offset at all
 def F_0(t, psi, N):
-    return -1j*np.dot(H_0(N), psi)
+    H = H_0(N)
+    return -1j*np.dot(H, psi)
 
 
 def F_HF(t, psi, HF):
@@ -196,6 +260,11 @@ def F_HF(t, psi, HF):
 def F_General(t, psi, N, centre, func, params, circleBoundary):
     H = HT_General(N, centre, func, params, circleBoundary, t)
     return -1j*np.dot(H, psi)
+
+def F_0_T(t, psi, N, centre):
+    H = H_0_T(N, centre, t)
+    return -1j*np.dot(H, psi)
+
 
 
 def ConvertComplex(s):
@@ -325,6 +394,12 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
             method='RK45')
         sol=sol.y
         
+    elif form == "H0T":
+        sol = solve_ivp(lambda t,psi: F_0_T(t, psi, 
+                                N, centre), 
+                t_span=tspan, y0=psi0, rtol=rtol, 
+                atol=rtol, t_eval=t_eval,
+                method='RK45')    
         
     elif form == 'numericalG-SS-p':
         #get numerically calculated effective Hamiltonian
@@ -336,11 +411,25 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
         sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
         sol = np.vstack(sol).T
         
+    
+        
         
     return sol
 
 
+def SolveSchrodingerTimeIndependent(hamiltonian, tspan, nTimesteps, psi0):
+    t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
+    #diagonalise hamiltonian
+    evals, evecs = GetEvalsAndEvecs(hamiltonian)
+    coeffs =  np.dot(np.conj(evecs.T), psi0)
+    sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
+    sol = np.vstack(sol).T
+    return sol
+    
+A = np.array([[1,0],[50,99]])
+psi = np.array([1, 1j])
 
+X = np.dot(A, psi)
 
 def CreateHF(form, rtol, N, centre, a, omega, phi, onsite): 
 

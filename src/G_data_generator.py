@@ -122,12 +122,12 @@ centre=25;
 form='SS-p' 
 
 rtol = 1e-11
-a1 = 35
-a2 = 35
+a = 500
 # phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
-phis = [ pi/6, pi/5, pi/4,  pi/3, pi/2, 0]
-phiOffset = pi/2
-omegaMultiplier = 2
+phis = [ pi/5, pi/4,  pi/3, pi/2, 0]
+phiOffset = 0
+omegaMultiplier = 0
+onsite = 0
 
 
 
@@ -140,7 +140,7 @@ omegaMultiplier = 2
 
 
 for phi in phis:
-    print('a1=',a1,'  phi=',phi)
+    print('a=',a,'  phi=',phi)
     df1 = pd.DataFrame(columns=["form", "rtol", "N", 
                                 "a1", 
                                 "a2",
@@ -159,7 +159,7 @@ for phi in phis:
                                 "rho",
                                 "epsilon",
                                 "delta"])
-    for i, omega1 in enumerate(np.linspace(20.1, 100, 80*10, endpoint=True)):
+    for i, omega1 in enumerate(np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)):
         
         start = time.time()
         
@@ -167,21 +167,21 @@ for phi in phis:
         print(omega1)
         
         if form == "SS-p":
-            aInput = a1
+            aInput = a
             omegaInput = omega1
             phiInput = phi
+            onsiteInput = onsite
             
-        elif form =="DS-p" or form == "SSDF-p":
-            omega2 = omegaMultiplier*omega1
-            aInput = [a1,a2]
-            omegaInput = [omega1,omega2]
-            phiInput = [phi, phi+phiOffset]
+        # elif form =="DS-p" or form == "SSDF-p":
+        #     omega2 = omegaMultiplier*omega1
+        #     aInput = [a1,a2]
+        #     omegaInput = [omega1,omega2]
+        #     phiInput = [phi, phi+phiOffset]
 
         # calculate effective Hamiltonian 
-        UT, HF = CreateHF(form, rtol, N, centre, aInput, omegaInput, phiInput)
+        UT, HF = CreateHF(form, rtol, N, centre, aInput, omegaInput, phiInput, onsiteInput)
         
-#            R = RGaugeMatrix(N, centre, a, omega, phi)
-#            HF = np.dot(np.conj(R.T), np.dot(HF, R))
+
         
         # log matrix elements
         square = HF[centre-2][centre]
@@ -202,8 +202,8 @@ for phi in phis:
         df1.loc[i] = [form, 
                       rtol,
                       N,
-                      a1,
-                      a2,
+                      a,
+                      0,
                       omega1,
                       omegaMultiplier,
                       phi,

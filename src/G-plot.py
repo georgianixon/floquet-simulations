@@ -6,7 +6,7 @@ Created on Sat Aug 22 14:01:15 2020
 """
 
 import matplotlib as mpl
-place="Georgia"
+place="Georgia Nixon"
 from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
@@ -65,7 +65,6 @@ Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 
 # common params
 N=51;   rtol=1e-11
-a = 35
 
 # form="SS-p"
 # phi1 = pi/4
@@ -78,12 +77,12 @@ a = 35
 # omegas = [omega1, omega2]
 
 
-form="StepFuncGen"
-centre=[ 25]
-a = [ 35]
-omega = [10]
-phi = [ 0]
-onsite = [0]
+form="SS-p"
+centre=25
+a = 150
+omega = 4
+phi = 0
+onsite = 0
 
 
 UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
@@ -112,7 +111,7 @@ fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layou
                        figsize=(sz,sz/2))
 
 for n1, f in enumerate(apply):
-    pcm = ax[n1].matshow(f(HF), interpolation='none', cmap='PuOr',  norm=norm)
+    pcm = ax[n1].matshow(f(HPhasesFlip), interpolation='none', cmap='PuOr',  norm=norm)
     ax[n1].set_title(labels[n1])
     ax[n1].tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
       labeltop=False)  
