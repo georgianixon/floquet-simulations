@@ -429,7 +429,7 @@ aSiteStart1 = 100; aSiteStart2 = 110
 psi01 = np.zeros(N, dtype=np.complex_); psi01[aSiteStart1] = 1;
 psi02 = np.zeros(N, dtype=np.complex_); psi02[aSiteStart2] = 1;
 p0 = pi/7; p1 = pi/3; p2 = pi/2; p3 = pi/4
-HPhases = H_PhasesOnLoopsOneD(N, centre, 0, pi/4, pi/4, pi/4, p4=pi/(sqrt(3)))
+HPhases = H_PhasesOnLoopsOneD(N, centre, 1, pi/4, pi/4, 0, p4=pi/(sqrt(3)))
 
 # HPhasesFlip = np.flip(np.flip(HPhases, 0).T, 0)
 

@@ -177,7 +177,7 @@ def H_PhasesOnLoopsOneD(N, centre, p0, p1, p2, p3, p4=0):
     H = np.zeros((N,N), dtype = np.complex128)
     H = H + H_0(N)
     for i in range(centre-2, centre+3):
-        H[i,i] = -exp(1j*p0)
+        H[i,i] =  p0 # this cannot be complex otherwise it will not be hermitian
     for i in range(centre-2, centre+2):
         #hopping
         H[i, i+1] = -exp(1j*p1)
