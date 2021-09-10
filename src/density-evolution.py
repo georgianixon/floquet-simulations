@@ -16,7 +16,7 @@ sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 from hamiltonians import SolveSchrodinger, SolveSchrodingerGeneral, SolveSchrodingerTimeIndependent
 from hamiltonians import  PhiString
 
-from hamiltonians import H_PhasesOnLoopsOneD
+from hamiltonians import H_PhasesOnLoopsOneD, H_0, H_0_Phases
 
 import matplotlib as mpl
 import seaborn as sns
@@ -429,7 +429,9 @@ aSiteStart1 = 100; aSiteStart2 = 110
 psi01 = np.zeros(N, dtype=np.complex_); psi01[aSiteStart1] = 1;
 psi02 = np.zeros(N, dtype=np.complex_); psi02[aSiteStart2] = 1;
 p0 = pi/7; p1 = pi/3; p2 = pi/2; p3 = pi/4
-HPhases = H_PhasesOnLoopsOneD(N, centre, 1, pi/4, pi/4, 0, p4=pi/(sqrt(3)))
+# HPhases = H_PhasesOnLoopsOneD(N, centre, 0, pi/3, pi/4, np.nan,np.nan)
+HPhases = H_0_Phases(N, [99, 107, 120, 140], [pi/4, pi/3, pi/7, pi/sqrt(3)])
+H0 = H_0(N)
 
 # HPhasesFlip = np.flip(np.flip(HPhases, 0).T, 0)
 
@@ -442,7 +444,7 @@ t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 
 
 psi1 = SolveSchrodingerTimeIndependent(HPhases, tspan, nTimesteps, psi01)
-psi2 = SolveSchrodingerTimeIndependent(HPhases, tspan, nTimesteps, psi02)
+psi2 = SolveSchrodingerTimeIndependent(H0, tspan, nTimesteps, psi01)
 
 pMax = np.max(np.abs(np.vstack((psi1, psi2))))
 pMin = np.min(np.vstack((np.real(np.vstack((psi1, psi2))), np.imag(np.vstack((psi1, psi2))))))
@@ -459,7 +461,7 @@ PlotPsi(psi1, x_positions, x_labels, r"title",
       normaliser)
 
 #flip one
-psi2 = np.flip(psi2, axis=0)
+# psi2 = np.flip(psi2, axis=0)
 
 PlotPsi(psi2, x_positions, x_labels,   r"title",
       normaliser)
@@ -523,19 +525,19 @@ psiDiffAtShake = np.sum(psiDiffAtShake, axis=0)
 
 fig, ax = plt.subplots(figsize = (12,8))
 plt.plot(t_eval/T, psiOverallDiffAboveBorder)
-plt.title("Psi Diff Above Border [:45]", y=1.02)
+plt.title("Psi Diff Above Border [:"+str(centre)+"]", y=1.02)
 plt.show()
 
 
 fig, ax = plt.subplots(figsize = (12,8))
 plt.plot(t_eval/T, psiDiffAtShake)
-plt.title("Psi Diff At Shake [45:48]", y=1.02)
+plt.title("Psi Diff At Shake ["+str(centre)+"]", y=1.02)
 plt.show()
 
 
 fig, ax = plt.subplots(figsize = (12,8))
 plt.plot(t_eval/T, psiOverallDiffBelowBorder)
-plt.title("Psi Diff Below Border [48:]", y=1.06)
+plt.title("Psi Diff Below Border ["+str(centre)+":]", y=1.06)
 plt.show()
 
 # fig, ax = plt.subplots(figsize = (12,8))

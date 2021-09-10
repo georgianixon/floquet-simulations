@@ -179,29 +179,34 @@ def H_PhasesOnLoopsOneD(N, centre, p0, p1, p2, p3, p4=0):
     for i in range(centre-2, centre+3):
         H[i,i] =  p0 # this cannot be complex otherwise it will not be hermitian
     for i in range(centre-2, centre+2):
-        #hopping
-        H[i, i+1] = -exp(1j*p1)
-        H[i+1,i] = -exp(-1j*p1)
+        if not np.isnan(p1):
+            #hopping
+            H[i, i+1] = -exp(1j*p1)
+            H[i+1,i] = -exp(-1j*p1)
     for i in range(centre-2, centre+1):
-        #NNN hopping
-        H[i, i+2] = -exp(1j*p2)
-        H[i+2,i] = -exp(-1j*p2)
+        if not np.isnan(p2):
+            #NNN hopping
+            H[i, i+2] = -exp(1j*p2)
+            H[i+2,i] = -exp(-1j*p2)
     for i in range(centre-2, centre):
-        H[i, i+3] = -exp(1j*p3)
-        H[i+3,i] = -exp(-1j*p3)
+        if not np.isnan(p3):
+            H[i, i+3] = -exp(1j*p3)
+            H[i+3,i] = -exp(-1j*p3)
     for i in range(centre-2, centre-1):
-        H[i, i+4] = -exp(1j*p4)
-        H[i+4,i] = -exp(-1j*p4)
+        if not np.isnan(p4):
+            H[i, i+4] = -exp(1j*p4)
+            H[i+4,i] = -exp(-1j*p4)
     return H
 
 
-def H_0_Phases(N, centre, el):
+def H_0_Phases(N, centres, els):
     H = np.zeros((N, N), dtype=np.complex128)
-    H = H + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
-    H[centre][centre-1] = -exp(1j*el)
-    H[centre-1][centre] = -exp(-1j*el)
-    H[centre+1][centre] = -exp(-1j*el)
-    H[centre][centre+1]= -exp(1j*el)
+    H = H + H_0(N)
+    for centre, el in zip(centres, els):
+        H[centre][centre-1] = -exp(1j*el)
+        H[centre-1][centre] = -exp(-1j*el)
+        # H[centre+1][centre] = -exp(-1j*el)
+        # H[centre][centre+1]= -exp(1j*el)
     assert(np.all(0 == (np.conj(H.T) -H)))
     return H
 
