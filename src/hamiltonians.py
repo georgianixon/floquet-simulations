@@ -14,7 +14,8 @@ from scipy.special import jv, jn_zeros
 import pandas as pd
 
 
-from scipy.linalg import eig as eig
+from scipy.linalg import eig 
+from scipy.linalg import eigh 
 from scipy.linalg import expm
 
 def GetEvalsAndEvecs(HF):
@@ -48,6 +49,8 @@ def GetEvalsAndEvecs(HF):
         print('evals are imaginary! e.g.', f"{x:.3}")
         return evals, evecs
 
+
+    
     
     
 def getevalsandevecs(HF):

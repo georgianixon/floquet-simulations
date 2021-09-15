@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -22,7 +22,7 @@ from numpy import sin, cos, exp, pi
 
 import sys
 sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
-from hamiltonians import  hoppingHF, ConvertComplex
+from hamiltonians import  hoppingHF, ConvertComplex, PhiString
 
 
 
@@ -45,26 +45,6 @@ def filter_duplicates(x):
         else:
             return np.nan
 
-
-# def phistring(phi):
-#     if phi == 0:
-#         return ""
-#     elif phi == "phi":
-#         return r'+ \phi' 
-#     else:
-#         return  r'+ \pi /' + str(int(1/(phi/pi)))
-    
-from fractions import Fraction 
-
-def PhiString(phi):
-    fraction = phi/pi
-    fraction = Fraction(fraction).limit_denominator(100)
-    numerator = fraction.numerator
-    denominator = fraction.denominator
-    if numerator ==1:
-        return r"\pi /"+str(denominator)
-    else:
-        str(numerator)+r"\pi / "+str(denominator)
     
     
     
@@ -147,20 +127,22 @@ phi1s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phiOffset = pi/2
 omegaMultiplier = 2
 apply = [np.abs, np.real, np.imag]
-omegaMin = 30
+omegaMax = 100
+omegaMin = 50
+ymax = 0.02
 
 form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"; paramsString = r"$a=$"+str(a)
 # form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 # form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 
 
-look = "square"; matrixEl = "G_{n-2, n}"
-look ="chi"; matrixEl = "G_{n-1, n-1}"
-look ="gamma"; matrixEl = "G_{n-1, n}"
-look ="triangle"; matrixEl = "G_{n-1, n+1}"
-look ="alpha"; matrixEl = "G_{n, n}"
+# look = "square"; matrixEl = "G_{n-2, n}"
+# look ="chi"; matrixEl = "G_{n-1, n-1}"
+# look ="gamma"; matrixEl = "G_{n-1, n}"
+# look ="triangle"; matrixEl = "G_{n-1, n+1}"
+# look ="alpha"; matrixEl = "G_{n, n}"
 look ="tilde"; matrixEl = "G_{n, n+1}"
-look ="star"; matrixEl = "G_{n, n+2}"
+# look ="star"; matrixEl = "G_{n, n+2}"
 # look ="beta"; matrixEl = "G_{n+1, n+1}"
 # look ="rho"; matrixEl = "G_{n+1, n+2}"
 # look ="epsilon";  matrixEl = "G_{n+1, n+3}"
@@ -197,7 +179,8 @@ for nc, phi1 in enumerate(phi1s):
         
     if not df_plot.empty:
         df_plot = df_plot.sort_values(by=['omega1'])
-        df_plot = df_plot[df_plot["omega1"] < omegaMin]
+        df_plot = df_plot[df_plot["omega1"] < omegaMax]
+        df_plot = df_plot[df_plot["omega1"] > omegaMin]
         
         for n1, f in enumerate(apply):
             ax[n1].plot(df_plot['omega1'], f(df_plot[look].values), 
@@ -216,12 +199,12 @@ for nc, phi1 in enumerate(phi1s):
 handles_legend, labels_legend = ax[1].get_legend_handles_labels()    
 fig.legend(handles_legend, labels_legend, loc='upper right')
 plt.grid(True)
+# ax[0].set_ylim([None, ymax])
 fig.suptitle(""
              + form +r";  "+hamiltonianString+"\n"
              +paramsString
               # +", "+r"$a_2=$"+str(a2)
              , y=1.2)
-             
 plt.show()
 
 
