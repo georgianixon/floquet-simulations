@@ -15,7 +15,7 @@ import pandas as pd
 import time
 import sys
 sys.path.append('/Users/'+place+'/Code/MBQD/floquet-simulations/src')
-from hamiltonians import  CreateHF, SolveSchrodinger
+from hamiltonians import  CreateHF, SolveSchrodinger, ConvertComplex
 
 
 def filter_duplicates(x):
@@ -37,9 +37,6 @@ def filter_duplicates(x):
         else:
             return np.nan
         
-
-def ConvertComplex(s):
-    return np.complex128(s.replace('i', 'j').replace('*I', 'j').replace('*^', 'e'))
 
 sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
 dfname = "data/analysis-G.csv"
@@ -116,7 +113,7 @@ df = pd.read_csv(sh+dfname,
 
 #%%
 
- # need tp dp 1e-6 phi = 0
+# need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
 form='SS-p' 

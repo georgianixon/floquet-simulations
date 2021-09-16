@@ -455,7 +455,7 @@ def CreateHF(form, rtol, N, centre, a, omega, phi, onsite):
     # print(time.time()-start, 'seconds.')
     
     # evals_U, evecs = eig(UT)
-    evals_U, evecs = GetEvalsAndEvecs(UT)
+    evals_U, evecs = GetEvalsAndEvecs(UT) #evals can be imaginary
     evals_H = 1j / T *log(evals_U)
     
     HF = np.zeros([N,N], dtype=np.complex_)
