@@ -6,7 +6,7 @@ Created on Thu Sep 16 16:30:56 2021
 """
 
 
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -96,7 +96,7 @@ dfname = "data/analysis-G.csv"
 
 df = pd.read_csv(sh+dfname, 
                  index_col=False, 
-                 converters={"square": ConvertComplex,
+                 converters={"G": ConvertComplex,
                             "chi": ConvertComplex,
                             "gamma": ConvertComplex,
                             "triangle": ConvertComplex,
