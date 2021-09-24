@@ -148,40 +148,42 @@ omegaMax = 100
 omegaMin = 6
 ymax = 1
 ymin = 0
-form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
-# form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
+# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
+form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
 # form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 # form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 
 
-termsDict = [("O-3", "G_{n-3, n-3}"),
+termsDict = [ 
+    # ("O-3", "G_{n-3, n-3}"),
             ("O-2","G_{n-2, n-2}"),
             ("O-1","G_{n-1, n-1}"),
             ("O","G_{n, n}"),
             ("O+1","G_{n+1, n+1}"),
             ("O+2","G_{n+2, n+2}"),
-            ("O+3","G_{n+3, n+3}"),
-            ("N1-3","G_{n-3, n-2}"),
+            # ("O+3","G_{n+3, n+3}"),
+            # ("N1-3","G_{n-3, n-2}"),
             ("N1-2","G_{n-2, n-1}"),
             ("N1-1","G_{n-1, n}"),
             ("N1+1","G_{n, n+1}"),
             ("N1+2","G_{n+1, n+2}"),
-            ("N1+3","G_{n+2, n+3}"),
-            ("N2-2","G_{n-3, n-1}"),
+            # ("N1+3","G_{n+2, n+3}"),
+            # ("N2-2","G_{n-3, n-1}"),
             ("N2-1","G_{n-2, n}"),
             ("N2","G_{n-1, n+1}"),
             ("N2+1","G_{n, n+2}"),
-            ("N2+2","G_{n+1, n+3}"),
-            ("N3-2","G_{n-3, n}"),
+            # ("N2+2","G_{n+1, n+3}"),
+            # ("N3-2","G_{n-3, n}"),
             ("N3-1", "G_{n-2, n+1}"),
             ("N3+1", "G_{n-1, n+2}"),
-            ("N3+2","G_{n, n+3}"),
-            ("N4-1","G_{n-3, n+1}"),
+            # ("N3+2","G_{n, n+3}"),
+            # ("N4-1","G_{n-3, n+1}"),
             ("N4","G_{n-2, n+2}"),
-            ("N4+1","G_{n-1, n+3}"),
-            ("N5-1","G_{n-3, n+2}"),
-            ("N5+1","G_{n-2, n+3}"),
-            ("N6", "G_{n-3, n+3}")]
+            # ("N4+1","G_{n-1, n+3}"),
+            # ("N5-1","G_{n-3, n+2}"),
+            # ("N5+1","G_{n-2, n+3}"),
+            # ("N6", "G_{n-3, n+3}")
+            ]
              
 # look = "O-3"; matrixEl = "G_{n-3, n-3}"
 # look = "O-2"; matrixEl = "G_{n-2, n-2}"
