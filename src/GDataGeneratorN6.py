@@ -42,79 +42,80 @@ sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
 dfname = "data/analysis-G-N6.csv"
 
 
-df = pd.DataFrame(columns=["form", "rtol","N", 
-                            "a", 
-                            "omega", 
-                            "phi", 
-                            "onsite",
-                            "O-3",
-                            "O-2",
-                            "O-1",
-                            "O",
-                            "O+1",
-                            "O+2",
-                            "O+3",
-                            "N1-3",
-                            "N1-2",
-                            "N1-1",
-                            "N1+1",
-                            "N1+2",
-                            "N1+3",
-                            "N2-2",
-                            "N2-1",
-                            "N2",
-                            "N2+1",
-                            "N2+2",
-                            "N3-2",
-                            "N3-1",
-                            "N3+1",
-                            "N3+2",
-                            "N4-1",
-                            "N4",
-                            "N4+1",
-                            "N5-1",
-                            "N5+1",
-                            "N6"])
+# df = pd.DataFrame(columns=["form", "rtol","N", 
+#                            "centre",
+#                             "a", 
+#                             "omega", 
+#                             "phi", 
+#                             "onsite",
+#                             "O-3",
+#                             "O-2",
+#                             "O-1",
+#                             "O",
+#                             "O+1",
+#                             "O+2",
+#                             "O+3",
+#                             "N1-3",
+#                             "N1-2",
+#                             "N1-1",
+#                             "N1+1",
+#                             "N1+2",
+#                             "N1+3",
+#                             "N2-2",
+#                             "N2-1",
+#                             "N2",
+#                             "N2+1",
+#                             "N2+2",
+#                             "N3-2",
+#                             "N3-1",
+#                             "N3+1",
+#                             "N3+2",
+#                             "N4-1",
+#                             "N4",
+#                             "N4+1",
+#                             "N5-1",
+#                             "N5+1",
+#                             "N6"])
     
-df.to_csv(sh+dfname,
-                    index=False, 
-                    columns=['form', 'rtol', 'N', 
-                            'a',
-                            "omega", 
-                            "phi",
-                            "onsite",
-                            "O-3",
-                            "O-2",
-                            "O-1",
-                            "O",
-                            "O+1",
-                            "O+2",
-                            "O+3",
-                            "N1-3",
-                            "N1-2",
-                            "N1-1",
-                            "N1+1",
-                            "N1+2",
-                            "N1+3",
-                            "N2-2",
-                            "N2-1",
-                            "N2",
-                            "N2+1",
-                            "N2+2",
-                            "N3-2",
-                            "N3-1",
-                            "N3+1",
-                            "N3+2",
-                            "N4-1",
-                            "N4",
-                            "N4+1",
-                            "N5-1",
-                            "N5+1",
-                            "N6"]
-                    )
+# df.to_csv(sh+dfname,
+#                     index=False, 
+#                     columns=['form', 'rtol', 'N', "centre",
+#                             'a',
+#                             "omega", 
+#                             "phi",
+#                             "onsite",
+#                             "O-3",
+#                             "O-2",
+#                             "O-1",
+#                             "O",
+#                             "O+1",
+#                             "O+2",
+#                             "O+3",
+#                             "N1-3",
+#                             "N1-2",
+#                             "N1-1",
+#                             "N1+1",
+#                             "N1+2",
+#                             "N1+3",
+#                             "N2-2",
+#                             "N2-1",
+#                             "N2",
+#                             "N2+1",
+#                             "N2+2",
+#                             "N3-2",
+#                             "N3-1",
+#                             "N3+1",
+#                             "N3+2",
+#                             "N4-1",
+#                             "N4",
+#                             "N4+1",
+#                             "N5-1",
+#                             "N5+1",
+#                             "N6"]
+#                     )
 
 #%%
-df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int,
+df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int, "centre":int,
                  'a':np.float64, 
                  'omega':np.float64, 
                  'phi':np.float64,
@@ -187,10 +188,10 @@ df = pd.read_csv(sh+dfname,
 # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form='SS-p' 
+form="StepFunc"#'SS-p' 
 
 rtol = 1e-11
-a = 15
+a = 25
 phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 onsite = 0
 omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
@@ -199,7 +200,7 @@ omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
 
 for phi in phis:
     print('a=',a,'  phi=',phi)
-    df1 = pd.DataFrame(columns=["form", "rtol", "N", 
+    df1 = pd.DataFrame(columns=["form", "rtol", "N", "centre",
                                 "a",
                                 "omega",
                                 "phi",
@@ -239,7 +240,7 @@ for phi in phis:
         omega1 = round(omega1, 1)
         print(omega1)
         
-        if form == "SS-p":
+        if form == "SS-p" or form == "StepFunc":
             aInput = a
             omegaInput = omega1
             phiInput = phi
@@ -298,6 +299,7 @@ for phi in phis:
         df1.loc[i] = [form, 
                       rtol,
                       N,
+                      centre,
                       a,
                       omega1,
                       phi,
@@ -355,7 +357,7 @@ for phi in phis:
     print('   saving..')
     df.to_csv(sh+dfname,
               index=False, 
-              columns=['form', 'rtol','N',
+              columns=['form', 'rtol','N', "centre",
                        'a', 
                        'omega', 
                        'phi',
