@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import sys
 sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
-from hamiltonians import CreateHF, HT_SS, hoppingHF
+from hamiltonians import CreateHF, HT_SS, hoppingHF, GetEvalsAndEvecs
 from scipy.special import jn_zeros, jv
 from fractions import Fraction 
     
@@ -86,6 +86,8 @@ onsite = 0
 
 
 UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
+
+HFevals, HFevecs = GetEvalsAndEvecs(HF)
 
 #%%
 
@@ -172,6 +174,9 @@ fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
 #fig.savefig('', 
 #        format='pdf', bbox_inches='tight')
 plt.show()
+
+#%%
+
 
 
 

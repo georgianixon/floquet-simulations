@@ -141,15 +141,15 @@ centre = 25
 
 rtol=1e-11
 aas = [25]
-# phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phis =  [0]
+phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+# phis =  [pi/7]
 apply = [np.abs, np.real, np.imag]
 omegaMax = 100
 omegaMin = 6
-ymax = 0.2
+ymax = 1
 ymin = 0
-# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
-form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
+form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
+# form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
 # form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 # form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 
@@ -235,7 +235,7 @@ for look, matrixEl in termsDict:
     for a in aas:
     
         for nc, phi in enumerate(phis):
-            if form == "SS-p":
+            if form == "SS-p" or form =="StepFunc":
                 df_plot = df[(df['form']==form)&
                          (df['N']==N)&
                           (df['a']==a)&
