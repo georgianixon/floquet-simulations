@@ -187,11 +187,11 @@ df = pd.read_csv(sh+dfname,
 
 # need tp dp 1e-6 phi = 0
 N = 51; 
-centre=25;
+centre=35;
 form="StepFunc"#'SS-p' 
 
 rtol = 1e-11
-a = 25
+a = 35
 phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 onsite = 0
 omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)

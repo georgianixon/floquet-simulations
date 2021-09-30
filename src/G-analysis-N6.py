@@ -140,14 +140,14 @@ centre = 25
 
 
 rtol=1e-11
-aas = [25]
+aas = [15,25]
 phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-# phis =  [pi/7]
+phis =  [0]
 apply = [np.abs, np.real, np.imag]
 omegaMax = 100
 omegaMin = 6
-ymax = 1
-ymin = 0
+ymax = None
+ymin = None
 # form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
 form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
 # form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
@@ -184,7 +184,11 @@ termsDict = [
             # ("N5+1","G_{n-2, n+3}"),
             # ("N6", "G_{n-3, n+3}")
             ]
-             
+            
+# termsDict = [
+#             ("N1-1","G_{n-1, n}"),
+#             ("N1+1","G_{n, n+1}"),
+#             ] 
 # look = "O-3"; matrixEl = "G_{n-3, n-3}"
 # look = "O-2"; matrixEl = "G_{n-2, n-2}"
 # look = "O-1"; matrixEl = "G_{n-1, n-1}"
@@ -256,14 +260,18 @@ for look, matrixEl in termsDict:
         
                 
             if not df_plot.empty:
-                # df_plot["x-axis"] = df_plot.apply(
-                #     lambda row: row["a"]/row["omega"], axis=1)
+                df_plot["x-axis"] = df_plot.apply(
+                    lambda row: row["a"]/row["omega"], axis=1)
+                df_plot = df_plot.sort_values(by=['x-axis'])
+                
                 df_plot = df_plot.sort_values(by=['omega'])
                 df_plot = df_plot[df_plot["omega"] < omegaMax]
                 df_plot = df_plot[df_plot["omega"] > omegaMin]
                 
                 for n1, f in enumerate(apply):
-                    ax[n1].plot(df_plot["omega"], f(df_plot[look].values), 
+                    # ax[n1].plot(df_plot["omega"], f(-jv(0,a/df_plot["omega"])), label="bessel func")
+                    # ax[n1].plot(df_plot["x-axis"], f(-jv(0,df_plot["x-axis"])), label="bessel func")
+                    ax[n1].plot(df_plot["x-axis"], f(df_plot[look].values), 
                                 label=
                                     r'$\phi_1=$'+str(round(phi/pi, 2))+r'$\pi$'
                                     +", A="+str(a)
@@ -293,35 +301,7 @@ for look, matrixEl in termsDict:
 
 #%%
 
-a1 = 20
-a2 = 20
-#phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
-phi1 =0
-phiOffset = pi/2
-omegaMultiplier = 2
-omega1 = 10
-omega2 = omega1*omegaMultiplier
-phi2 = phi1+phiOffset
-T = 2*pi/omega1
-
-t = np.linspace(-2*T,2*T, 300)
-y = a1*cos(omega1*t + phi1) + a2*cos(omega2*t + phi2)
-plt.plot(t,y)
-plt.xlabel("t")
-plt.ylabel("V(t)")
-plt.show()
-
-
-                                                         
-                                                              
-                                                              
-                                                              
-#%%
-df_plot = df[(df['form']==form)].phi1.unique()
-                                                              
-                                                              
-                                                              
-                                                   
+      
                                                               
                                                               
 
