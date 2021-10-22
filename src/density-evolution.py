@@ -25,20 +25,23 @@ from fractions import Fraction
 
 sh = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/"
 
-size=25
+size=28
 params = {
-            'legend.fontsize': size*0.75,
+            'legend.fontsize': size*0.65,
           'axes.labelsize': size,
           'axes.titlesize': size,
-          'xtick.labelsize': size*0.75,
-          'ytick.labelsize': size*0.75,
+          'xtick.labelsize': size*0.65,
+          'ytick.labelsize': size*0.65,
           'font.size': size,
           'axes.edgecolor' :'white',
           'xtick.minor.visible': False,
           'axes.grid':False,
           'font.family' : 'STIXGeneral',
-          'mathtext.fontset':'stix'
+          'mathtext.fontset':'stix',
+          # "grid.alpha":1
           }
+
+
 mpl.rcParams.update(params)
 
 
@@ -880,7 +883,101 @@ plt.show()
 # plt.title("total probability current below shake [47:]", y=1.02)
 # plt.show()
 
+#%%
+"""for poaster"""
+
+
+""""Global parameters"""
+N = 91#182; 
+centre = 30#90;
+rtol=1e-11
+
+#SS-p params
+a = 35
+omega = a /jn_zeros(0,1)[0]
+phi = 0
+T = 2*pi / omega
+onsite = 0
+form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+
+
+form = "SS-p"; 
+hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; 
+paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+
+
+"""wave 1 parameters""" # for ssdf
+A_site_start1 = 40#85;
+
+
+# plot potential
+t = np.linspace(0, 4*2*pi/omega, 100)
+shake = a*cos(omega*t + phi) 
 
 
 
+"""solver params"""
+nOscillations = 30
+#how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
+nTimesteps = nOscillations*100
+n_osc_divisions = 2
+tspan = (0,nOscillations*T)
+t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 
+
+psi0_1 = np.zeros(N, dtype=np.complex_); psi0_1[A_site_start1] = 1;
+psi = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, 
+                                  tspan, nTimesteps, psi0_1, onsite)
+
+
+"""plot"""
+
+
+# normaliser = mpl.colors.Normalize(vmin=0, vmax=1)
+linthresh = 1e-2
+normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+# normaliser=mpl.colors.LogNorm(vmin=0, vmax=1.0, base=10)
+x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
+x_labels = list(range(0, nOscillations+1, n_osc_divisions))
+
+
+
+"""
+Plot Matter Wave
+"""
+
+mpl.rcParams.update({
+      'mathtext.fontset':'stix'
+      })
+
+apply = [lambda x: np.abs(x)**2]
+labels = [r'$|\psi(t)|^2$']
+
+
+cmapcol = 'PuOr' #PiYG_r
+cmap= mpl.cm.get_cmap(cmapcol)
+
+sz = 4
+fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
+                        figsize=(sz*1.7,sz))
+
+for i, f in enumerate(apply):
+    ax.matshow(f(psi), interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
+    ax.set_title(labels[i],  fontfamily='STIXGeneral')
+    ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+      labeltop=False)  
+    ax.set_xticks(x_positions)
+    ax.set_xlabel('t/T', fontfamily='STIXGeneral')
+    ax.set_xticklabels(x_labels)
+    for side in ["bottom", "top", "left", "right"]:
+        ax.spines[side].set_visible(False)
+    if i == 0:
+        ax.set_ylabel('site', fontfamily='STIXGeneral')
+
+cax = plt.axes([1.03, 0.1, 0.03, 0.8])
+fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
+# fig.suptitle(title, y = 1.2,  fontfamily='STIXGeneral')
+paper = "/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
+plt.savefig(paper + "reflection.png", dpi=700)
+
+plt.show()

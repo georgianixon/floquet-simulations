@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -51,13 +51,13 @@ def filter_duplicates(x):
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=20
+size=30
 params = {
-            'legend.fontsize': size*0.75,
+            'legend.fontsize': size*0.65,
           'axes.labelsize': size,
           'axes.titlesize': size,
-          'xtick.labelsize': size*0.75,
-          'ytick.labelsize': size*0.75,
+          'xtick.labelsize': size*0.65,
+          'ytick.labelsize': size*0.65,
           'font.size': size,
           'font.family': 'STIXGeneral',
 #          'axes.titlepad': 25,
@@ -127,8 +127,8 @@ phi1s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phiOffset = pi/2
 omegaMultiplier = 2
 apply = [np.abs, np.real, np.imag]
-omegaMax = 100
-omegaMin = 50
+omegaMax = 30
+omegaMin = 0
 ymax = 0.02
 
 form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"; paramsString = r"$a=$"+str(a)
@@ -234,11 +234,101 @@ plt.show()
                                                               
                                                               
 #%%
-df_plot = df[(df['form']==form)].phi1.unique()
+""" For poster"""
                                                               
                                                               
                                                               
-                                                   
+"""
+Plot General
+"""
+
+N = 51; 
+centre = 25
+
+
+
+rtol=1e-11
+a = 35
+phi1s =  [0]
+# phi1s =  [pi/3, pi/2]
+phiOffset = pi/2
+omegaMultiplier = 2
+apply = [np.real]
+omegaMax = 30
+omegaMin = 0
+ymax = 0.02
+
+form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"; paramsString = r"$a=$"+str(a)
+# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
+# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
+
+
+# look = "square"; matrixEl = "G_{n-2, n}"
+# look ="chi"; matrixEl = "G_{n-1, n-1}"
+# look ="gamma"; matrixEl = "G_{n-1, n}"
+# look ="triangle"; matrixEl = "G_{n-1, n+1}"
+# look ="alpha"; matrixEl = "G_{n, n}"
+look ="tilde"; matrixEl = "G_{n, n+1}"
+# look ="star"; matrixEl = "G_{n, n+2}"
+# look ="beta"; matrixEl = "G_{n+1, n+1}"
+# look ="rho"; matrixEl = "G_{n+1, n+2}"
+# look ="epsilon";  matrixEl = "G_{n+1, n+3}"
+# look ="delta";  matrixEl = "G_{n+2, n+2}"
+
+
+labels = [r"$ J_{\mathrm{eff}}$"]
+
+
+sz = 4
+fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz*1.7,sz ),
+                       constrained_layout=True, sharey=True)
+
+
+# df.loc[df['form'] == 'SS-p','phi offset'] = np.nan
+        
+for nc, phi1 in enumerate(phi1s):
+    if form == "SS-p":
+        df_plot = df[(df['form']==form)&
+                 (df['N']==N)&
+                  (df['a1']==a)&
+                  (df['phi1']==phi1)]
+        
+    elif form =="SSDF-p" or form == "DS-p":
+         df_plot = df[(df['form']==form)&
+                 (df['N']==N)&
+                  (df['a1']==a)&
+                  (df['phi1']==phi1)&
+                  (df["omega multiplier"]==omegaMultiplier)&
+                  (df['phi offset']==phiOffset)]
+
+        
+    if not df_plot.empty:
+        df_plot = df_plot.sort_values(by=['omega1'])
+        df_plot = df_plot[df_plot["omega1"] < omegaMax]
+        df_plot = df_plot[df_plot["omega1"] > omegaMin]
+        
+        for n1, f in enumerate(apply):
+            ax.plot(df_plot['omega1'], f(df_plot[look].values))
+                        
+            ax.set_xlabel(r'$\omega$')
+            
+#            ax[n1].set_ylim((-0.5, 0.5))
+
+ax.set_ylabel((labels[n1]), rotation=0, labelpad=15)
+handles_legend, labels_legend = ax.get_legend_handles_labels()    
+# fig.legend(handles_legend, labels_legend, loc='upper right')
+plt.grid(True)
+# ax[0].set_ylim([None, ymax])
+# fig.suptitle(""
+#              + form +r";  "+hamiltonianString+"\n"
+#              +paramsString
+#               # +", "+r"$a_2=$"+str(a2)
+#              , y=1.2)
+
+paper = "/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
+plt.savefig(paper + "tunnelling.png", dpi=700)
+plt.show()
+                                              
                                                               
                                                               
 
