@@ -202,6 +202,44 @@ def H_PhasesOnLoopsOneD(N, centre, p0, p1, p2, p3, p4=0):
     return H
 
 
+
+
+    
+def H_DipoleTrap(N, centre, dipoleFac):
+    H = np.zeros((N,N), dtype = np.complex128)
+    H = H + H_0(N)
+    for i in range(N):
+        H[i,i] =  dipoleFac*np.abs(centre-i)**2 # this cannot be complex otherwise it will not be hermitian
+    return H
+
+def H_DipoleTrapwPhases(N, centre, dipoleFac, p1, p2, p3, p4):
+    H = np.zeros((N,N), dtype = np.complex128)
+    H = H + H_0(N)
+    for i in range(N):
+        H[i,i] =  dipoleFac*np.abs(centre-i)**2 # this cannot be complex otherwise it will not be hermitian
+    
+    # add phases
+    for i in range(centre-2, centre+2):
+        if not np.isnan(p1):
+            #hopping
+            H[i, i+1] = -exp(1j*p1)
+            H[i+1,i] = -exp(-1j*p1)
+    for i in range(centre-2, centre+1):
+        if not np.isnan(p2):
+            #NNN hopping
+            H[i, i+2] = -exp(1j*p2)
+            H[i+2,i] = -exp(-1j*p2)
+    for i in range(centre-2, centre):
+        if not np.isnan(p3):
+            H[i, i+3] = -exp(1j*p3)
+            H[i+3,i] = -exp(-1j*p3)
+    for i in range(centre-2, centre-1):
+        if not np.isnan(p4):
+            H[i, i+4] = -exp(1j*p4)
+            H[i+4,i] = -exp(-1j*p4)
+    return H
+
+
 def H_0_Phases(N, centres, els):
     H = np.zeros((N, N), dtype=np.complex128)
     H = H + H_0(N)

@@ -16,7 +16,7 @@ sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 from hamiltonians import SolveSchrodinger, SolveSchrodingerGeneral, SolveSchrodingerTimeIndependent
 from hamiltonians import  PhiString
 
-from hamiltonians import H_PhasesOnLoopsOneD, H_0, H_0_Phases
+from hamiltonians import H_PhasesOnLoopsOneD, H_0, H_0_Phases, H_DipoleTrap,  H_DipoleTrapwPhases
 
 import matplotlib as mpl
 import seaborn as sns
@@ -203,38 +203,46 @@ def ProbCurrentofPsi(psi, circleBoundary=0):
 
 #%%
 """
-Compare two matter waves
+Compare two SHAKING matter waves
 """
 
 
 """"Global parameters"""
-N = 92#182; 
+N = 91#182; 
 centre = 45#90;
 rtol=1e-11
 
 #SS-p params
 a = 35
-omega = 4#a /jn_zeros(0,1)[0]
-phi = 0
+omega = 10#a /jn_zeros(0,1)[0]
+phi1 = 0
+phi2 = pi/2
 T = 2*pi / omega
-form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+
+form = "StepFunc"
+
+hamiltonianString=""
+paramsString=""
+onsite=0
 
 
-form = "SS-p"; 
-hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; 
-paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+
+
+# form = "SS-p"; 
+# hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; 
+# paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
 
 
 
-form = "DS-p"; 
-hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
-                      +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2]$"); 
-paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
-                ", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)
-                +", \phi_2 = \phi_1 + \pi/2, s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2)
-                + r", N = "+str(N)+", b = "+str(centre)+"$ ")
-form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 ="+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
-
+# form = "DS-p"; 
+# hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
+#                       +r"\hat{n}_{b+1} [a \> \cos (\omega_2 t + \phi_2) + s_2]$"); 
+# paramsString = (r"$a="+str(a)+", "+r"\omega_1="+"{:.2f}".format(omega1)+
+#                 ", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)
+#                 +", \phi_2 = \phi_1 + \pi/2, s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2)
+#                 + r", N = "+str(N)+", b = "+str(centre)+"$ ")
+# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 ="+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
 
 # #DS-p params
 # form = "DS-p"; 
@@ -292,23 +300,25 @@ form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1
 #                 +r", s_1 = " + str(onsite1)+r", s_2 = "+ str(onsite2) +r", s_3 = "+str(onsite3)
 #                 + r", N = "+str(N)+", b = "+str(centre)+"$ ")
 
+
+
 """wave 1 parameters""" # for ssdf
 A_site_start1 = 40#85;
 """wave 2 params"""
-A_site_start2 = 51#96;
+A_site_start2 = 40#96;
 
 
 # plot potential
-t = np.linspace(0, 4*2*pi/omega1, 100)
-shake1 = a*cos(omega1*t + phi1) + onsite1
-shake2 = a*cos(omega2*t + phi2) + onsite2
-shake3 = a*cos(omega3*t + phi3) + onsite3
-plt.plot(t, shake1+shake2+shake3, label="V(t)")
-plt.plot(t, np.abs(shake1+shake2+shake3), label = "abs(V(t))")
-plt.ylabel("V")
-plt.xlabel("t")
-plt.legend()
-plt.show()
+# t = np.linspace(0, 4*2*pi/omega1, 100)
+# shake1 = a*cos(omega1*t + phi1) + onsite1
+# shake2 = a*cos(omega2*t + phi2) + onsite2
+# shake3 = a*cos(omega3*t + phi3) + onsite3
+# plt.plot(t, shake1+shake2+shake3, label="V(t)")
+# plt.plot(t, np.abs(shake1+shake2+shake3), label = "abs(V(t))")
+# plt.ylabel("V")
+# plt.xlabel("t")
+# plt.legend()
+# plt.show()
 
 
 
@@ -326,9 +336,9 @@ t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 
 psi0_1 = np.zeros(N, dtype=np.complex_); psi0_1[A_site_start1] = 1;
 psi0_2 = np.zeros(N, dtype=np.complex_); psi0_2[A_site_start2] = 1;
-psi1 = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, 
+psi1 = SolveSchrodinger(form, rtol, N, centre, a, omega, phi1, 
                                   tspan, nTimesteps, psi0_1, onsite)
-psi2 = SolveSchrodinger(form, rtol, N, centre, a,omega, phi,
+psi2 = SolveSchrodinger(form, rtol, N, centre, a,omega, phi2,
                                   tspan, nTimesteps, psi0_2, onsite)
 
 
@@ -337,7 +347,7 @@ psi2 = SolveSchrodinger(form, rtol, N, centre, a,omega, phi,
 
 
 # normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-2
+linthresh = 1e-6
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
@@ -345,7 +355,7 @@ x_labels = list(range(0, nOscillations+1, n_osc_divisions))
 
 
 #flip one
-psi2 = np.flip(psi2, axis=0)
+# psi2 = np.flip(psi2, axis=0)
 
 PlotPsi(psi1, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString+r"$,\> \psi_{start site} = " +str(A_site_start1)+r"$",
       normaliser)
@@ -428,16 +438,29 @@ Homogeneous expansion
 N = 211
 T = 1
 centre = 105
-aSiteStart1 = 100; aSiteStart2 = 110
+aSiteStart1 = 95; aSiteStart2 = 110
 psi01 = np.zeros(N, dtype=np.complex_); psi01[aSiteStart1] = 1;
-psi02 = np.zeros(N, dtype=np.complex_); psi02[aSiteStart2] = 1;
+# psi02 = np.zeros(N, dtype=np.complex_); psi02[aSiteStart2] = 1;
 p0 = pi/7; p1 = pi/3; p2 = pi/2; p3 = pi/4
-# HPhases = H_PhasesOnLoopsOneD(N, centre, 0, pi/3, pi/4, np.nan,np.nan)
-HPhases = H_0_Phases(N, [99, 107, 120, 140], [pi/4, pi/3, pi/7, pi/sqrt(3)])
-H0 = H_0(N)
+# H0 = H_DipoleTrap(N, centre, 0.001)
+# HPhases = H_0_Phases(N, [99, 107, 120, 140], [pi/4, pi/3, pi/7, pi/sqrt(3)])
+# HPhases = H_PhasesOnLoopsOneD(N, centre, 0, pi/3, pi/4, pi/5,np.nan)
+# HPhases = H_DipoleTrap(N, centre, 0.001)
+
+HPhases1 = H_DipoleTrapwPhases(N, 
+            centre, 0.001, pi/3, pi/4, pi/5, pi/6)
+HPhases2 = H_DipoleTrapwPhases(N, 
+            centre, 0.001, 0, 0, 0, 0)
+
+HPhases1 = H_PhasesOnLoopsOneD(N, centre, 0, pi/3, pi/4, pi/5,pi/2)
+HPhases2 = H_PhasesOnLoopsOneD(N, centre, 0, 0, 0, 0,0)
+
+
+
 
 # HPhasesFlip = np.flip(np.flip(HPhases, 0).T, 0)
 
+#parameters for ODE solver
 nOscillations = 50
 #how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
 nTimesteps = nOscillations*100
@@ -446,17 +469,21 @@ tspan = (0,nOscillations*T)
 t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 
 
-psi1 = SolveSchrodingerTimeIndependent(HPhases, tspan, nTimesteps, psi01)
-psi2 = SolveSchrodingerTimeIndependent(H0, tspan, nTimesteps, psi01)
+#solve differential equation
+psi1 = SolveSchrodingerTimeIndependent(HPhases1, tspan, nTimesteps, psi01)
+psi2 = SolveSchrodingerTimeIndependent(HPhases2, tspan, nTimesteps, psi01)
 
+#find min and max values of solutions for graphing
 pMax = np.max(np.abs(np.vstack((psi1, psi2))))
 pMin = np.min(np.vstack((np.real(np.vstack((psi1, psi2))), np.imag(np.vstack((psi1, psi2))))))
 absMax = np.max([np.abs(pMax), np.abs(pMin)])
         
+#normaliser params
 normaliser = mpl.colors.Normalize(vmin=-absMax, vmax=absMax)
 linthresh = 1e-3
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-absMax, vmax=absMax, base=10)
 
+#other graphing params
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
 
