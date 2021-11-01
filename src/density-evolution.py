@@ -6,7 +6,7 @@ Created on Thu Sep 10 15:55:49 2020
 @author: Georgia
 """
 
-place = "Georgia Nixon"
+place = "Georgia"
 from numpy import exp, sin, cos, pi, log, sqrt
 import numpy as np
 import matplotlib.pyplot as plt
@@ -80,7 +80,7 @@ def PlotPsi(psi, x_positions, x_labels, title, normaliser):
     
     cax = plt.axes([1.03, 0.1, 0.03, 0.8])
     fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
-    fig.suptitle(title, y = 1.2,  fontfamily='STIXGeneral')
+    fig.suptitle(title, y = 1.3,  fontfamily='STIXGeneral')
     
     plt.show()
     
@@ -120,7 +120,7 @@ def PlotProbCurrent(psi, x_positions, x_labels, title, normaliser):
     
     cax = plt.axes([1.03, 0.1, 0.03, 0.8])
     fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
-    fig.suptitle(title, y = 1.1,  fontfamily='STIXGeneral')
+    fig.suptitle(title, y = 1.4,  fontfamily='STIXGeneral')
     
     plt.show()
     
@@ -164,7 +164,7 @@ def PlotTwoPsi(psi1, psi2, x_positions, x_labels, title, normaliser):
     
     cax = plt.axes([1.03, 0.1, 0.03, 0.8])
     fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
-    fig.suptitle(title, y = 1.2)
+    fig.suptitle(title, y = 1.3)
     plt.show()
     
 
@@ -218,22 +218,26 @@ omega = 10#a /jn_zeros(0,1)[0]
 phi1 = 0
 phi2 = pi/2
 T = 2*pi / omega
-
-form = "StepFunc"
-
-hamiltonianString=""
-paramsString=""
 onsite=0
 
-
-# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+# form = "StepFunc"
+# hamiltonianString="$H(t)=H_0 + a \> \cos (\omega t + \phi) \sum_{i \geq b} \hat{n}_i  $";
+# paramsString1=r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi1)+", b = "+str(centre)+r"$"
+# paramsString2=r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi2)+", b = "+str(centre)+r"$"
 
 
 # form = "SS-p"; 
 # hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; 
-# paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
+# paramsString1 = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi1)+r"$"
+# paramsString2 = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi2)+r"$"
 
 
+form = "General"
+aas= [25,25,25]
+omegas = [10,10,10]
+phis1 = [pi/2, pi/2, pi/2]
+phis2 = [0,0,0]
+funcs = []
 
 # form = "DS-p"; 
 # hamiltonianString = (r"$H(t)=H_0 + \hat{n}_b [a \> \cos (\omega_1 t + \phi_1) + s_1]  + "
@@ -341,13 +345,13 @@ psi1 = SolveSchrodinger(form, rtol, N, centre, a, omega, phi1,
 psi2 = SolveSchrodinger(form, rtol, N, centre, a,omega, phi2,
                                   tspan, nTimesteps, psi0_2, onsite)
 
-
+SolveSchrodingerGeneral(N,centre,func,params, tspan, nTimesteps, psi0, circleBoundary = 0):
 
 """plot"""
 
 
 # normaliser = mpl.colors.Normalize(vmin=-1, vmax=1)
-linthresh = 1e-6
+linthresh = 1e-2
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
@@ -357,9 +361,9 @@ x_labels = list(range(0, nOscillations+1, n_osc_divisions))
 #flip one
 # psi2 = np.flip(psi2, axis=0)
 
-PlotPsi(psi1, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString+r"$,\> \psi_{start site} = " +str(A_site_start1)+r"$",
+PlotPsi(psi1, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString1+r"$,\> \psi_{start site} = " +str(A_site_start1)+r"$",
       normaliser)
-PlotPsi(psi2, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString+r"$,\> \psi_{start site} = " +str(A_site_start2)+r"$",
+PlotPsi(psi2, x_positions, x_labels,  form+", "+hamiltonianString+"\n"+paramsString2+r"$,\> \psi_{start site} = " +str(A_site_start2)+r"$",
       normaliser)
 
 
@@ -371,8 +375,10 @@ PlotTwoPsi(psi1, psi2, x_positions, x_labels, title,
 
 """ Is there a diode? """
 
-
-shakeLen = len(omega)
+try:
+    shakeLen = len(omega)
+except:
+    shakeLen=1
 
 psi1AboveBorder = psi1[:centre,:-1]
 psi2AboveBorder = psi2[:centre,:-1]
@@ -480,7 +486,7 @@ absMax = np.max([np.abs(pMax), np.abs(pMin)])
         
 #normaliser params
 normaliser = mpl.colors.Normalize(vmin=-absMax, vmax=absMax)
-linthresh = 1e-3
+linthresh = 1e-2
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-absMax, vmax=absMax, base=10)
 
 #other graphing params
@@ -503,6 +509,8 @@ PlotPsi(psi2, x_positions, x_labels,   r"title",
 #plot difference
 PlotTwoPsi(psi1, psi2, x_positions, x_labels, r"title", normaliser)
 
+
+#%%
 probCurrent1 = ProbCurrentofPsi(psi1, circleBoundary=0)
 probCurrent2 = ProbCurrentofPsi(psi2, circleBoundary=0)
 
@@ -580,13 +588,13 @@ plt.show()
 """ Ramp """
 
 """General Params"""  
-N = 92#182; 
+N = 91#182; 
 rtol=1e-11
 
 """wave 1 parameters""" # for ssdf
-A_site_start1 = 40#85;
+A_site_start1 = 35#85;
 """wave 2 params"""
-A_site_start2 = 51#96;
+A_site_start2 = 35#96;
 
 """Ramp params"""
 def Ramp(params, t): # ramp
@@ -632,34 +640,36 @@ def Cosine(params, t):
 
 
 a = 35
-omega1=10; omega2=2*omega1; omega3=omega1
-phi1=0; phi2=pi/4; phi3=pi/2
-onsite1=0; onsite2=5; onsite3=10
+omega1=10; omega2=2*omega1; omega3=3*omega1
+phi1=0; 
+phi2 = pi/2
+onsite1=0; onsite2=0; onsite3=0
 T=2*pi/omega1
-centres = [45,46, 47]
-funcs = [RampHalf, RampHalf, RampHalf]
+centres = [40, 50, 60]
+funcs = [Cosine, Cosine, Cosine]
 
-params = [[a, omega1, phi1, onsite1], [a, omega2, phi2, onsite2], [a, omega3, phi3, onsite3]]
+params1 = [[a, omega1, phi1, onsite1], [a, omega2, phi1, onsite1], [a, omega1, phi1, onsite1]]
+params2 = [[a, omega1, phi2, onsite1], [a, omega2, phi2, onsite1], [a, omega1, phi2, onsite1]]
 
 
 
-t = np.linspace(0, 4*2*pi/omega1, 100)
-shake1 = funcs[0](params[0], t)
-shake2 = funcs[1](params[1], t)
-shake3 = funcs[2](params[2], t)
-plt.plot(t, shake1+shake2+shake3)
-plt.plot(t, np.abs(shake1+shake2+shake3))
-plt.ylabel("V")
-plt.xlabel("t")
-plt.show()
+# t = np.linspace(0, 4*2*pi/omega1, 100)
+# shake1 = funcs[0](params[0], t)
+# shake2 = funcs[1](params[1], t)
+# shake3 = funcs[2](params[2], t)
+# plt.plot(t, shake1+shake2+shake3)
+# plt.plot(t, np.abs(shake1+shake2+shake3))
+# plt.ylabel("V")
+# plt.xlabel("t")
+# plt.show()
 
-plt.plot(t, shake1, label="site 1")
-plt.plot(t, shake2, label="site 2")
-plt.plot(t, shake3, label="site 3")
-plt.ylabel("V")
-plt.xlabel("t")
-plt.legend()
-plt.show()
+# plt.plot(t, shake1, label="site 1")
+# plt.plot(t, shake2, label="site 2")
+# plt.plot(t, shake3, label="site 3")
+# plt.ylabel("V")
+# plt.xlabel("t")
+# plt.legend()
+# plt.show()
 
 
 
@@ -676,8 +686,8 @@ t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 psi0_1 = np.zeros(N, dtype=np.complex_); psi0_1[A_site_start1] = 1;
 psi0_2 = np.zeros(N, dtype=np.complex_); psi0_2[A_site_start2] = 1;
 
-psi1 = SolveSchrodingerGeneral(N,centres,funcs,params, tspan, nTimesteps, psi0_1)
-psi2 = SolveSchrodingerGeneral(N,centres,funcs,params, tspan, nTimesteps, psi0_2)
+psi1 = SolveSchrodingerGeneral(N,centres,funcs,params1, tspan, nTimesteps, psi0_1)
+psi2 = SolveSchrodingerGeneral(N,centres,funcs,params2, tspan, nTimesteps, psi0_2)
 
 
 """plot"""
@@ -688,20 +698,24 @@ x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
 
 
+title1 = r"three sites shaking w cosine function, \n different frequency $\omega_1=10$, $\omega_2=20$,  $\omega_3=10$, same phase $\phi=\pi/2$"
+title2 = r"three sites shaking w cosine function, \n  different frequency $\omega_1=10$,  $\omega_2=20$, $\omega_3=10$,, same phase $\phi=0$"
+titleShared = r"comparison, three sites shaking w cosine function,mixed frequencies, compare phases $\phi=0$ and $\phi=\pi/2$"
 
 #flip one
-psi2 = np.flip(psi2, axis=0)
+# psi2 = np.flip(psi2, axis=0)
 
-PlotPsi(psi1, x_positions, x_labels,  "Ramp",
+PlotPsi(psi1, x_positions, x_labels,  title1,
       normaliser)
-PlotPsi(psi2, x_positions, x_labels, "Ramp",
+PlotPsi(psi2, x_positions, x_labels, title2,
       normaliser)
 
 
 #plot difference
-PlotTwoPsi(psi1, psi2, x_positions, x_labels, "Ramp",
+PlotTwoPsi(psi1, psi2, x_positions, x_labels, titleShared,
       normaliser)
 
+#%%
 
 """ Is there a diode? """
 

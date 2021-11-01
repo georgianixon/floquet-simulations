@@ -146,6 +146,7 @@ def H_0(N):
 
 def HT_General(N, centres, funcs, paramss, circleBoundary, t):
     H = H_0(N)
+    # do we want periodic boundary conditions?
     if circleBoundary:
         H[0,-1]=-1
         H[-1,0]=-1
