@@ -25,13 +25,22 @@ def GetEvalsAndEvecs(HF):
     Set the gauge for each evec; choosing the first non-zero element to be real and positive.
     Note that the gauge may be changed later by multiplying any vec arbitrarily by a phase. 
     """
-    #order by evals, also order corresponding evecs
-    evals, evecs = eig(HF)
-    idx = np.real(evals).argsort()
-    evals = evals[idx]
-    evecs = evecs[:,idx]
     
-    #make first element of evecs real and positive
+    # check if hermitian
+    if np.all(np.conj(HF.T)==HF):
+        evals, evecs = eigh(HF)
+        return evals, evecs
+    
+    else:
+        # print("matrix not hermitian")
+        #order by evals, also order corresponding evecs
+        evals, evecs = eig(HF)
+        idx = np.real(evals).argsort()
+        evals = evals[idx]
+        evecs = evecs[:,idx]
+    
+    # all evecs have a gauge 
+    # make first element of evecs real and positive
     for vec in range(np.size(HF[0])):
         
         # Find first element of the first eigenvector that is not zero
@@ -46,7 +55,7 @@ def GetEvalsAndEvecs(HF):
         return np.real(evals), evecs
     else:
         x =  evals[np.argsort(np.imag(evals))[0]]
-        print('evals are imaginary! e.g.', f"{x:.3}")
+        # print('evals are imaginary! e.g.', f"{x:.3}")
         return evals, evecs
 
 
