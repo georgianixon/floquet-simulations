@@ -18,7 +18,7 @@ from scipy.linalg import eig
 from scipy.linalg import eigh 
 from scipy.linalg import expm
 
-def GetEvalsAndEvecs(HF):
+def GetEvalsAndEvecsGen(HF):
     """
     Get e-vals and e-vecs of Hamiltonian HF.
     Order Evals and correspoinding evecs by smallest eval first.
@@ -27,9 +27,8 @@ def GetEvalsAndEvecs(HF):
     """
     
     # check if hermitian
-    if np.all(np.conj(HF.T)==HF):
-        evals, evecs = eigh(HF)
-        return evals, evecs
+    if np.all(np.round(np.conj(HF.T),15)==np.round(HF,15)):
+        evals, evecs = eigh(HF) # evals are automatically real
     
     else:
         # print("matrix not hermitian")
