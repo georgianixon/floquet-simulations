@@ -51,13 +51,13 @@ def filter_duplicates(x):
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=20
+size=12
 params = {
-            'legend.fontsize': size*0.75,
+            'legend.fontsize': size*0.8,
           'axes.labelsize': size,
           'axes.titlesize': size,
-          'xtick.labelsize': size*0.75,
-          'ytick.labelsize': size*0.75,
+          'xtick.labelsize': size*0.8,
+          'ytick.labelsize': size*0.8,
           'font.size': size,
           'font.family': 'STIXGeneral',
 #          'axes.titlepad': 25,
@@ -140,33 +140,34 @@ centre = 25
 
 
 rtol=1e-11
-aas = [15,25]
-phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+aas = [5, 10, 15, 20, 25, 30, 35]
+# aas = [35]
+# phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phis =  [0]
 apply = [np.abs, np.real, np.imag]
 omegaMax = 100
-omegaMin = 6
+omegaMin = 4
 ymax = None
 ymin = None
-# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
-form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
+form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
+# form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
 # form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 # form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 
 
 termsDict = [ 
     # ("O-3", "G_{n-3, n-3}"),
-            ("O-2","G_{n-2, n-2}"),
+            # ("O-2","G_{n-2, n-2}"),
             ("O-1","G_{n-1, n-1}"),
             ("O","G_{n, n}"),
             ("O+1","G_{n+1, n+1}"),
-            ("O+2","G_{n+2, n+2}"),
+            # ("O+2","G_{n+2, n+2}"),
             # ("O+3","G_{n+3, n+3}"),
             # ("N1-3","G_{n-3, n-2}"),
-            ("N1-2","G_{n-2, n-1}"),
+            # ("N1-2","G_{n-2, n-1}"),
             ("N1-1","G_{n-1, n}"),
             ("N1+1","G_{n, n+1}"),
-            ("N1+2","G_{n+1, n+2}"),
+            # ("N1+2","G_{n+1, n+2}"),
             # ("N1+3","G_{n+2, n+3}"),
             # ("N2-2","G_{n-3, n-1}"),
             ("N2-1","G_{n-2, n}"),
@@ -174,11 +175,11 @@ termsDict = [
             ("N2+1","G_{n, n+2}"),
             # ("N2+2","G_{n+1, n+3}"),
             # ("N3-2","G_{n-3, n}"),
-            ("N3-1", "G_{n-2, n+1}"),
-            ("N3+1", "G_{n-1, n+2}"),
+            # ("N3-1", "G_{n-2, n+1}"),
+            # ("N3+1", "G_{n-1, n+2}"),
             # ("N3+2","G_{n, n+3}"),
             # ("N4-1","G_{n-3, n+1}"),
-            ("N4","G_{n-2, n+2}"),
+            # ("N4","G_{n-2, n+2}"),
             # ("N4+1","G_{n-1, n+3}"),
             # ("N5-1","G_{n-3, n+2}"),
             # ("N5+1","G_{n-2, n+3}"),
@@ -262,6 +263,8 @@ for look, matrixEl in termsDict:
             if not df_plot.empty:
                 df_plot["x-axis"] = df_plot.apply(
                     lambda row: row["a"]/row["omega"], axis=1)
+                
+                
                 df_plot = df_plot.sort_values(by=['x-axis'])
                 
                 df_plot = df_plot.sort_values(by=['omega'])
@@ -271,16 +274,14 @@ for look, matrixEl in termsDict:
                 for n1, f in enumerate(apply):
                     # ax[n1].plot(df_plot["omega"], f(-jv(0,a/df_plot["omega"])), label="bessel func")
                     # ax[n1].plot(df_plot["x-axis"], f(-jv(0,df_plot["x-axis"])), label="bessel func")
+                    # ax[n1].plot(df_plot["omega"], f(df_plot[look].values), 
+                    #             label=
+                    #                 r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
+                    #                 +", A="+str(a))
                     ax[n1].plot(df_plot["x-axis"], f(df_plot[look].values), 
                                 label=
                                     r'$\phi_1=$'+str(round(phi/pi, 2))+r'$\pi$'
-                                    +", A="+str(a)
-                                
-                                    # +', '+
-                                    # form
-                                  # + ' rtol='+str(rtol)
-                                 # color='Blue'
-                                )
+                                    +", A="+str(a))
                     ax[n1].set_xlabel(r'$A/\omega$')
                     ax[n1].set_title(labels[n1])
         #            ax[n1].set_ylim((-0.5, 0.5))
@@ -302,6 +303,124 @@ for look, matrixEl in termsDict:
 #%%
 
       
+#For paper
+
+N = 51; 
+centre = 25
+
+rtol=1e-11
+aas = [35]
+# aas = [30]
+phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+# phis =  [0]
+apply = [np.abs]
+omegaMax = 20
+omegaMin = 4
+ymax = 1
+ymin = 0
+form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
+# form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
+# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
+# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
+
+
+termsDict = [ 
+    # ("O-3", "G_{n-3, n-3}"),
+            # ("O-2","G_{n-2, n-2}"),
+            # ("O-1","G_{n-1, n-1}"),
+            # ("O","G_{n, n}"),
+            # ("O+1","G_{n+1, n+1}"),
+            # ("O+2","G_{n+2, n+2}"),
+            # ("O+3","G_{n+3, n+3}"),
+            # ("N1-3","G_{n-3, n-2}"),
+            # ("N1-2","G_{n-2, n-1}"),
+            # ("N1-1","G_{n-1, n}"),
+            # ("N1+1","G_{n, n+1}"),
+            # ("N1+2","G_{n+1, n+2}"),
+            # ("N1+3","G_{n+2, n+3}"),
+            # ("N2-2","G_{n-3, n-1}"),
+            # ("N2-1","G_{n-2, n}"),
+            # ("N2","G_{n-1, n+1}"),
+            ("N2+1","G_{n, n+2}"),
+            # ("N2+2","G_{n+1, n+3}"),
+            # ("N3-2","G_{n-3, n}"),
+            # ("N3-1", "G_{n-2, n+1}"),
+            # ("N3+1", "G_{n-1, n+2}"),
+            # ("N3+2","G_{n, n+3}"),
+            # ("N4-1","G_{n-3, n+1}"),
+            # ("N4","G_{n-2, n+2}"),
+            # ("N4+1","G_{n-1, n+3}"),
+            # ("N5-1","G_{n-3, n+2}"),
+            # ("N5+1","G_{n-2, n+3}"),
+            # ("N6", "G_{n-3, n+3}")
+            ]
+
+
+look = termsDict[0][0]
+matrixEl = termsDict[0][1]
+
+
+sz =4
+
+fig, ax = plt.subplots(figsize=(sz,sz),constrained_layout=True, sharey=True)
+
+
+# df.loc[df['form'] == 'SS-p','phi offset'] = np.nan
+        
+for a in aas:
+
+    for nc, phi in enumerate(phis):
+        if form == "SS-p" or form =="StepFunc":
+            df_plot = df[(df['form']==form)&
+                     (df['N']==N)&
+                      (df['a']==a)&
+                      (df['phi']==phi)&
+                      (df["centre"]==centre)]
+            # df_plot.loc[:,"x-axis"] = df_plot.loc[:,"a"]/df_plot.loc[:,"omega"]
+            
+            
+        # elif form =="SSDF-p" or form == "DS-p":
+        #      df_plot = df[(df['form']==form)&
+        #              (df['N']==N)&
+        #               (df['a']==a)&
+        #               (df['phi']==phi1)&
+        #               (df["omega multiplier"]==omegaMultiplier)&
+        #               (df['phi offset']==phiOffset)]
+    
+            
+        if not df_plot.empty:
+            df_plot["x-axis"] = df_plot.apply(
+                lambda row: row["a"]/row["omega"], axis=1)
+            
+            
+            df_plot = df_plot.sort_values(by=['x-axis'])
+            
+            df_plot = df_plot.sort_values(by=['omega'])
+            df_plot = df_plot[df_plot["omega"] < omegaMax]
+            df_plot = df_plot[df_plot["omega"] > omegaMin]
+            
+
+            ax.plot(df_plot["omega"], np.abs(df_plot[look].values), 
+                        label=
+                            r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
+                            +", A="+str(a))
+            # ax.plot(df_plot["x-axis"], np.abs((df_plot[look].values)), 
+            #             label=
+            #                 r'$\phi_1=$'+str(round(phi/pi, 2))+r'$\pi$'
+            #                 +", A="+str(a))
+            ax.set_ylabel(r"$|" +matrixEl+"|$")
+            # ax.set_xlabel(r'$\frac{A}{\omega}$', fontsize=18)
+            ax.set_xlabel(r'$\omega$')
+
+
+    
+handles_legend, labels_legend = ax.get_legend_handles_labels()    
+fig.legend(handles_legend, labels_legend, loc='upper right')
+plt.grid(True)
+ax.set_ylim([ymin, ymax])
+paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
+fig.savefig(paper+'G-SS-N2+1-A=35-ylim=1.pdf', format='pdf', bbox_inches='tight')
+plt.show()
                                                               
                                                               
 

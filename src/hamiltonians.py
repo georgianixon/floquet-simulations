@@ -18,7 +18,7 @@ from scipy.linalg import eig
 from scipy.linalg import eigh 
 from scipy.linalg import expm
 
-def GetEvalsAndEvecsGen(HF):
+def GetEvalsAndEvecsGen(HF, fix_gauge=1):
     """
     Get e-vals and e-vecs of Hamiltonian HF.
     Order Evals and correspoinding evecs by smallest eval first.
@@ -40,22 +40,26 @@ def GetEvalsAndEvecsGen(HF):
     
     # all evecs have a gauge 
     # make first element of evecs real and positive
-    for vec in range(np.size(HF[0])):
-        
-        # Find first element of the first eigenvector that is not zero
-        firstNonZero = (evecs[:,vec]!=0).argmax()
-        #find the conjugate phase of this element
-        conjugatePhase = np.conj(evecs[firstNonZero,vec])/np.abs(evecs[firstNonZero,vec])
-        #multiply all elements by the conjugate phase
-        evecs[:,vec] = conjugatePhase*evecs[:,vec]
+    if fix_gauge:
+        for vec in range(np.size(HF[0])):
+            
+            # Find first element of the first eigenvector that is not zero
+            firstNonZero = (evecs[:,vec]!=0).argmax()
+            #find the conjugate phase of this element
+            conjugatePhase = np.conj(evecs[firstNonZero,vec])/np.abs(evecs[firstNonZero,vec])
+            #multiply all elements by the conjugate phase
+            evecs[:,vec] = conjugatePhase*evecs[:,vec]
 
     # check that the evals are real
-    if np.all((np.round(np.imag(evals),7) == 0)) == True:
-        return np.real(evals), evecs
-    else:
-        x =  evals[np.argsort(np.imag(evals))[0]]
-        # print('evals are imaginary! e.g.', f"{x:.3}")
-        return evals, evecs
+    
+    return evals, evecs
+
+    # if np.all((np.round(np.imag(evals),10) == 0)) == True:
+    #     return np.real(evals), evecs
+    # else:
+    #     # x =  evals[np.argsort(np.imag(evals))[0]]
+    #     # print('evals are imaginary! e.g.', f"{x:.3}")
+    #     return evals, evecs
 
 
     
@@ -460,7 +464,7 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
         #get numerically calculated effective Hamiltonian
         _, HF = CreateHF('SS-p', rtol, N, centre, a, phi, omega)
         #diagonalise
-        evals, evecs= GetEvalsAndEvecs(HF)
+        evals, evecs= GetEvalsAndEvecsGen(HF)
         # get initial state, psi0, written in basis of evecs, find coefficients
         coeffs =  np.dot(np.conj(evecs.T), psi0)
         sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
@@ -475,7 +479,7 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
 def SolveSchrodingerTimeIndependent(hamiltonian, tspan, nTimesteps, psi0):
     t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
     #diagonalise hamiltonian
-    evals, evecs = GetEvalsAndEvecs(hamiltonian)
+    evals, evecs = GetEvalsAndEvecsGen(hamiltonian)
     coeffs =  np.dot(np.conj(evecs.T), psi0)
     sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
     sol = np.vstack(sol).T
@@ -502,7 +506,7 @@ def CreateHF(form, rtol, N, centre, a, omega, phi, onsite):
     # print(time.time()-start, 'seconds.')
     
     # evals_U, evecs = eig(UT)
-    evals_U, evecs = GetEvalsAndEvecs(UT) #evals can be imaginary
+    evals_U, evecs = GetEvalsAndEvecsGen(UT) #evals can be imaginary
     evals_H = 1j / T *log(evals_U)
     
     HF = np.zeros([N,N], dtype=np.complex_)

@@ -6,7 +6,7 @@ Created on Thu Sep 10 15:55:49 2020
 @author: Georgia
 """
 
-place = "Georgia"
+place = "Georgia Nixon"
 from numpy import exp, sin, cos, pi, log, sqrt
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,13 +25,13 @@ from fractions import Fraction
 
 sh = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/"
 
-size=28
+size=12
 params = {
-            'legend.fontsize': size*0.65,
+            'legend.fontsize': size*0.9,
           'axes.labelsize': size,
           'axes.titlesize': size,
-          'xtick.labelsize': size*0.65,
-          'ytick.labelsize': size*0.65,
+          'xtick.labelsize': size*0.9,
+          'ytick.labelsize': size*0.9,
           'font.size': size,
           'axes.edgecolor' :'white',
           'xtick.minor.visible': False,
@@ -925,7 +925,7 @@ plt.show()
 # plt.show()
 
 #%%
-"""for poaster"""
+"""for poster"""
 
 
 """"Global parameters"""
@@ -974,10 +974,10 @@ psi = SolveSchrodinger(form, rtol, N, centre, a, omega, phi,
 """plot"""
 
 
-# normaliser = mpl.colors.Normalize(vmin=0, vmax=1)
-linthresh = 1e-2
-normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
-# normaliser=mpl.colors.LogNorm(vmin=0, vmax=1.0, base=10)
+normaliser = mpl.colors.Normalize(vmin=0, vmax=1)
+# linthresh = 1e-2
+# normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+normaliser=mpl.colors.LogNorm(vmin=1e-2, vmax=1.0)
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
 
@@ -991,34 +991,40 @@ mpl.rcParams.update({
       'mathtext.fontset':'stix'
       })
 
-apply = [lambda x: np.abs(x)**2]
-labels = [r'$|\psi(t)|^2$']
 
 
-cmapcol = 'PuOr' #PiYG_r
+
+cmapcol = "Purples"#'PuOr' #PiYG_r
 cmap= mpl.cm.get_cmap(cmapcol)
 
-sz = 4
-fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
-                        figsize=(sz*1.7,sz))
+sz = 2.5
+fig, ax = plt.subplots(figsize=(sz*1.7,sz))
 
-for i, f in enumerate(apply):
-    ax.matshow(f(psi), interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
-    ax.set_title(labels[i],  fontfamily='STIXGeneral')
-    ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
-      labeltop=False)  
-    ax.set_xticks(x_positions)
-    ax.set_xlabel('t/T', fontfamily='STIXGeneral')
-    ax.set_xticklabels(x_labels)
-    for side in ["bottom", "top", "left", "right"]:
-        ax.spines[side].set_visible(False)
-    if i == 0:
-        ax.set_ylabel('site', fontfamily='STIXGeneral')
 
-cax = plt.axes([1.03, 0.1, 0.03, 0.8])
-fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax)
+ax.matshow(np.abs(psi)**2, interpolation='none', cmap=cmap, norm=normaliser, aspect='auto')
+ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+  labeltop=False)  
+ax.set_xticks(x_positions)
+ax.set_xlabel('t/T', fontfamily='STIXGeneral')
+ax.set_xticklabels(x_labels)
+for side in ["bottom", "top", "left", "right"]:
+    ax.spines[side].set_visible(False)
+if i == 0:
+    ax.set_ylabel('site', fontfamily='STIXGeneral')
+
+cax = plt.axes([0.91, 0.1, 0.03, 0.8])
+cbar = fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax, extend="min")
+
+cbar.ax.get_yaxis().set_ticks([])
+for j, lab in zip([1, 0.1, 0.01,], ['$1$','$0.1$','$0.01$']):
+    cbar.ax.text(500, j, lab, ha='center', va='center')
+# cbar.ax.get_yaxis().labelpad = 30
+cbar.ax.set_ylabel(r'$|\psi(t)|^2$', rotation=270, labelpad=35)
+
+
+
 # fig.suptitle(title, y = 1.2,  fontfamily='STIXGeneral')
-paper = "/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
-plt.savefig(paper + "reflection.png", dpi=700)
+paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
+plt.savefig(paper + "Reflection.pdf", bbox_inches='tight')
 
 plt.show()
