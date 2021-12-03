@@ -139,37 +139,56 @@ def HT_StepFunc(N, centre, a, omega,  phi, onsite,  t):
     return matrix
 
 def HT_StepFuncGen(N, centres, aas, omegas,  phis, onsites,  t):
-    H = H_0(N)
+    H = H0(N)
     for centre, a, omega, phi, onsite in zip(centres, aas, omegas, phis, onsites):
         for i in range(centre, N):
             H[i, i] = H[i,i] + a*cos(omega*t + phi) + onsite
     return H
 
 
+def HT_SSHModel(N, aas, omegas,  phis, onsites,  t):
+    
+    assert(N/4 == int(N/4))
+    nCycles = int(N/4)
+    
+    a1 = aas[0]
+    a2 = aas[1]
+    omega1 = omegas[0]
+    omega2 = omegas[1]
+    phi1 = phis[0]
+    phi2 = phis[1]
+    onsite1 = onsites[0]
+    onsite2 = onsites[1]
+    
+    H = H0(N)
+    
+    for cycle in range(nCycles):
+        i = cycle*4 + 1
+        H[i,i] = a1*cos(omega1*t + phi1) + onsite1
+        H[i+1, i+1] = a1*cos(omega1*t + phi1) + onsite1 + a2*cos(omega2*t + phi2) + onsite2
+        H[i+2, i+2] = a2*cos(omega2*t + phi2) + onsite2
+        
+    return H
 
 
 
 """
 No energy offset
 """
-def H_0(N):
+def H0(N):
     return np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)      
 
 
 def HT_General(N, centres, funcs, paramss, circleBoundary, t):
-    H = H_0(N)
+    H = H0(N)
     # do we want periodic boundary conditions?
     if circleBoundary:
         H[0,-1]=-1
         H[-1,0]=-1
     
-    numOfShakes = len(centres)
-    if numOfShakes == 1:
-        H[centres,centres] = funcs(paramss, t)
-    else:    
-        for i in range(numOfShakes):
-            func = funcs[i]
-            H[centres[i],centres[i]] = func(paramss[i], t)
+    for i in range(len(centres)):
+        func = funcs[i]
+        H[centres[i],centres[i]] = func(paramss[i], t)
     return H
 
 """Moving phases"""
@@ -189,9 +208,20 @@ def H_0_T(N, centre, t):
 Time independent Hamiltonians
 """
 
-def H_PhasesOnLoopsOneD(N, centre, p0, p1, p2, p3, p4=0):
+def H0_PhasesNNHop(N, centres, els):
+    H = np.zeros((N, N), dtype=np.complex128)
+    H = H + H0(N)
+    for centre, el in zip(centres, els):
+        H[centre][centre-1] = -exp(1j*el)
+        H[centre-1][centre] = -exp(-1j*el)
+        # H[centre+1][centre] = -exp(-1j*el)
+        # H[centre][centre+1]= -exp(1j*el)
+    assert(np.all(0 == (np.conj(H.T) -H)))
+    return H
+
+def H0_PhasesLongRangeHop(N, centre, p0, p1, p2, p3, p4=0):
     H = np.zeros((N,N), dtype = np.complex128)
-    H = H + H_0(N)
+    H = H + H0(N)
     for i in range(centre-2, centre+3):
         H[i,i] =  p0 # this cannot be complex otherwise it will not be hermitian
     for i in range(centre-2, centre+2):
@@ -216,18 +246,26 @@ def H_PhasesOnLoopsOneD(N, centre, p0, p1, p2, p3, p4=0):
 
 
 
-
+def H0_Triangle(J1, J2):
+    H = np.zeros((3,3), dtype=np.complex128)
+    H[0,1] =-J2
+    H[1,2] =-J2
+    H[2,0] =-J1
+    H[1,0] =np.conj(-J2)
+    H[2,1] =np.conj(-J2)
+    H[0,2] =np.conj(-J1)
+    return H
     
-def H_DipoleTrap(N, centre, dipoleFac):
+def H0_DipoleTrap(N, centre, dipoleFac):
     H = np.zeros((N,N), dtype = np.complex128)
-    H = H + H_0(N)
+    H = H + H0(N)
     for i in range(N):
         H[i,i] =  dipoleFac*np.abs(centre-i)**2 # this cannot be complex otherwise it will not be hermitian
     return H
 
-def H_DipoleTrapwPhases(N, centre, dipoleFac, p1, p2, p3, p4):
+def H0_DipoleTrapwPhases(N, centre, dipoleFac, p1, p2, p3, p4):
     H = np.zeros((N,N), dtype = np.complex128)
-    H = H + H_0(N)
+    H = H + H0(N)
     for i in range(N):
         H[i,i] =  dipoleFac*np.abs(centre-i)**2 # this cannot be complex otherwise it will not be hermitian
     
@@ -253,16 +291,7 @@ def H_DipoleTrapwPhases(N, centre, dipoleFac, p1, p2, p3, p4):
     return H
 
 
-def H_0_Phases(N, centres, els):
-    H = np.zeros((N, N), dtype=np.complex128)
-    H = H + H_0(N)
-    for centre, el in zip(centres, els):
-        H[centre][centre-1] = -exp(1j*el)
-        H[centre-1][centre] = -exp(-1j*el)
-        # H[centre+1][centre] = -exp(-1j*el)
-        # H[centre][centre+1]= -exp(1j*el)
-    assert(np.all(0 == (np.conj(H.T) -H)))
-    return H
+
 
 
 
@@ -309,7 +338,7 @@ def F_Linear(t, psi, N, a, omega, phi):
 
 # no energy offset at all
 def F_0(t, psi, N):
-    H = H_0(N)
+    H = H0(N)
     return -1j*np.dot(H, psi)
 
 
@@ -322,6 +351,10 @@ def F_General(t, psi, N, centre, func, params, circleBoundary):
 
 def F_0_T(t, psi, N, centre):
     H = H_0_T(N, centre, t)
+    return -1j*np.dot(H, psi)
+
+def F_SSHModel(t, psi, N, aas, omegas, phis, onsites):
+    H = HT_SSHModel(N, aas, omegas,  phis, onsites,  t)
     return -1j*np.dot(H, psi)
 
 
@@ -460,6 +493,14 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
                 atol=rtol, t_eval=t_eval,
                 method='RK45')    
         
+    elif form == "SSHModel":
+        sol = solve_ivp(lambda t,psi: F_SSHModel(t, psi, N, a, omega, phi, onsite), 
+            t_span=tspan, y0=psi0, rtol=rtol, 
+            atol=rtol, t_eval=t_eval,
+            method='RK45')
+        sol=sol.y
+        
+        
     elif form == 'numericalG-SS-p':
         #get numerically calculated effective Hamiltonian
         _, HF = CreateHF('SS-p', rtol, N, centre, a, phi, omega)
@@ -492,15 +533,15 @@ X = np.dot(A, psi)
 
 def CreateHF(form, rtol, N, centre, a, omega, phi, onsite): 
 
-    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p", "StepFunc", "StepFuncGen"])
+    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p", "StepFunc", "StepFuncGen", "SSHModel"])
     T = 2*pi/np.min(omega)
     tspan = (0,T)
     UT = np.zeros([N,N], dtype=np.complex_)
-    
+    nTimesteps = 100
     for A_site_start in range(N):
     #    print(A_site_start)
         psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, 100, psi0, onsite)
+        sol = SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, psi0, onsite)
         UT[:,A_site_start]=sol[:,-1] 
     
     # print(time.time()-start, 'seconds.')
@@ -521,7 +562,34 @@ def CreateHF(form, rtol, N, centre, a, omega, phi, onsite):
     return UT, HF
 
 
+def CreateHFGeneral(N, centre, func, params, T, circleBoundary): 
 
+    tspan = (0,T)
+    UT = np.zeros([N,N], dtype=np.complex_)
+    nTimesteps = 100
+    
+    for A_site_start in range(N):
+    #    print(A_site_start)
+        psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
+        sol = SolveSchrodingerGeneral(N, centre, func, params, tspan, nTimesteps, psi0, circleBoundary=circleBoundary)
+        UT[:,A_site_start]=sol[:,-1] 
+    
+    # print(time.time()-start, 'seconds.')
+    
+    # evals_U, evecs = eig(UT)
+    evals_U, evecs = GetEvalsAndEvecsGen(UT) #evals can be imaginary
+    evals_H = 1j / T *log(evals_U)
+    
+    HF = np.zeros([N,N], dtype=np.complex_)
+    for i in range(N):
+        term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
+        HF = HF+term
+        
+    # print('   ',time.time()-start, 's')
+    HFr = RoundComplex(HF, 5)
+    assert(np.all(0 == (HFr - np.conj(HFr.T))))
+
+    return UT, HF
 
 def hoppingHF(N, centre, a, omega, phi):
     HF =  np.zeros([N,N], dtype=np.complex_)
@@ -543,7 +611,7 @@ def formatcomplex(num, dp):
     return ("{:."+str(dp)+"f}").format(num.real) + " + " + ("{:."+str(dp)+"f}").format(num.imag) + "i"
 
 def plotevecs(evecs, N, func, colour, title, ypos=0.934):
-    sz = 3
+    sz = 1
     num = 7
     fig, ax = plt.subplots(nrows = num, ncols = num, sharex=True,
                            sharey=True,
@@ -553,7 +621,7 @@ def plotevecs(evecs, N, func, colour, title, ypos=0.934):
         for j in range(num):
             evec1 = evecs[:,num*i + j]
     
-            ax[i,j].plot(range(N), func(evec1), color=colour) 
+            ax[i,j].plot(range(N), func(evec1), color=colour, linewidth=0.6) 
 
     fig.suptitle(title, y=ypos)
     plt.show()
@@ -619,6 +687,50 @@ def PhiString(phi):
     elif numerator ==1:
         return r"\pi /"+str(denominator)
     else:
-        str(numerator)+r"\pi / "+str(denominator)
+        return str(numerator)+r"\pi / "+str(denominator)
+      
         
+      #%%
+      
+"""Ramp params"""
+def Ramp(params, t): # ramp
+    a = params[0]
+    omega = params[1]
+    phi = params[2]
+    onsite = params[3]
+    
+    nCycle = np.floor(t*omega/2/pi + phi/2/pi)
+    y = a*omega*t/2/pi + a*phi/2/pi - nCycle*a + onsite
+    return y 
+
+def RampHalf(params, t): # ramp
+    a = params[0]
+    omega = params[1]
+    phi = params[2]
+    onsite = params[3]
+    
+    nHalfCycle = np.floor(t*omega/pi + phi/pi)
+    y = (a*omega*t/pi + a*phi/pi - nHalfCycle*a)*((nHalfCycle + 1 ) % 2) + onsite
+    return y 
+
+
+"""Blip params"""
+def Blip(params, t):
+    a = params[0]
+    omega = params[1]
+    phi = params[2]
+    onsite = params[3]
+    
+    nHalfCycle = np.floor(t*omega/pi + phi/pi)
+    y = a*sin(omega*t + phi)*((nHalfCycle+1) % 2) + onsite
+    return y
+
+"""Usual Cos shake"""
+def Cosine(params, t):
+    a = params[0]
+    omega = params[1]
+    phi = params[2]
+    onsite = params[3]
+    y = a*cos(omega*t + phi)+ onsite
+    return y 
         

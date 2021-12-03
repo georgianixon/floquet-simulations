@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -21,7 +21,8 @@ import seaborn as sns
 from numpy import sin, cos, exp, pi
 
 import sys
-sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
+sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
+# sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
 from hamiltonians import  hoppingHF, ConvertComplex, PhiString
 
 
@@ -51,13 +52,13 @@ def filter_duplicates(x):
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=12
+size=16
 params = {
-            'legend.fontsize': size*0.8,
+            'legend.fontsize': size*0.7,
           'axes.labelsize': size,
           'axes.titlesize': size,
-          'xtick.labelsize': size*0.8,
-          'ytick.labelsize': size*0.8,
+          'xtick.labelsize': size*0.7,
+          'ytick.labelsize': size*0.7,
           'font.size': size,
           'font.family': 'STIXGeneral',
 #          'axes.titlepad': 25,
@@ -145,9 +146,9 @@ aas = [5, 10, 15, 20, 25, 30, 35]
 # phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phis =  [0]
 apply = [np.abs, np.real, np.imag]
-omegaMax = 100
+omegaMax = 20
 omegaMin = 4
-ymax = None
+ymax = 0.5
 ymin = None
 form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
 # form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
@@ -158,21 +159,21 @@ form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \p
 termsDict = [ 
     # ("O-3", "G_{n-3, n-3}"),
             # ("O-2","G_{n-2, n-2}"),
-            ("O-1","G_{n-1, n-1}"),
-            ("O","G_{n, n}"),
-            ("O+1","G_{n+1, n+1}"),
+            # ("O-1","G_{n-1, n-1}"),
+            # ("O","G_{n, n}"),
+            # ("O+1","G_{n+1, n+1}"),
             # ("O+2","G_{n+2, n+2}"),
             # ("O+3","G_{n+3, n+3}"),
             # ("N1-3","G_{n-3, n-2}"),
             # ("N1-2","G_{n-2, n-1}"),
             ("N1-1","G_{n-1, n}"),
-            ("N1+1","G_{n, n+1}"),
+            # ("N1+1","G_{n, n+1}"),
             # ("N1+2","G_{n+1, n+2}"),
             # ("N1+3","G_{n+2, n+3}"),
             # ("N2-2","G_{n-3, n-1}"),
-            ("N2-1","G_{n-2, n}"),
-            ("N2","G_{n-1, n+1}"),
-            ("N2+1","G_{n, n+2}"),
+            # ("N2-1","G_{n-2, n}"),
+            # ("N2","G_{n-1, n+1}"),
+            # ("N2+1","G_{n, n+2}"),
             # ("N2+2","G_{n+1, n+3}"),
             # ("N3-2","G_{n-3, n}"),
             # ("N3-1", "G_{n-2, n+1}"),
@@ -186,44 +187,6 @@ termsDict = [
             # ("N6", "G_{n-3, n+3}")
             ]
             
-# termsDict = [
-#             ("N1-1","G_{n-1, n}"),
-#             ("N1+1","G_{n, n+1}"),
-#             ] 
-# look = "O-3"; matrixEl = "G_{n-3, n-3}"
-# look = "O-2"; matrixEl = "G_{n-2, n-2}"
-# look = "O-1"; matrixEl = "G_{n-1, n-1}"
-# look = "O"; matrixEl = "G_{n, n}"
-# look = "O+1"; matrixEl = "G_{n+1, n+1}"
-# look = "O+2"; matrixEl = "G_{n+2, n+2}"
-# look = "O+3"; matrixEl = "G_{n+3, n+3}"
-
-# look = "N1-3"; matrixEl = "G_{n-3, n-2}"
-# look = "N1-2"; matrixEl = "G_{n-2, n-1}"
-# look = "N1-1"; matrixEl = "G_{n-1, n}"
-# look = "N1+1"; matrixEl = "G_{n, n+1}"
-# look = "N1+2"; matrixEl = "G_{n+1, n+2}"
-# look = "N1+3"; matrixEl = "G_{n+2, n+3}"
-
-# look = "N2-2"; matrixEl = "G_{n-3, n-1}"
-# look = "N2-1"; matrixEl = "G_{n-2, n}"
-# look = "N2"; matrixEl = "G_{n-1, n+1}"
-# look = "N2+1"; matrixEl = "G_{n, n+2}"
-# look = "N2+2"; matrixEl = "G_{n+1, n+3}"
-
-# look = "N3-2"; matrixEl = "G_{n-3, n}"
-# look = "N3-1"; matrixEl = "G_{n-2, n+1}"
-# look = "N3+1"; matrixEl = "G_{n-1, n+2}"
-# look = "N3+2"; matrixEl = "G_{n, n+3}"
-
-# look = "N4-1"; matrixEl = "G_{n-3, n+1}"
-# look = "N4"; matrixEl = "G_{n-2, n+2}"
-# look = "N4+1"; matrixEl = "G_{n-1, n+3}"
-
-# look = "N5-1"; matrixEl = "G_{n-3, n+2}"
-# look = "N5+1"; matrixEl = "G_{n-2, n+3}"
-
-# look = "N6"; matrixEl = "G_{n-3, n+3}"
         
 for look, matrixEl in termsDict:
 
@@ -231,7 +194,7 @@ for look, matrixEl in termsDict:
               r"$\mathrm{Real} \{"+matrixEl+r"\}$",
               r"$\mathrm{Imag} \{"+matrixEl+r"\}$"]
     
-    sz =15
+    sz =12
     
     fig, ax = plt.subplots(ncols=len(apply), nrows=1, figsize=(sz,sz/len(apply)),
                            constrained_layout=True, sharey=True)
@@ -274,15 +237,17 @@ for look, matrixEl in termsDict:
                 for n1, f in enumerate(apply):
                     # ax[n1].plot(df_plot["omega"], f(-jv(0,a/df_plot["omega"])), label="bessel func")
                     # ax[n1].plot(df_plot["x-axis"], f(-jv(0,df_plot["x-axis"])), label="bessel func")
-                    # ax[n1].plot(df_plot["omega"], f(df_plot[look].values), 
+                    
+                    ax[n1].plot(df_plot["omega"], f(df_plot[look].values), 
+                                label= r'$\phi=$' + str(round(phi/pi, 2)) + r'$\pi$' + ", A=" + str(a))
+                    
+                    # ax[n1].plot(df_plot["x-axis"], f(df_plot[look].values), 
                     #             label=
-                    #                 r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
+                    #                 r'$\phi_1=$'+str(round(phi/pi, 2))+r'$\pi$'
                     #                 +", A="+str(a))
-                    ax[n1].plot(df_plot["x-axis"], f(df_plot[look].values), 
-                                label=
-                                    r'$\phi_1=$'+str(round(phi/pi, 2))+r'$\pi$'
-                                    +", A="+str(a))
+                    
                     ax[n1].set_xlabel(r'$A/\omega$')
+                    ax[n1].set_xlabel(r'$\omega$')
                     ax[n1].set_title(labels[n1])
         #            ax[n1].set_ylim((-0.5, 0.5))
     
@@ -318,17 +283,16 @@ omegaMax = 20
 omegaMin = 4
 ymax = 1
 ymin = 0
-form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
-# form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
-# form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
-# form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
-
+# form = "SS-p";
+form = "StepFunc"; 
+# form = "DS-p"; 
+# form = "SSDF-p"; 
 
 termsDict = [ 
     # ("O-3", "G_{n-3, n-3}"),
             # ("O-2","G_{n-2, n-2}"),
             # ("O-1","G_{n-1, n-1}"),
-            # ("O","G_{n, n}"),
+            ("O","G_{n, n}"),
             # ("O+1","G_{n+1, n+1}"),
             # ("O+2","G_{n+2, n+2}"),
             # ("O+3","G_{n+3, n+3}"),
@@ -341,7 +305,7 @@ termsDict = [
             # ("N2-2","G_{n-3, n-1}"),
             # ("N2-1","G_{n-2, n}"),
             # ("N2","G_{n-1, n+1}"),
-            ("N2+1","G_{n, n+2}"),
+            # ("N2+1","G_{n, n+2}"),
             # ("N2+2","G_{n+1, n+3}"),
             # ("N3-2","G_{n-3, n}"),
             # ("N3-1", "G_{n-2, n+1}"),
@@ -419,8 +383,85 @@ fig.legend(handles_legend, labels_legend, loc='upper right')
 plt.grid(True)
 ax.set_ylim([ymin, ymax])
 paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
-fig.savefig(paper+'G-SS-N2+1-A=35-ylim=1.pdf', format='pdf', bbox_inches='tight')
+# fig.savefig(paper+'G-StepFunc-elements-O-A=35-ylim=1.pdf', format='pdf', bbox_inches='tight')
 plt.show()
                                                               
-                                                              
+   #%%
+
+"""
+for poster
+"""
+
+N = 51; 
+centre = 25
+
+
+
+rtol=1e-11
+a = 35
+# aas = [35]
+# phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phi =  0
+apply = [np.abs, np.real, np.imag]
+omegaMax = 20
+omegaMin = 4
+ymax = 0.5
+ymin = None
+form = "SS-p";
+
+termsDict = [ 
+            ("N1-1","G_{n-1, n}"),
+            ]
+            
+        
+for look, matrixEl in termsDict:
+    
+    sz =3
+    
+    fig, ax = plt.subplots( figsize=(sz,sz/2),
+                           constrained_layout=True, sharey=True)
+    
+
+    df_plot = df[(df['form']==form)&
+             (df['N']==N)&
+              (df['a']==a)&
+              (df['phi']==phi)&
+              (df["centre"]==centre)]
+    # df_plot.loc[:,"x-axis"] = df_plot.loc[:,"a"]/df_plot.loc[:,"omega"]
+        
+
+        
+    if not df_plot.empty:
+        df_plot["x-axis"] = df_plot.apply(
+            lambda row: row["a"]/row["omega"], axis=1)
+        
+        
+        df_plot = df_plot.sort_values(by=['x-axis'])
+        
+        df_plot = df_plot.sort_values(by=['omega'])
+        df_plot = df_plot[df_plot["omega"] < omegaMax]
+        df_plot = df_plot[df_plot["omega"] > omegaMin]
+
+            
+        ax.plot(df_plot["omega"], np.real(df_plot[look].values), 
+                    label= r'$\phi=$' + str(round(phi/pi, 2)) + r'$\pi$' + ", A=" + str(a), color="#FF0000")
+        
+        # ax.plot(df_plot["x-axis"], np.real(df_plot[look].values), 
+        #             label=
+        #                 r'$\phi_1=$'+str(round(phi/pi, 2))+r'$\pi$'
+        #                 +", A="+str(a), color="r")
+        
+        # ax.set_xlabel(r'$A/\omega$')
+        ax.set_xlabel(r'$\omega$')
+        ax.set_ylabel(r"$J'$", rotation=0, color="#FF0000", labelpad=15)
+#            ax[n1].set_ylim((-0.5, 0.5))
+    
+        
+    handles_legend, labels_legend = ax.get_legend_handles_labels()    
+    # fig.legend(handles_legend, labels_legend, loc='upper right')
+    plt.grid(True)
+    ax.set_ylim([ymin, ymax])
+    paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
+    fig.savefig(paper+'ElementG-Tunnelling-A=35-poster.pdf', format='pdf', bbox_inches='tight')
+    plt.show()                                                           
 
