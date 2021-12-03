@@ -15,8 +15,8 @@ import pandas as pd
 import time
 import sys
 sys.path.append('/Users/'+place+'/Code/MBQD/floquet-simulations/src')
-from hamiltonians import  CreateHFGeneral, SolveSchrodinger, ConvertComplex, Cosine
-
+from hamiltonians import  CreateHFGeneral, SolveSchrodinger, ConvertComplex, Cosine, Ramp, RampHalf
+dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 
 def filter_duplicates(x):
     """
@@ -38,42 +38,41 @@ def filter_duplicates(x):
             return np.nan
         
 
-sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-Triangle.csv"
+dfname = "analysis-G-Triangle.csv"
 
 
-df = pd.DataFrame(columns=["form", "rtol","N", 
-                            "centre",
-                            "a", 
-                            "omega", 
-                            "phi", 
-                            "onsite",
-                            "O-1",
-                            "O-2",
-                            "O-3",
-                            "N1-1",
-                            "N1-2",
-                            "N1-3"
-                         ])
+# df = pd.DataFrame(columns=["form", "func","rtol","N", 
+#                             "centre",
+#                             "a", 
+#                             "omega", 
+#                             "phi", 
+#                             "onsite",
+#                             "O-1",
+#                             "O-2",
+#                             "O-3",
+#                             "N1-1",
+#                             "N1-2",
+#                             "N1-3"
+#                          ])
     
-df.to_csv(sh+dfname,
-                    index=False, 
-                    columns=["form", "rtol","N", 
-                            "centre",
-                            "a", 
-                            "omega", 
-                            "phi", 
-                            "onsite",
-                            "O-1",
-                            "O-2",
-                            "O-3",
-                            "N1-1",
-                            "N1-2",
-                            "N1-3"]
-                    )
+# df.to_csv(dataLoc+dfname,
+#                     index=False, 
+#                     columns=["form", "func", "rtol","N", 
+#                             "centre",
+#                             "a", 
+#                             "omega", 
+#                             "phi", 
+#                             "onsite",
+#                             "O-1",
+#                             "O-2",
+#                             "O-3",
+#                             "N1-1",
+#                             "N1-2",
+#                             "N1-3"]
+#                     )
 
 #%%
-# df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int, "centre":int,
+# df_dtype_dict = {'form':str,'func':str, "rtol":np.float64, 'N':int, "centre":int,
 #                  'a':np.float64, 
 #                  'omega':np.float64, 
 #                  'phi':np.float64,
@@ -107,7 +106,7 @@ df.to_csv(sh+dfname,
 #                 "N5+1":np.float64,
 #                 "N6":np.float64}
 
-df = pd.read_csv(sh+dfname, 
+df = pd.read_csv(dataLoc+dfname, 
                  index_col=False, 
                  converters={
                             "O-1": ConvertComplex,
@@ -136,7 +135,8 @@ omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
 # omegas = np.linspace(20.1, 200, 200*10-200)
 
 onsite = 0
-funcs = [Cosine]
+funcs = [RampHalf]
+funcname = "RampHalf"
 circleBoundary = 1
 
 # UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
@@ -150,7 +150,7 @@ for a in [35]:
     
     for phi in phis:
         print('a=',a,'  phi=',phi)
-        df1 = pd.DataFrame(columns=["form", "rtol", "N", "centre",
+        df1 = pd.DataFrame(columns=["form", "func","rtol", "N", "centre",
                                     "a",
                                     "omega",
                                     "phi",
@@ -195,6 +195,7 @@ for a in [35]:
             print('   ',time.time()-start, 's')
             
             df1.loc[i] = [form, 
+                          funcname,
                           rtol,
                           N,
                           centre,
@@ -226,9 +227,10 @@ for a in [35]:
     #                                }).reset_index()
         
         print('   saving..')
-        df.to_csv(sh+dfname,
+        df.to_csv(dataLoc+dfname,
                   index=False, 
-                  columns=['form', 'rtol','N', "centre",
+                  columns=['form', "func", 
+                           'rtol','N', "centre",
                            'a', 
                            'omega', 
                            'phi',

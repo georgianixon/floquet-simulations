@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -21,10 +21,9 @@ import seaborn as sns
 from numpy import sin, cos, exp, pi
 
 import sys
-# sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
-sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
+sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
 from hamiltonians import  hoppingHF, ConvertComplex, PhiString
-
+dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 
 
 def filter_duplicates(x):
@@ -92,10 +91,10 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 sh = "/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/"
 # sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-Triangle.csv"
+dfname = "analysis-G-Triangle.csv"
 
 
-df = pd.read_csv(sh+dfname, 
+df = pd.read_csv(dataLoc+dfname, 
                  index_col=False, 
                  converters={"O-1": ConvertComplex,
                             "O-2": ConvertComplex,
@@ -128,6 +127,7 @@ omegaMin = 4
 ymax = None
 ymin = None
 form = "Tri"
+funcName = "RampHalf"
 
 termsDict = [ 
     ("O-1", "G_{0, 0}"),
@@ -161,7 +161,8 @@ for look, matrixEl in termsDict:
                      (df['N']==N)&
                       (df['a']==a)&
                       (df['phi']==phi)&
-                      (df["centre"]==centre)]
+                      (df["centre"]==centre)&
+                      (df["func"]==funcName)]
                 # df_plot.loc[:,"x-axis"] = df_plot.loc[:,"a"]/df_plot.loc[:,"omega"]
                 
         
