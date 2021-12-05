@@ -6,17 +6,18 @@ Created on Thu Sep 10 15:55:49 2020
 @author: Georgia
 """
 
-place = "Georgia Nixon"
+place = "Georgia"
 from numpy import exp, sin, cos, pi, log, sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
-sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
+# sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
+sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
 from hamiltonians import SolveSchrodinger, SolveSchrodingerGeneral, SolveSchrodingerTimeIndependent
-from hamiltonians import  PhiString
+from hamiltonians import  PhiString, GetEvalsAndEvecsGen
 
-from hamiltonians import H_PhasesOnLoopsOneD, H_0, H_0_Phases, H_DipoleTrap,  H_DipoleTrapwPhases
+from hamiltonians import  H0_DipoleTrap,  H0_DipoleTrapwPhases, H0_PhasesNNHop
 
 import matplotlib as mpl
 import seaborn as sns
@@ -61,7 +62,7 @@ def PlotPsi(psi, x_positions, x_labels, title, normaliser):
     cmapcol = 'PuOr' #PiYG_r
     cmap= mpl.cm.get_cmap(cmapcol)
     
-    sz = 6
+    sz = 3
     fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
                             figsize=(sz*len(apply)*1.3,sz))
     
@@ -101,7 +102,7 @@ def PlotProbCurrent(psi, x_positions, x_labels, title, normaliser):
     cmapcol = 'PuOr' #PiYG_r
     cmap= mpl.cm.get_cmap(cmapcol)
     
-    sz = 7
+    sz = 4
     fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
                             figsize=(sz*len(apply),sz))
     
@@ -145,7 +146,7 @@ def PlotTwoPsi(psi1, psi2, x_positions, x_labels, title, normaliser):
     cmapcol = 'PuOr' #PiYG_r
     cmap= mpl.cm.get_cmap(cmapcol)
     
-    sz = 5
+    sz = 3
     fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
                             figsize=(sz*len(apply),sz))
     
@@ -432,42 +433,34 @@ Homogeneous expansion
 
 # revolving phases
 # form = "H0T"
-# N = 91; 
+N = 49; 
 # centre = 45;
-# rtol=1e-11
-# T = 1
-# psi2 = SolveSchrodinger("H0T", N, centre, rtol, tspan, nTimesteps, psi0)
+rtol=1e-11
+T = 1
+centres = [6, 7, 25, 27, 29, 35]
+phases1 = [0, 1, 2, 3, 4, 5]
+phases2 = [0, 0, 0, 0, 0, 0]
 
 
 # phases with non trivial loops and NNN hopping
 
-N = 211
-T = 1
-centre = 105
-aSiteStart1 = 95; aSiteStart2 = 110
+
+aSiteStart1 = 20; 
+# aSiteStart2 = 110
 psi01 = np.zeros(N, dtype=np.complex_); psi01[aSiteStart1] = 1;
 # psi02 = np.zeros(N, dtype=np.complex_); psi02[aSiteStart2] = 1;
-p0 = pi/7; p1 = pi/3; p2 = pi/2; p3 = pi/4
-# H0 = H_DipoleTrap(N, centre, 0.001)
-# HPhases = H_0_Phases(N, [99, 107, 120, 140], [pi/4, pi/3, pi/7, pi/sqrt(3)])
-# HPhases = H_PhasesOnLoopsOneD(N, centre, 0, pi/3, pi/4, pi/5,np.nan)
-# HPhases = H_DipoleTrap(N, centre, 0.001)
-
-HPhases1 = H_DipoleTrapwPhases(N, 
-            centre, 0.001, pi/3, pi/4, pi/5, pi/6)
-HPhases2 = H_DipoleTrapwPhases(N, 
-            centre, 0.001, 0, 0, 0, 0)
-
-HPhases1 = H_PhasesOnLoopsOneD(N, centre, 0, pi/3, pi/4, pi/5,pi/2)
-HPhases2 = H_PhasesOnLoopsOneD(N, centre, 0, 0, 0, 0,0)
+# p0 = pi/7; p1 = pi/3; p2 = pi/2; p3 = pi/4
+HPhases1 = H0_PhasesNNHop(N, centres, phases1)
+HPhases2 = H0_PhasesNNHop(N, centres, phases2)
 
 
-
-
+evals1, evecs1 = GetEvalsAndEvecsGen(HPhases1)
+evals2, evecs2 = GetEvalsAndEvecsGen(HPhases1)
+# psi01 = evecs2[:,0]
 # HPhasesFlip = np.flip(np.flip(HPhases, 0).T, 0)
 
 #parameters for ODE solver
-nOscillations = 50
+nOscillations = 10
 #how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
 nTimesteps = nOscillations*100
 n_osc_divisions = 2
@@ -486,20 +479,20 @@ absMax = np.max([np.abs(pMax), np.abs(pMin)])
         
 #normaliser params
 normaliser = mpl.colors.Normalize(vmin=-absMax, vmax=absMax)
-linthresh = 1e-2
+linthresh = 1e-1
 normaliser=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-absMax, vmax=absMax, base=10)
 
 #other graphing params
 x_positions = np.linspace(0, nTimesteps, int(nOscillations/n_osc_divisions+1))
 x_labels = list(range(0, nOscillations+1, n_osc_divisions))
 
-PlotPsi(psi1, x_positions, x_labels, r"title",
+PlotPsi(psi1, x_positions, x_labels, r"",
       normaliser)
 
 #flip one
 # psi2 = np.flip(psi2, axis=0)
 
-PlotPsi(psi2, x_positions, x_labels,   r"title",
+PlotPsi(psi2, x_positions, x_labels,   r"",
       normaliser)
 
 
@@ -507,7 +500,7 @@ PlotPsi(psi2, x_positions, x_labels,   r"title",
 
 
 #plot difference
-PlotTwoPsi(psi1, psi2, x_positions, x_labels, r"title", normaliser)
+PlotTwoPsi(psi1, psi2, x_positions, x_labels, r"", normaliser)
 
 
 #%%
@@ -587,6 +580,7 @@ plt.show()
 #%%
 """ Ramp """
 
+from hamiltonians import Ramp, RampHalf, Blip, Cosine
 """General Params"""  
 N = 91#182; 
 rtol=1e-11
@@ -595,48 +589,6 @@ rtol=1e-11
 A_site_start1 = 35#85;
 """wave 2 params"""
 A_site_start2 = 35#96;
-
-"""Ramp params"""
-def Ramp(params, t): # ramp
-    a = params[0]
-    omega = params[1]
-    phi = params[2]
-    onsite = params[3]
-    
-    nCycle = np.floor(t*omega/2/pi + phi/2/pi)
-    y = a*omega*t/2/pi + a*phi/2/pi - nCycle*a + onsite
-    return y 
-
-def RampHalf(params, t): # ramp
-    a = params[0]
-    omega = params[1]
-    phi = params[2]
-    onsite = params[3]
-    
-    nHalfCycle = np.floor(t*omega/pi + phi/pi)
-    y = (a*omega*t/pi + a*phi/pi - nHalfCycle*a)*((nHalfCycle + 1 ) % 2) + onsite
-    return y 
-
-
-"""Blip params"""
-def Blip(params, t):
-    a = params[0]
-    omega = params[1]
-    phi = params[2]
-    onsite = params[3]
-    
-    nHalfCycle = np.floor(t*omega/pi + phi/pi)
-    y = a*sin(omega*t + phi)*((nHalfCycle+1) % 2) + onsite
-    return y
-
-"""Usual Cos shake"""
-def Cosine(params, t):
-    a = params[0]
-    omega = params[1]
-    phi = params[2]
-    onsite = params[3]
-    y = a*cos(omega*t + phi)+ onsite
-    return y 
 
 
 a = 35
@@ -929,8 +881,8 @@ plt.show()
 
 
 """"Global parameters"""
-N = 91#182; 
-centre = 30#90;
+N = 19#182; 
+centre = 3#90;
 rtol=1e-11
 
 #SS-p params
@@ -948,7 +900,7 @@ paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+P
 
 
 """wave 1 parameters""" # for ssdf
-A_site_start1 = 40#85;
+A_site_start1 =6#85;
 
 
 # plot potential
@@ -958,7 +910,7 @@ shake = a*cos(omega*t + phi)
 
 
 """solver params"""
-nOscillations = 30
+nOscillations = 12
 #how many steps we want. NB, this means we will solve for nTimesteps+1 times (edges)
 nTimesteps = nOscillations*100
 n_osc_divisions = 2
@@ -997,7 +949,7 @@ mpl.rcParams.update({
 cmapcol = "Purples"#'PuOr' #PiYG_r
 cmap= mpl.cm.get_cmap(cmapcol)
 
-sz = 2.5
+sz = 1.7
 fig, ax = plt.subplots(figsize=(sz*1.7,sz))
 
 
@@ -1009,22 +961,21 @@ ax.set_xlabel('t/T', fontfamily='STIXGeneral')
 ax.set_xticklabels(x_labels)
 for side in ["bottom", "top", "left", "right"]:
     ax.spines[side].set_visible(False)
-if i == 0:
-    ax.set_ylabel('site', fontfamily='STIXGeneral')
+ax.set_ylabel('site', fontfamily='STIXGeneral')
 
-cax = plt.axes([0.91, 0.1, 0.03, 0.8])
+cax = plt.axes([0.96, 0.1, 0.06, 0.8])
 cbar = fig.colorbar(plt.cm.ScalarMappable(cmap=cmapcol, norm=normaliser), cax=cax, extend="min")
 
 cbar.ax.get_yaxis().set_ticks([])
 for j, lab in zip([1, 0.1, 0.01,], ['$1$','$0.1$','$0.01$']):
-    cbar.ax.text(500, j, lab, ha='center', va='center')
+    cbar.ax.text(300, j, lab, ha='center', va='center')
 # cbar.ax.get_yaxis().labelpad = 30
-cbar.ax.set_ylabel(r'$|\psi(t)|^2$', rotation=270, labelpad=35)
+cbar.ax.set_ylabel(r'$|\psi(t)|^2$', rotation=270, labelpad=38)
 
 
 
 # fig.suptitle(title, y = 1.2,  fontfamily='STIXGeneral')
 paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
-plt.savefig(paper + "Reflection.pdf", bbox_inches='tight')
+plt.savefig(paper + "Reflection-Poster.pdf", bbox_inches='tight')
 
 plt.show()

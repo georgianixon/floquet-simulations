@@ -188,23 +188,183 @@ df = pd.read_csv(sh+dfname,
 # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form="SS-p"#"StepFunc"#'SS-p' 
+form="StepFunc"#'SS-p' 
 
 rtol = 1e-11
-a = 35
 phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 onsite = 0
-# omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
-omegas = np.linspace(20.1, 200, 200*10-200)
-
-for phi in phis:
-    print('a=',a,'  phi=',phi)
-    df1 = pd.DataFrame(columns=["form", "rtol", "N", "centre",
-                                "a",
-                                "omega",
-                                "phi",
-                                "onsite",
-                                "O-3",
+omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
+# omegas = np.linspace(20.1, 200, 200*10-200)
+    
+    
+for a in [5, 10, 15, 20, 30]:
+    
+    
+    for phi in phis:
+        print('a=',a,'  phi=',phi)
+        df1 = pd.DataFrame(columns=["form", "rtol", "N", "centre",
+                                    "a",
+                                    "omega",
+                                    "phi",
+                                    "onsite",
+                                    "O-3",
+                                    "O-2",
+                                    "O-1",
+                                    "O",
+                                    "O+1",
+                                    "O+2",
+                                    "O+3",
+                                    "N1-3",
+                                    "N1-2",
+                                    "N1-1",
+                                    "N1+1",
+                                    "N1+2",
+                                    "N1+3",
+                                    "N2-2",
+                                    "N2-1",
+                                    "N2",
+                                    "N2+1",
+                                    "N2+2",
+                                    "N3-2",
+                                    "N3-1",
+                                    "N3+1",
+                                    "N3+2",
+                                    "N4-1",
+                                    "N4",
+                                    "N4+1",
+                                    "N5-1",
+                                    "N5+1",
+                                    "N6"])
+        for i, omega1 in enumerate(omegas):
+            
+            start = time.time()
+            
+            omega1 = round(omega1, 1)
+            print(omega1)
+            
+            if form == "SS-p" or form == "StepFunc":
+                aInput = a
+                omegaInput = omega1
+                phiInput = phi
+                onsiteInput = onsite
+            # elif form =="DS-p" or form == "SSDF-p":
+            #     omega2 = omegaMultiplier*omega1
+            #     aInput = [a1,a2]
+            #     omegaInput = [omega1,omega2]
+            #     phiInput = [phi, phi+phiOffset]
+    
+            # calculate effective Hamiltonian 
+            UT, HF = CreateHF(form, rtol, N, centre, aInput, omegaInput, phiInput, onsiteInput)
+            
+    
+            
+            # log matrix elements
+            Om3 = HF[centre-3][centre-3]
+            Om2 = HF[centre-2][centre-2]
+            Om1 = HF[centre-1][centre-1]
+            O = HF[centre][centre]
+            Op1 = HF[centre+1][centre+1]
+            Op2 = HF[centre+2][centre+2]
+            Op3 = HF[centre+3][centre+3]
+            
+            N1m3 = HF[centre-3][centre-2]
+            N1m2 = HF[centre-2][centre-1]
+            N1m1 = HF[centre-1][centre]
+            N1p1 = HF[centre][centre+1]
+            N1p2 = HF[centre+1][centre+2]
+            N1p3 = HF[centre+2][centre+3]
+            
+            N2m2 = HF[centre-3][centre-1]
+            N2m1 = HF[centre-2][centre]
+            N2 = HF[centre-1][centre+1]
+            N2p1 = HF[centre][centre+2]
+            N2p2 = HF[centre+1][centre+3]
+            
+            N3m2 = HF[centre-3][centre]
+            N3m1 = HF[centre-2][centre+1]
+            N3p1 = HF[centre-1][centre+2]
+            N3p2 = HF[centre][centre+3]
+            
+            N4m1 = HF[centre-3][centre+1]
+            N4 = HF[centre-2][centre+2]
+            N4p1 = HF[centre-2][centre+3]
+            
+            N5m1 = HF[centre-3][centre+2]
+            N5p1 = HF[centre-2][centre+1]
+            
+            N6 = HF[centre-3][centre+3]
+            
+            
+            
+            print('   ',time.time()-start, 's')
+            
+            df1.loc[i] = [form, 
+                          rtol,
+                          N,
+                          centre,
+                          a,
+                          omega1,
+                          phi,
+                          onsite,
+                          Om3,
+                            Om2,
+                            Om1,
+                            O,
+                            Op1,
+                            Op2,
+                            Op3,
+                            
+                            N1m3, 
+                            N1m2,
+                            N1m1, 
+                            N1p1,
+                            N1p2,
+                            N1p3, 
+                            
+                            N2m2,
+                            N2m1, 
+                            N2 ,
+                            N2p1, 
+                            N2p2,
+                            
+                            N3m2, 
+                            N3m1, 
+                            N3p1,
+                            N3p2, 
+                            
+                            N4m1, 
+                            N4,
+                            N4p1, 
+                            
+                            N5m1,
+                            N5p1, 
+                            
+                            N6 
+            ]
+    
+    
+        df = df.append(df1, ignore_index=True, sort=False)
+        # df= df.astype(dtype=df_dtype_dict)
+        
+    #        print('  grouping..')
+    #        df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
+    #                         'N'], dropna=False).agg({
+    #                                'hopping':filter_duplicates,
+    #                                'onsite':filter_duplicates,
+    #                                'next onsite':filter_duplicates,
+    #                                'NNN':filter_duplicates,
+    #                                'NNN overtop':filter_duplicates
+    #                                }).reset_index()
+        
+        print('   saving..')
+        df.to_csv(sh+dfname,
+                  index=False, 
+                  columns=['form', 'rtol','N', "centre",
+                           'a', 
+                           'omega', 
+                           'phi',
+                           "onsite",
+                          "O-3",
                                 "O-2",
                                 "O-1",
                                 "O",
@@ -232,160 +392,3 @@ for phi in phis:
                                 "N5-1",
                                 "N5+1",
                                 "N6"])
-    for i, omega1 in enumerate(omegas):
-        
-        start = time.time()
-        
-        omega1 = round(omega1, 1)
-        print(omega1)
-        
-        if form == "SS-p" or form == "StepFunc":
-            aInput = a
-            omegaInput = omega1
-            phiInput = phi
-            onsiteInput = onsite
-        # elif form =="DS-p" or form == "SSDF-p":
-        #     omega2 = omegaMultiplier*omega1
-        #     aInput = [a1,a2]
-        #     omegaInput = [omega1,omega2]
-        #     phiInput = [phi, phi+phiOffset]
-
-        # calculate effective Hamiltonian 
-        UT, HF = CreateHF(form, rtol, N, centre, aInput, omegaInput, phiInput, onsiteInput)
-        
-
-        
-        # log matrix elements
-        Om3 = HF[centre-3][centre-3]
-        Om2 = HF[centre-2][centre-2]
-        Om1 = HF[centre-1][centre-1]
-        O = HF[centre][centre]
-        Op1 = HF[centre+1][centre+1]
-        Op2 = HF[centre+2][centre+2]
-        Op3 = HF[centre+3][centre+3]
-        
-        N1m3 = HF[centre-3][centre-2]
-        N1m2 = HF[centre-2][centre-1]
-        N1m1 = HF[centre-1][centre]
-        N1p1 = HF[centre][centre+1]
-        N1p2 = HF[centre+1][centre+2]
-        N1p3 = HF[centre+2][centre+3]
-        
-        N2m2 = HF[centre-3][centre-1]
-        N2m1 = HF[centre-2][centre]
-        N2 = HF[centre-1][centre+1]
-        N2p1 = HF[centre][centre+2]
-        N2p2 = HF[centre+1][centre+3]
-        
-        N3m2 = HF[centre-3][centre]
-        N3m1 = HF[centre-2][centre+1]
-        N3p1 = HF[centre-1][centre+2]
-        N3p2 = HF[centre][centre+3]
-        
-        N4m1 = HF[centre-3][centre+1]
-        N4 = HF[centre-2][centre+2]
-        N4p1 = HF[centre-2][centre+3]
-        
-        N5m1 = HF[centre-3][centre+2]
-        N5p1 = HF[centre-2][centre+1]
-        
-        N6 = HF[centre-3][centre+3]
-        
-        
-        
-        print('   ',time.time()-start, 's')
-        
-        df1.loc[i] = [form, 
-                      rtol,
-                      N,
-                      centre,
-                      a,
-                      omega1,
-                      phi,
-                      onsite,
-                      Om3,
-                        Om2,
-                        Om1,
-                        O,
-                        Op1,
-                        Op2,
-                        Op3,
-                        
-                        N1m3, 
-                        N1m2,
-                        N1m1, 
-                        N1p1,
-                        N1p2,
-                        N1p3, 
-                        
-                        N2m2,
-                        N2m1, 
-                        N2 ,
-                        N2p1, 
-                        N2p2,
-                        
-                        N3m2, 
-                        N3m1, 
-                        N3p1,
-                        N3p2, 
-                        
-                        N4m1, 
-                        N4,
-                        N4p1, 
-                        
-                        N5m1,
-                        N5p1, 
-                        
-                        N6 
-        ]
-
-
-    df = df.append(df1, ignore_index=True, sort=False)
-    # df= df.astype(dtype=df_dtype_dict)
-    
-#        print('  grouping..')
-#        df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
-#                         'N'], dropna=False).agg({
-#                                'hopping':filter_duplicates,
-#                                'onsite':filter_duplicates,
-#                                'next onsite':filter_duplicates,
-#                                'NNN':filter_duplicates,
-#                                'NNN overtop':filter_duplicates
-#                                }).reset_index()
-    
-    print('   saving..')
-    df.to_csv(sh+dfname,
-              index=False, 
-              columns=['form', 'rtol','N', "centre",
-                       'a', 
-                       'omega', 
-                       'phi',
-                       "onsite",
-                      "O-3",
-                            "O-2",
-                            "O-1",
-                            "O",
-                            "O+1",
-                            "O+2",
-                            "O+3",
-                            "N1-3",
-                            "N1-2",
-                            "N1-1",
-                            "N1+1",
-                            "N1+2",
-                            "N1+3",
-                            "N2-2",
-                            "N2-1",
-                            "N2",
-                            "N2+1",
-                            "N2+2",
-                            "N3-2",
-                            "N3-1",
-                            "N3+1",
-                            "N3+2",
-                            "N4-1",
-                            "N4",
-                            "N4+1",
-                            "N5-1",
-                            "N5+1",
-                            "N6"])
