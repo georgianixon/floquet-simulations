@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -127,12 +127,12 @@ omegaMin = 4
 ymax = None
 ymin = None
 form = "Tri"
-funcName = "RampHalf"
+funcName = "Cosine"
 
 termsDict = [ 
-    ("O-1", "G_{0, 0}"),
-            ("O-2","G_{1, 1}"),
-            ("O-3","G_{2, 2}"),
+    # ("O-1", "G_{0, 0}"),
+            # ("O-2","G_{1, 1}"),
+            # ("O-3","G_{2, 2}"),
             ("N1-1","G_{0, 1}"),
             ("N1-2","G_{1, 2}"),
             ("N1-3","G_{0, 2}")]

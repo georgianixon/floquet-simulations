@@ -21,8 +21,8 @@ import seaborn as sns
 from numpy import sin, cos, exp, pi
 
 import sys
-sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
-# sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
+# sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
+sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
 from hamiltonians import  hoppingHF, ConvertComplex, PhiString
 
 
@@ -91,12 +91,13 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
-sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-N6.csv"
+# sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
+dataLoc = "/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
+dfname = "analysis-G-N6.csv"
 # dfname = "data/analysis-G.csv"
 
 
-df = pd.read_csv(sh+dfname, 
+df = pd.read_csv(dataLoc+dfname, 
                  index_col=False, 
                  converters={"O-3": ConvertComplex,
                             "O-2": ConvertComplex,

@@ -6,7 +6,7 @@ Created on Fri Dec  3 15:26:34 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -120,7 +120,7 @@ centre2 = 2
 rtol=1e-11
 # aas = [5, 10, 15, 20, 25, 30, 35]
 aas = [35]
-phi1s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phi1s =  [0]#[0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phi2s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 # phis =  [0]
 apply = [np.abs, np.real, np.imag]
@@ -129,14 +129,14 @@ omegaMin = 4
 ymax = None
 ymin = None
 form = "Tri"
-func1Name = "RampHalf"
-func2Name = "RampHalf"
+func1Name = "Blip"#"RampHalf"#"Cosine"#
+func2Name = "Blip"#"RampHalf"#"Cosine"#
 
 
 termsDict = [ 
-    ("O-1", "G_{0, 0}"),
-            ("O-2","G_{1, 1}"),
-            ("O-3","G_{2, 2}"),
+    # ("O-1", "G_{0, 0}"),
+            # ("O-2","G_{1, 1}"),
+            # ("O-3","G_{2, 2}"),
             ("N1-1","G_{0, 1}"),
             ("N1-2","G_{1, 2}"),
             ("N1-3","G_{0, 2}")]
@@ -189,7 +189,7 @@ for look, matrixEl in termsDict:
                     for n1, f in enumerate(apply):
                         
                         ax[n1].plot(df_plot["omega1"], f(df_plot[look].values), 
-                                    label= r'$\phi1=$' + PhiString(phi1) + r'$\pi$' + ", A=" + str(a))
+                                    label= r'$\phi1=' + PhiString(phi1) + r', \phi2=' + PhiString(phi2) +r'\pi' + ", A=" + str(a)+r'$')
                         
                         # ax[n1].plot(df_plot["x-axis"], f(df_plot[look].values), 
                         #             label=

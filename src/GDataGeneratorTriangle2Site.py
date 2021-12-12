@@ -6,7 +6,7 @@ Created on Fri Dec  3 15:13:19 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 
 from numpy.linalg import eig
 from numpy import  pi, log, exp, sin
@@ -16,7 +16,7 @@ import pandas as pd
 import time
 import sys
 sys.path.append('/Users/'+place+'/Code/MBQD/floquet-simulations/src')
-from hamiltonians import  CreateHFGeneral, SolveSchrodinger, ConvertComplex, Cosine, Ramp, RampHalf
+from hamiltonians import  CreateHFGeneral, SolveSchrodinger, ConvertComplex, Cosine, Ramp, RampHalf, Blip
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 
 def filter_duplicates(x):
@@ -42,35 +42,35 @@ def filter_duplicates(x):
 dfname = "analysis-G-Triangle-2Site.csv"
 
 
-df = pd.DataFrame(columns=["form", "func1","func2","rtol","N", 
-                            "centre1","centre2",
-                            "a1", "a2", 
-                            "omega1", "omega2", 
-                            "phi1", "phi2", 
-                            "onsite1","onsite2",
-                            "O-1",
-                            "O-2",
-                            "O-3",
-                            "N1-1",
-                            "N1-2",
-                            "N1-3"
-                          ])
+# df = pd.DataFrame(columns=["form", "func1","func2","rtol","N", 
+#                             "centre1","centre2",
+#                             "a1", "a2", 
+#                             "omega1", "omega2", 
+#                             "phi1", "phi2", 
+#                             "onsite1","onsite2",
+#                             "O-1",
+#                             "O-2",
+#                             "O-3",
+#                             "N1-1",
+#                             "N1-2",
+#                             "N1-3"
+#                           ])
     
-df.to_csv(dataLoc+dfname,
-                    index=False, 
-                    columns=["form", "func1","func2","rtol","N", 
-                            "centre1","centre2",
-                            "a1", "a2", 
-                            "omega1", "omega2", 
-                            "phi1", "phi2", 
-                            "onsite1","onsite2",
-                            "O-1",
-                            "O-2",
-                            "O-3",
-                            "N1-1",
-                            "N1-2",
-                            "N1-3"]
-                    )
+# df.to_csv(dataLoc+dfname,
+#                     index=False, 
+#                     columns=["form", "func1","func2","rtol","N", 
+#                             "centre1","centre2",
+#                             "a1", "a2", 
+#                             "omega1", "omega2", 
+#                             "phi1", "phi2", 
+#                             "onsite1","onsite2",
+#                             "O-1",
+#                             "O-2",
+#                             "O-3",
+#                             "N1-1",
+#                             "N1-2",
+#                             "N1-3"]
+#                     )
 
 #%%
 # df_dtype_dict = {'form':str,'func':str, "rtol":np.float64, 'N':int, "centre":int,
@@ -135,13 +135,12 @@ omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
 # omegas = np.linspace(20.1, 200, 200*10-200)
 
 onsite1 = 0; onsite2 = 0
-funcs = [RampHalf, RampHalf]
-funcname1 = "RampHalf"; funcname2="RampHalf"
+funcs = [Blip, Blip]
+funcname1 = "Blip"; funcname2="Blip"
 
 circleBoundary = 1
 
 # UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
-
 
 
 

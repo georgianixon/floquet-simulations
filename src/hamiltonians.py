@@ -249,11 +249,11 @@ def H0_PhasesLongRangeHop(N, centre, p0, p1, p2, p3, p4=0):
 def H0_Triangle(J1, J2):
     H = np.zeros((3,3), dtype=np.complex128)
     H[0,1] =-J2
-    H[1,2] =-J2
+    H[1,2] =-np.conj(J2)
     H[2,0] =-J1
-    H[1,0] =np.conj(-J2)
-    H[2,1] =np.conj(-J2)
-    H[0,2] =np.conj(-J1)
+    H[1,0] =-np.conj(-J2)
+    H[2,1] =-J2
+    H[0,2] =-np.conj(-J1)
     return H
     
 def H0_DipoleTrap(N, centre, dipoleFac):
@@ -724,6 +724,7 @@ def Blip(params, t):
     nHalfCycle = np.floor(t*omega/pi + phi/pi)
     y = a*sin(omega*t + phi)*((nHalfCycle+1) % 2) + onsite
     return y
+
 
 """Usual Cos shake"""
 def Cosine(params, t):
