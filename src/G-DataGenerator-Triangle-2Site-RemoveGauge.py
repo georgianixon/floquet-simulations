@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Dec  3 15:13:19 2021
+Created on Mon Dec 13 11:09:01 2021
 
 @author: Georgia Nixon
 """
 
 
-place = "Georgia"
+
+place = "Georgia Nixon"
 
 from numpy.linalg import eig
 from numpy import  pi, log, exp, sin
@@ -16,7 +17,7 @@ import pandas as pd
 import time
 import sys
 sys.path.append('/Users/'+place+'/Code/MBQD/floquet-simulations/src')
-from hamiltonians import  CreateHFGeneral, SolveSchrodinger, ConvertComplex, Cosine, Ramp, RampHalf, Blip
+from hamiltonians import  CreateHFGeneral, SolveSchrodinger, ConvertComplex, Cosine, Ramp, RampHalf, Blip, RemoveWannierGauge
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 
 def filter_duplicates(x):
@@ -39,15 +40,9 @@ def filter_duplicates(x):
             return np.nan
         
 
-dfname = "analysis-G-Triangle-2Site.csv"
 dfname = "analysis-G-Triangle-2Site-RemoveGauge.csv"
 
-def RemoveWannierGauge(matrix, p):
-    phase = np.angle(N[p-1,p])
-    for i in [p-1, p+1]:
-        matrix[i, p] = np.exp(-1j*phase)*matrix[i,p]
-        matrix[p, i] = np.exp(1j*phase)*matrix[p,i]
-    return matrix
+
 
 
 
@@ -99,22 +94,7 @@ def RemoveWannierGauge(matrix, p):
 #                 "N1-1":np.float64,
 #                 "N1+1":np.float64,
 #                 "N1+2":np.float64,
-#                 "N1+3":np.float64,
-#                 "N2-2":np.float64,
-#                 "N2-1":np.float64,
-#                 "N2":np.float64,
-#                 "N2+1":np.float64,
-#                 "N2+2":np.float64,
-#                 "N3-2":np.float64,
-#                 "N3-1":np.float64,
-#                 "N3+1":np.float64,
-#                 "N3+2":np.float64,
-#                 "N4-1":np.float64,
-#                 "N4":np.float64,
-#                 "N4+1":np.float64,
-#                 "N5-1":np.float64,
-#                 "N5+1":np.float64,
-#                 "N6":np.float64}
+#                 "N1+3":np.float64}
 
 df = pd.read_csv(dataLoc+dfname, 
                  index_col=False, 
@@ -135,7 +115,7 @@ df = pd.read_csv(dataLoc+dfname,
 N = 3; 
 centre1=1; centre2=2
 centres=[centre1,centre2];
-form="Tri"#'SS-p' 
+form="Tri-RemoveGauge"#'SS-p' 
 
 
 rtol = 1e-11
@@ -144,12 +124,10 @@ omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
 # omegas = np.linspace(20.1, 200, 200*10-200)
 
 onsite1 = 0; onsite2 = 0
-funcs = [Blip, Blip]
-funcname1 = "Blip"; funcname2="Blip"
+funcs = [Cosine, Cosine]
+funcname1 = "Cosine"; funcname2="Cosine"
 
 circleBoundary = 1
-
-# UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
 
 
@@ -180,7 +158,7 @@ for a in [35]:
                 print(omega1)
                 
                 T = 2*pi/omega1
-                omega2 = 2*omega1
+                omega2 = 3*omega1
                 # elif form =="DS-p" or form == "SSDF-p":
                 #     omega2 = omegaMultiplier*omega1
                 #     aInput = [a1,a2]
@@ -191,7 +169,8 @@ for a in [35]:
                 paramss = [[a, omega1, phi1, onsite1], [a, omega2, phi2, onsite2]]
                 UT, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
         
-                
+                for site in range(N):
+                    HF = RemoveWannierGauge(HF, site, N)
                 # log matrix elements
                 Om1 = HF[0][0]
                 Om2 = HF[1][1]

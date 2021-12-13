@@ -19,6 +19,12 @@ from scipy.special import jn_zeros, jv
 from fractions import Fraction 
 from hamiltonians import Cosine, PhiString
     
+def RemoveWannierGauge(matrix, c, N):
+    phase = np.angle(matrix[c-1,c])
+    gaugeMatrix = np.identity(N, dtype=np.complex128)
+    gaugeMatrix[c,c] = np.exp(-1j*phase)
+    matrix = np.matmul(np.matmul(np.conj(gaugeMatrix), matrix), gaugeMatrix)
+    return matrix
 
 
 size=12

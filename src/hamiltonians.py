@@ -443,7 +443,7 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
             method='RK45')
         sol=sol.y
         
-    elif form == 'SS-p':
+    elif form == 'SS-p' or form =="SS-p-RemoveGauge":
         sol = solve_ivp(lambda t,psi: F_SS(t, psi, 
                                            N, centre, a, omega, phi, onsite), 
             t_span=tspan, y0=psi0, rtol=rtol, 
@@ -533,7 +533,7 @@ X = np.dot(A, psi)
 
 def CreateHF(form, rtol, N, centre, a, omega, phi, onsite): 
 
-    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p", "StepFunc", "StepFuncGen", "SSHModel"])
+    assert(form in ['linear', "linear-p", "SS-p", "DS-p", "SSDF-p", "StepFunc", "StepFuncGen", "SSHModel", "SS-p-RemoveGauge"])
     T = 2*pi/np.min(omega)
     tspan = (0,T)
     UT = np.zeros([N,N], dtype=np.complex_)
@@ -734,4 +734,13 @@ def Cosine(params, t):
     onsite = params[3]
     y = a*cos(omega*t + phi)+ onsite
     return y 
+
+
+def RemoveWannierGauge(matrix, c, N):
+    phase = np.angle(matrix[c-1,c])
+    phase = phase - np.pi #because it should be np.pi
+    gaugeMatrix = np.identity(N, dtype=np.complex128)
+    gaugeMatrix[c,c] = np.exp(-1j*phase)
+    matrix = np.matmul(np.matmul(np.conj(gaugeMatrix), matrix), gaugeMatrix)
+    return matrix
         

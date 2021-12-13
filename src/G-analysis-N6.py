@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -52,7 +52,7 @@ def filter_duplicates(x):
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=16
+size=10
 params = {
             'legend.fontsize': size*0.7,
           'axes.labelsize': size,
@@ -69,11 +69,12 @@ params = {
           'axes.grid': True,
           'grid.alpha': 1,
           # 'grid.color': "0.9"
+          "text.usetex": True
           }
 
 
 mpl.rcParams.update(params)
-
+mpl.rcParams["text.latex.preamble"] = mpl.rcParams["text.latex.preamble"] + r'\usepackage{xfrac}'
 
 CB91_Blue = 'darkblue'#'#2CBDFE'
 CB91_Green = '#47DBCD'
@@ -275,17 +276,17 @@ N = 51;
 centre = 25
 
 rtol=1e-11
-aas = [35]
+aas = [35]#[35, 30, 25, 20, 15, 10, 5]
 # aas = [30]
-phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phis =  [0]
 # phis =  [0]
 apply = [np.abs]
 omegaMax = 20
 omegaMin = 4
-ymax = 1
-ymin = 0
-# form = "SS-p";
-form = "StepFunc"; 
+ymax = None
+ymin = None
+form = "SS-p";
+# form = "StepFunc"; 
 # form = "DS-p"; 
 # form = "SSDF-p"; 
 
@@ -293,14 +294,14 @@ termsDict = [
     # ("O-3", "G_{n-3, n-3}"),
             # ("O-2","G_{n-2, n-2}"),
             # ("O-1","G_{n-1, n-1}"),
-            ("O","G_{n, n}"),
+            # ("O","G_{n, n}"),
             # ("O+1","G_{n+1, n+1}"),
             # ("O+2","G_{n+2, n+2}"),
             # ("O+3","G_{n+3, n+3}"),
             # ("N1-3","G_{n-3, n-2}"),
             # ("N1-2","G_{n-2, n-1}"),
             # ("N1-1","G_{n-1, n}"),
-            # ("N1+1","G_{n, n+1}"),
+            ("N1+1","G_{b, b+1}"),
             # ("N1+2","G_{n+1, n+2}"),
             # ("N1+3","G_{n+2, n+3}"),
             # ("N2-2","G_{n-3, n-1}"),
@@ -325,9 +326,9 @@ look = termsDict[0][0]
 matrixEl = termsDict[0][1]
 
 
-sz =4
+sz =3.2
 
-fig, ax = plt.subplots(figsize=(sz,sz),constrained_layout=True, sharey=True)
+fig, ax = plt.subplots(figsize=(sz,0.6*sz),constrained_layout=True, sharey=True)
 
 
 # df.loc[df['form'] == 'SS-p','phi offset'] = np.nan
@@ -360,23 +361,22 @@ for a in aas:
             
             df_plot = df_plot.sort_values(by=['x-axis'])
             
-            df_plot = df_plot.sort_values(by=['omega'])
-            df_plot = df_plot[df_plot["omega"] < omegaMax]
-            df_plot = df_plot[df_plot["omega"] > omegaMin]
+            # df_plot = df_plot.sort_values(by=['omega'])
+            # df_plot = df_plot[df_plot["omega"] < omegaMax]
+            # df_plot = df_plot[df_plot["omega"] > omegaMin]
             
 
-            ax.plot(df_plot["omega"], np.abs(df_plot[look].values), 
-                        label=
-                            r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
-                            +", A="+str(a))
-            # ax.plot(df_plot["x-axis"], np.abs((df_plot[look].values)), 
+            # ax.plot(df_plot["omega"], np.real(df_plot[look].values), 
             #             label=
-            #                 r'$\phi_1=$'+str(round(phi/pi, 2))+r'$\pi$'
+            #                 r'$\phi=$'+str(round(phi/pi, 2))+r'$\pi$'
             #                 +", A="+str(a))
-            ax.set_ylabel(r"$|" +matrixEl+"|$")
-            # ax.set_xlabel(r'$\frac{A}{\omega}$', fontsize=18)
-            ax.set_xlabel(r'$\omega$')
-
+            ax.plot(df_plot["x-axis"], -np.real((df_plot[look].values)), 
+                        label=r"$J' = -" +matrixEl+"$")
+            # ax.set_ylabel()
+            ax.set_xlabel(r'$\sfrac{A}{\omega}$', fontsize=13)
+            # ax.set_xlabel(r'$\omega$')
+        ax.plot(df_plot["x-axis"], jv(0, df_plot["x-axis"]), '--', 
+                        label=r"$\mathcal{J}_0 (A / \omega)$")
 
     
 handles_legend, labels_legend = ax.get_legend_handles_labels()    
@@ -384,7 +384,7 @@ fig.legend(handles_legend, labels_legend, loc='upper right')
 plt.grid(True)
 ax.set_ylim([ymin, ymax])
 paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
-# fig.savefig(paper+'G-StepFunc-elements-O-A=35-ylim=1.pdf', format='pdf', bbox_inches='tight')
+# fig.savefig(paper+'ElementG-SS-Tunnelling.pdf', format='pdf', bbox_inches='tight')
 plt.show()
                                                               
    #%%
@@ -463,6 +463,6 @@ for look, matrixEl in termsDict:
     plt.grid(True)
     ax.set_ylim([ymin, ymax])
     paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
-    fig.savefig(paper+'ElementG-Tunnelling-A=35-poster.pdf', format='pdf', bbox_inches='tight')
+    # fig.savefig(paper+'ElementG-Tunnelling-A=35-poster.pdf', format='pdf', bbox_inches='tight')
     plt.show()                                                           
 

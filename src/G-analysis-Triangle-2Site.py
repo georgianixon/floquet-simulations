@@ -6,7 +6,7 @@ Created on Fri Dec  3 15:26:34 2021
 """
 
 
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -91,8 +91,9 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 sh = "/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/"
 # sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
-dfname = "analysis-G-Triangle-2Site.csv"
-
+# dfname = "analysis-G-Triangle-2Site.csv"
+dfname = "analysis-G-Triangle-2Site-RemoveGauge - Copy.csv"
+# dfname = "analysis-G-Triangle-2Site-Full.csv"
 
 df = pd.read_csv(dataLoc+dfname, 
                  index_col=False, 
@@ -104,7 +105,8 @@ df = pd.read_csv(dataLoc+dfname,
                             "N1-3": ConvertComplex,
                             })
 
-
+df["omega multiplier"] = df["omega2"] / df["omega1"]
+df1 = df[df["omega multiplier"]==2]
 
 #%%                           
 """
@@ -126,11 +128,15 @@ phi2s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 apply = [np.abs, np.real, np.imag]
 omegaMax = 20
 omegaMin = 4
+omegaMultiplier = 2
 ymax = None
 ymin = None
-form = "Tri"
-func1Name = "Blip"#"RampHalf"#"Cosine"#
-func2Name = "Blip"#"RampHalf"#"Cosine"#
+form = "Tri-RemoveGauge"#"Tri"
+func1Name = "Cosine"##"Blip"#"RampHalf"#
+func2Name = "Cosine"##"Blip"#"RampHalf"#
+
+
+dfCos = df[(df["func1"]==func1Name) & (df["func2"]==func2Name)]
 
 
 termsDict = [ 
@@ -220,54 +226,31 @@ for look, matrixEl in termsDict:
       
 #For paper
 
-N = 51; 
-centre = 25
-
+N = 3; 
+centre1 = 1
+centre2 = 2
 rtol=1e-11
 aas = [35]
-# aas = [30]
-phis =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phi1s =  [0]#[0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phi2s =  [0]#[0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 # phis =  [0]
-apply = [np.abs]
+apply = [np.abs, np.real, np.imag]
 omegaMax = 20
 omegaMin = 4
-ymax = 1
-ymin = 0
-# form = "SS-p";
-form = "StepFunc"; 
-# form = "DS-p"; 
-# form = "SSDF-p"; 
+ymax = None
+ymin = None
+form = "Tri-RemoveGauge"#"Tri"
+func1Name = "Cosine"##"Blip"#"RampHalf"#
+func2Name = "Cosine"##"Blip"#"RampHalf"#
+
 
 termsDict = [ 
-    # ("O-3", "G_{n-3, n-3}"),
-            # ("O-2","G_{n-2, n-2}"),
-            # ("O-1","G_{n-1, n-1}"),
-            ("O","G_{n, n}"),
-            # ("O+1","G_{n+1, n+1}"),
-            # ("O+2","G_{n+2, n+2}"),
-            # ("O+3","G_{n+3, n+3}"),
-            # ("N1-3","G_{n-3, n-2}"),
-            # ("N1-2","G_{n-2, n-1}"),
-            # ("N1-1","G_{n-1, n}"),
-            # ("N1+1","G_{n, n+1}"),
-            # ("N1+2","G_{n+1, n+2}"),
-            # ("N1+3","G_{n+2, n+3}"),
-            # ("N2-2","G_{n-3, n-1}"),
-            # ("N2-1","G_{n-2, n}"),
-            # ("N2","G_{n-1, n+1}"),
-            # ("N2+1","G_{n, n+2}"),
-            # ("N2+2","G_{n+1, n+3}"),
-            # ("N3-2","G_{n-3, n}"),
-            # ("N3-1", "G_{n-2, n+1}"),
-            # ("N3+1", "G_{n-1, n+2}"),
-            # ("N3+2","G_{n, n+3}"),
-            # ("N4-1","G_{n-3, n+1}"),
-            # ("N4","G_{n-2, n+2}"),
-            # ("N4+1","G_{n-1, n+3}"),
-            # ("N5-1","G_{n-3, n+2}"),
-            # ("N5+1","G_{n-2, n+3}"),
-            # ("N6", "G_{n-3, n+3}")
-            ]
+    # ("O-1", "G_{0, 0}"),
+            # ("O-2","G_{1, 1}"),
+            # ("O-3","G_{2, 2}"),
+            ("N1-1","G_{0, 1}"),
+            ("N1-2","G_{1, 2}"),
+            ("N1-3","G_{0, 2}")]
 
 
 look = termsDict[0][0]

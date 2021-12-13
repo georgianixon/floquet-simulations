@@ -15,7 +15,7 @@ import pandas as pd
 import time
 import sys
 sys.path.append('/Users/'+place+'/Code/MBQD/floquet-simulations/src')
-from hamiltonians import  CreateHF, SolveSchrodinger, ConvertComplex
+from hamiltonians import  CreateHF, SolveSchrodinger, ConvertComplex, RemoveWannierGauge
 
 
 def filter_duplicates(x):
@@ -37,9 +37,8 @@ def filter_duplicates(x):
         else:
             return np.nan
         
-
-sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G-N6.csv"
+dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
+dfname = "analysis-G-N6.csv"
 
 
 # df = pd.DataFrame(columns=["form", "rtol","N", 
@@ -149,7 +148,7 @@ df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int, "centre":int,
                 "N5+1":np.float64,
                 "N6":np.float64}
 
-df = pd.read_csv(sh+dfname, 
+df = pd.read_csv(dataLoc+dfname, 
                  index_col=False, 
                  converters={"O-3": ConvertComplex,
                             "O-2": ConvertComplex,
@@ -188,7 +187,7 @@ df = pd.read_csv(sh+dfname,
 # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form="StepFunc"#'SS-p' 
+form="SS-p-RemoveGauge"#"StepFunc"#'SS-p' 
 
 rtol = 1e-11
 phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
@@ -242,7 +241,7 @@ for a in [5, 10, 15, 20, 30]:
             omega1 = round(omega1, 1)
             print(omega1)
             
-            if form == "SS-p" or form == "StepFunc":
+            if form == "SS-p" or form == "StepFunc" or form =="SS-p-RemoveGauge":
                 aInput = a
                 omegaInput = omega1
                 phiInput = phi
@@ -256,6 +255,10 @@ for a in [5, 10, 15, 20, 30]:
             # calculate effective Hamiltonian 
             UT, HF = CreateHF(form, rtol, N, centre, aInput, omegaInput, phiInput, onsiteInput)
             
+            if form.find("RemoveGauge") >=0:
+                #remove Gauge
+                for site in range(N):
+                    HF = RemoveWannierGauge(HF, site, N)
     
             
             # log matrix elements
@@ -357,7 +360,7 @@ for a in [5, 10, 15, 20, 30]:
     #                                }).reset_index()
         
         print('   saving..')
-        df.to_csv(sh+dfname,
+        df.to_csv(dataLoc+dfname,
                   index=False, 
                   columns=['form', 'rtol','N', "centre",
                            'a', 
