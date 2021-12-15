@@ -6,7 +6,7 @@ Created on Fri Dec  3 15:26:34 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -92,7 +92,7 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 sh = "/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/"
 # sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
 # dfname = "analysis-G-Triangle-2Site.csv"
-dfname = "analysis-G-Triangle-2Site-RemoveGauge - Copy.csv"
+dfname = "analysis-G-Triangle-2Site-RemoveGauge.csv"
 # dfname = "analysis-G-Triangle-2Site-Full.csv"
 
 df = pd.read_csv(dataLoc+dfname, 
@@ -105,8 +105,9 @@ df = pd.read_csv(dataLoc+dfname,
                             "N1-3": ConvertComplex,
                             })
 
-df["omega multiplier"] = df["omega2"] / df["omega1"]
-df1 = df[df["omega multiplier"]==2]
+# df["omega multiplier"] = df["omega2"] / df["omega1"]
+# df1 = df[df["omega multiplier"]==2]
+# df["omega multiplier"] = df["omega multiplier"].apply(np.int64)
 
 #%%                           
 """
@@ -128,7 +129,7 @@ phi2s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 apply = [np.abs, np.real, np.imag]
 omegaMax = 20
 omegaMin = 4
-omegaMultiplier = 2
+omegaMultiplier = 3
 ymax = None
 ymin = None
 form = "Tri-RemoveGauge"#"Tri"
@@ -136,7 +137,7 @@ func1Name = "Cosine"##"Blip"#"RampHalf"#
 func2Name = "Cosine"##"Blip"#"RampHalf"#
 
 
-dfCos = df[(df["func1"]==func1Name) & (df["func2"]==func2Name)]
+# dfCos = df[(df["func1"]==func1Name) & (df["func2"]==func2Name)]
 
 
 termsDict = [ 
@@ -174,6 +175,7 @@ for look, matrixEl in termsDict:
                           (df['a2']==a)&
                           (df['phi1']==phi1)&
                           (df['phi2']==phi2)&
+                          (df["omega multiplier"]==omegaMultiplier)&
                           (df["centre1"]==centre1)&
                           (df["func1"]==func1Name)&
                           (df["func2"]==func2Name)]

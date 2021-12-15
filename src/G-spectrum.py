@@ -8,9 +8,8 @@ Created on Tue Mar  2 13:01:46 2021
 place = "Georgia"
 from numpy import  pi
 import sys
-# C:\Users\Georgia Nixon\Code\MBQD\floquet-simulations\src
-# sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
-sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
+sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
+# sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
 from hamiltonians import CreateHF,CreateHFGeneral, GetEvalsAndEvecsGen, plotevecs
 from hamiltonians import formatcomplex, RoundComplex, PhiString
 from hamiltonians import H0_PhasesNNHop
@@ -23,7 +22,7 @@ import matplotlib as mpl
 import numpy as np
 
 
-size = 12
+size = 30
 params = {
             # 'legend.fontsize': size*0.75,
 #          'figure.figsize': (20,8),
@@ -68,7 +67,7 @@ N=49; centre=24; a=35; rtol=1e-11
 # phases = [0, 1, 2, 3, 4, 5]
 # phases = [0, 0, 0, 0, 0, 0]
 
-phi1=0;
+phi1=pi/3;
 phiOffset = pi/2
 phi2 = phi1+phiOffset
 omega1=10#a /jn_zeros(0,1)[0]
@@ -78,11 +77,12 @@ T = 2*pi/omega1
 circleBoundary = 0
 onsite1 =0; onsite2=0
 
-centres = [24, 25]
-funcs = [Cosine, Cosine]
-paramss = [[a, omega1, phi1, onsite1], [a, omega2, phi2, onsite2]]
-
-
+# centres = [24, 25]
+centres = [24]
+# funcs = [Cosine, Cosine]
+funcs = [Cosine]
+# paramss = [[a, omega1, phi1, onsite1], [a, omega2, phi2, onsite2]]
+paramss = [[a, omega1, phi1, onsite1]]
 # form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi) $"; paramsString = r"$a="+str(a)+r", \omega = "+"{:.2f}".format(omega)+", \phi = "+PhiString(phi)+r"$"
 # form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+"{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 = "+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
 # form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1="+ "{:.2f}".format(omega1)+", \omega_2 = "+str(omegaMultiplier)+" \omega_1, \phi_1 ="+PhiString(phi1)+", \phi_2 = \phi_1 + \pi/2, N = "+str(N)+", b = "+str(centre)+"$ "
@@ -102,16 +102,18 @@ colour = "dodgerblue"
 #              + form +r";  "+hamiltonianString+"\n"
 #              +paramsString)
 title = ""
-
-
-plotevecs(evecs, N, func, colour, title, ypos=0.955)    
-
-sz=5
+sz=8
 fig, ax = plt.subplots(figsize=(sz*1.4,sz))
-ax.plot(range(N), func(evals), 'x', color=colour)
+ax.plot(range(N), func(evals), '.', color=colour, markersize=20)
+ax.set_ylabel("e-value")
+ax.set_xlabel("eval index")
 # fig.suptitle(r"evals;  "+ form +r";  "+hamiltonianString+"\n"
 #              +paramsString, y=1)
 plt.show()
+
+plotevecs(evecs, N, func, colour, title, ypos=0.955)    
+
+
 
 
 

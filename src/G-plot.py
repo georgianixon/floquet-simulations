@@ -12,9 +12,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
-# sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
-sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
+sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
+# sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
 from hamiltonians import CreateHF, CreateHFGeneral, HT_SS, hoppingHF, GetEvalsAndEvecsGen
+from hamiltonians import Cosine, RemoveWannierGauge
 from scipy.special import jn_zeros, jv
 from fractions import Fraction 
 from hamiltonians import Cosine, PhiString
@@ -27,7 +28,7 @@ def RemoveWannierGauge(matrix, c, N):
     return matrix
 
 
-size=12
+size=30
 params = {
             'legend.fontsize': size*0.8,
 #          'figure.figsize': (20,8),
@@ -63,7 +64,7 @@ Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
 # common params
-N=12;   rtol=1e-11
+N=35;   rtol=1e-11
 
 # form="SS-p"
 # phi1 = pi/4
@@ -76,21 +77,51 @@ N=12;   rtol=1e-11
 # omegas = [omega1, omega2]
 
 
-form="SSHModel"#"StepFunc"#"SS-p"
-centres= [1]
-centre = 0
-a = [35,35]
-omega = [32, 7]#8.1
-# T = 2*pi/omega
-phi = [0,0]
-onsite = [0,0]
-funcs = [Cosine]
-paramss = [[a, omega, phi, onsite]]
-circleBoundary = 1
+# form = "SSHModel"
+# centre = np.nan
+# a = [35, 15]
+# omega1 = 10; omega = [omega1, 2*omega1 ]
+# phi = [0, 0]
+# onsite = [0,0]
+# UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
-UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
-# UT, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
-# HFevals, HFevecs = GetEvalsAndEvecsGen(HF)
+# centres= [1,2]
+centres = [17]
+a = 35
+omega1 = 7.5; omega2=3*omega1
+phi1 = 0; phi2 = 0
+T = 2*pi/omega1
+onsite = 0
+# funcs = [Cosine, Cosine]
+funcs = [Cosine]
+# paramss = [[a, omega1, phi1, onsite], [a, omega2, phi2, onsite]]
+paramss = [[a, omega1, phi1, onsite]]
+circleBoundary = 0
+UT, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
+
+# for site in range(N):
+#     HF = RemoveWannierGauge(HF, site, N)
+
+
+
+
+# UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
+
+HFevals, _ = GetEvalsAndEvecsGen(HF)
+# HFabs = np.abs(HF)
+# HFevalsabs, _ = GetEvalsAndEvecsGen(HFabs)
+
+#%%
+sz = 7
+fig, ax = plt.subplots(figsize=(sz/2,sz))
+ax.plot([0,0,0], HFevals, 'o')
+ax.plot([1,1,1], HFevalsabs, 'o')
+# ax.axes.xaxis.set_visible(False)
+# ax.set_title("evals")
+ax.set_xticks([0, 1])
+ax.set_xticklabels([r'$\mathrm{evals}_{real}$', r'$\mathrm{evals}_{abs}$'])
+ax.set_xlim([-0.3, 1.4])
+plt.show()
 
 
 #%%
@@ -111,7 +142,7 @@ labels = [
           r'$\mathrm{Imag}\{G_{n,m}\}$'
           ]
 
-sz = 6
+sz = 12
 fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
                        figsize=(sz,sz/2))
 
@@ -180,6 +211,10 @@ plt.show()
 
 #%%
 
+
+
+#%%
+
 # fig for paper
 
 
@@ -216,22 +251,22 @@ fig.colorbar(pcm, cax=cax)
 
 
 paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
-fig.savefig(paper+'G-SSHModel-small.pdf', format='pdf', bbox_inches='tight')
+# fig.savefig(paper+'G-SSHModel-small.pdf', format='pdf', bbox_inches='tight')
 plt.show()
 
 #%%
 
-# for poster - real part of Hamiltonian Triangle
+#  Real part of Hamiltonian 
 
-norm = mpl.colors.Normalize(vmin=-1, vmax=1)
-# linthresh = 1e-1
-# norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+# norm = mpl.colors.Normalize(vmin=-1, vmax=1)
+linthresh = 1e-2
+norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 # 
 
 '''abs real imag'''
 
 
-sz = 1.8
+sz = 7
 fig, ax = plt.subplots(nrows=1, ncols=1, constrained_layout=True, 
                        figsize=(sz,sz))
 
@@ -243,14 +278,46 @@ ax.set_xlabel('m')
 
 ax.set_ylabel('n', rotation=0, labelpad=10)
 
-ax.set_ylabel('n', rotation=0, labelpad=10)
+ax.set_ylabel('n', rotation=0, labelpad=14)
     
-cax = plt.axes([0.92, 0.12, 0.08, 0.8])
+# cax = plt.axes([0.97, 0.145, 0.08, 0.78]) #size = 6
+cax = plt.axes([0.99, 0.13, 0.04, 0.8])
 # fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
 fig.colorbar(pcm, cax=cax)
-fig.savefig(paper+'G-Triangle-Real.pdf', format='pdf', bbox_inches='tight')
+# fig.savefig(paper+'G-Triangle-Real.pdf', format='pdf', bbox_inches='tight')
 plt.show()
 
+#%%
+
+# Abs part of Hamiltonian 
+
+norm = mpl.colors.Normalize(vmin=0, vmax=1)
+# linthresh = 1e-1
+# norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+# 
+
+'''abs real imag'''
+
+
+sz = 6
+fig, ax = plt.subplots(nrows=1, ncols=1, constrained_layout=True, 
+                       figsize=(sz,sz))
+
+pcm = ax.matshow(np.abs(HF), interpolation='none', cmap='Purples',  norm=norm)
+ax.set_title(r'$\mathrm{Abs}\{G_{n,m}\}$')
+ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+  labeltop=False)  
+ax.set_xlabel('m')
+
+ax.set_ylabel('n', rotation=0, labelpad=10)
+
+ax.set_ylabel('n', rotation=0, labelpad=14)
+    
+cax = plt.axes([0.97, 0.145, 0.08, 0.78])
+# fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
+fig.colorbar(pcm, cax=cax)
+# fig.savefig(paper+'G-Triangle-Real.pdf', format='pdf', bbox_inches='tight')
+plt.show()
 
 
 
