@@ -333,7 +333,6 @@ nOscillations = 30
 nTimesteps = nOscillations*100
 n_osc_divisions = 2
 tspan = (0,nOscillations*T)
-t_eval = np.linspace(tspan[0], tspan[1], nTimesteps)
 
 
 
