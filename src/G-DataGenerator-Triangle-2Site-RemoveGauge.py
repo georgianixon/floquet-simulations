@@ -7,7 +7,7 @@ Created on Mon Dec 13 11:09:01 2021
 
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 
 from numpy.linalg import eig
 from numpy import  pi, log, exp, sin
@@ -19,6 +19,8 @@ import sys
 sys.path.append('/Users/'+place+'/Code/MBQD/floquet-simulations/src')
 from hamiltonians import  CreateHFGeneral, SolveSchrodinger, ConvertComplex, Cosine, Ramp, RampHalf, Blip, RemoveWannierGauge
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
+
+from fractions import Fraction
 
 def filter_duplicates(x):
     """
@@ -76,6 +78,11 @@ dfname = "analysis-G-Triangle-2Site-RemoveGauge.csv"
 #                             "N1-3"]
 #                     )
 
+
+a = [Fraction((x - y)/np.pi).limit_denominator(100) for x, y in zip(df["phi2"], df["phi1"])]
+numerators = [i.numerator for i in a]
+denominator = [i.denominator for i in a]
+
 #%%
 # df_dtype_dict = {'form':str,'func':str, "rtol":np.float64, 'N':int, "centre":int,
 #                  'a':np.float64, 
@@ -129,7 +136,7 @@ funcname1 = "Cosine"; funcname2="Cosine"
 
 circleBoundary = 1
 
-
+omegaMultiplier = 1.5
 
     
 for a in [35]:
@@ -141,7 +148,7 @@ for a in [35]:
             df1 = pd.DataFrame(columns=["form", "func1","func2","rtol","N", 
                                         "centre1","centre2",
                                         "a1", "a2", 
-                                        "omega1", "omega2", 
+                                        "omega1", "omega2", "omega multiplier",
                                         "phi1", "phi2", 
                                         "onsite1","onsite2",
                                         "O-1",
@@ -158,7 +165,7 @@ for a in [35]:
                 print(omega1)
                 
                 T = 2*pi/omega1
-                omega2 = 3*omega1
+                omega2 = omegaMultiplier*omega1
                 # elif form =="DS-p" or form == "SSDF-p":
                 #     omega2 = omegaMultiplier*omega1
                 #     aInput = [a1,a2]
@@ -196,6 +203,7 @@ for a in [35]:
                               a,
                               omega1,
                               omega2,
+                              omegaMultiplier,
                               phi1,
                               phi2,
                               onsite1,
@@ -229,7 +237,7 @@ for a in [35]:
                       columns=["form", "func1","func2","rtol","N", 
                                         "centre1","centre2",
                                         "a1", "a2", 
-                                        "omega1", "omega2", 
+                                        "omega1", "omega2", "omega multiplier",
                                         "phi1", "phi2", 
                                         "onsite1","onsite2",
                               "O-1",

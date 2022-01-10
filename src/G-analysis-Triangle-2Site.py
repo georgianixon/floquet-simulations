@@ -123,20 +123,22 @@ centre2 = 2
 rtol=1e-11
 # aas = [5, 10, 15, 20, 25, 30, 35]
 aas = [35]
-phi1s =  [0]#[0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phi1s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 phi2s =  [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 # phis =  [0]
 apply = [np.abs, np.real, np.imag]
 omegaMax = 20
 omegaMin = 4
-omegaMultiplier = 3
+omegaMultiplier = 2
 ymax = None
 ymin = None
-form = "Tri-RemoveGauge"#"Tri"
+form = "Tri"#"Tri-RemoveGauge"#"Tri"
 func1Name = "Cosine"##"Blip"#"RampHalf"#
 func2Name = "Cosine"##"Blip"#"RampHalf"#
 
 
+# df["omega multiplier"] = df["omega2"]/df["omega1"]
+# df["omega multiplier"] = df["omega multiplier"].astype(int)
 # dfCos = df[(df["func1"]==func1Name) & (df["func2"]==func2Name)]
 
 
@@ -214,12 +216,6 @@ for look, matrixEl in termsDict:
     fig.legend(handles_legend, labels_legend, loc='upper right')
     plt.grid(True)
     ax[0].set_ylim([ymin, ymax])
-    # fig.suptitle(""
-    #              + form +r";  "+hamiltonianString+"\n"
-    #              # +paramsString
-    #              +", "+look
-    #               # +", "+r"$a_2=$"+str(a2)
-    #              , y=1.2)
     plt.show()
 
 

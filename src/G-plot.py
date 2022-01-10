@@ -20,12 +20,12 @@ from scipy.special import jn_zeros, jv
 from fractions import Fraction 
 from hamiltonians import Cosine, PhiString
     
-def RemoveWannierGauge(matrix, c, N):
-    phase = np.angle(matrix[c-1,c])
-    gaugeMatrix = np.identity(N, dtype=np.complex128)
-    gaugeMatrix[c,c] = np.exp(-1j*phase)
-    matrix = np.matmul(np.matmul(np.conj(gaugeMatrix), matrix), gaugeMatrix)
-    return matrix
+# def RemoveWannierGauge(matrix, c, N):
+#     phase = np.angle(matrix[c-1,c])
+#     gaugeMatrix = np.identity(N, dtype=np.complex128)
+#     gaugeMatrix[c,c] = np.exp(-1j*phase)
+#     matrix = np.matmul(np.matmul(np.conj(gaugeMatrix), matrix), gaugeMatrix)
+#     return matrix
 
 
 size=30
@@ -64,7 +64,7 @@ Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
 # common params
-N=35;   rtol=1e-11
+N=3;   rtol=1e-11
 
 # form="SS-p"
 # phi1 = pi/4
@@ -85,22 +85,24 @@ N=35;   rtol=1e-11
 # onsite = [0,0]
 # UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
-# centres= [1,2]
-centres = [17]
+centres= [1,2]
+# centres = [17]
 a = 35
-omega1 = 7.5; omega2=3*omega1
-phi1 = 0; phi2 = 0
+omegaMultiplier = 3
+omega1 = 5.7; omega2=omegaMultiplier*omega1
+phiOffset = pi/6
+phi1 = pi/3; phi2 = phi1+phiOffset
 T = 2*pi/omega1
 onsite = 0
-# funcs = [Cosine, Cosine]
-funcs = [Cosine]
-# paramss = [[a, omega1, phi1, onsite], [a, omega2, phi2, onsite]]
-paramss = [[a, omega1, phi1, onsite]]
-circleBoundary = 0
+funcs = [Cosine, Cosine]
+# funcs = [Cosine]
+paramss = [[a, omega1, phi1, onsite], [a, omega2, phi2, onsite]]
+# paramss = [[a, omega1, phi1, onsite]]
+circleBoundary = 1
 UT, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
 
-# for site in range(N):
-#     HF = RemoveWannierGauge(HF, site, N)
+for site in range(N):
+    HF = RemoveWannierGauge(HF, site, N)
 
 
 
@@ -108,8 +110,11 @@ UT, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
 # UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
 HFevals, _ = GetEvalsAndEvecsGen(HF)
+HFabs = np.copy(HF)
+HFabs[0,2] = -np.abs(HFabs[0,2])
+HFabs[2,0] = -np.abs(HFabs[2,0])
 # HFabs = np.abs(HF)
-# HFevalsabs, _ = GetEvalsAndEvecsGen(HFabs)
+HFevalsabs, _ = GetEvalsAndEvecsGen(HFabs)
 
 #%%
 sz = 7
@@ -142,7 +147,7 @@ labels = [
           r'$\mathrm{Imag}\{G_{n,m}\}$'
           ]
 
-sz = 12
+sz = 8
 fig, ax = plt.subplots(nrows=1, ncols=len(apply), sharey=True, constrained_layout=True, 
                        figsize=(sz,sz/2))
 
@@ -155,59 +160,16 @@ for n1, f in enumerate(apply):
 
 ax[0].set_ylabel('n', rotation=0, labelpad=10)
 
-    
-    
 cax = plt.axes([1.03, 0.1, 0.03, 0.8])
 # fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
 fig.colorbar(pcm, cax=cax)
-
-# fig.suptitle('Python'
-#                # +', SS'
-#                +", Hopping toy model"
-#              # +', Linear'
-#     + r', $V(t) = $'
-#     + r"$|25><25|$"
-#     # str(a)+r'$ \cos( \omega t)$'
-#     + str(a)+r'$\cos( $'
-#     # +str(omega)
-#     + "{:.2f}".format(omega)
-#     + r'$ t$'
-#     + phistring(phi)
-#     + ')'
-#     + '\n'+'linthresh='+str(linthresh)
-#     + ', rtol='+str(rtol)
-#     , fontsize = 25, y=0.96)
-
-# fig.suptitle("Representation of Floquet Hamiltonian, G\n"
-#              # + r"given $H(t)=H_0 + 35 \cos (" + "{:.2f}".format(omega1)
-#              # + r"t" + phistring(phi1) 
-#              # + r") |"+str(centre)+r"><"+str(centre) +r"|$",
-#              +form+", "+r"$a_1=$"+str(a1)
-#               +", "+r"$a_2=$"+str(a2)
-#              +", "+r"$\omega_1=$"+"{:.2f}".format(omega1)
-#               +", "+r"$\omega_2=$"+"{:.2f}".format(omega2)
-#               +", "+r"$\phi_1=$"+ PhiStringNum(phi1)
-#               +", "+r"$\phi_2=$"+ PhiStringNum(phi2)
-             # , y=0.95)
-             
-#     + r', $V(t) = $'
-#     + r"$|25><25|$"
-#     # str(a)+r'$ \cos( \omega t)$'
-#     + str(a)+r'$\cos( $'
-#     # +str(omega)
-#     + "{:.2f}".format(omega)
-#     + r'$ t$'
-#     + phistring(phi)
-#     + ')'
-#     + '\n'+'linthresh='+str(linthresh)
-#     + ', rtol='+str(rtol)
-#     , fontsize = 25, y=0.96)
-
-
-#             
+    
 #fig.savefig('', 
 #        format='pdf', bbox_inches='tight')
 plt.show()
+
+
+
 
 #%%
 
