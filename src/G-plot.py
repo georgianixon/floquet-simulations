@@ -6,7 +6,7 @@ Created on Sat Aug 22 14:01:15 2020
 """
 
 import matplotlib as mpl
-place="Georgia Nixon"
+place="Georgia"
 from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,14 +63,25 @@ Set form = ... and other parameters
 Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
-def GetPhiOffsetReal(phi1Real, phiTOffset, omegaMultiplier):
-    if omegaMultiplier == 1.5:
-        piEquivA = 1/4
-        piEquivB = 1/6
-    phi1T = phi1Real/pi*piEquivA
-    phi2T = phi1T+phiTOffset
-    phi2Real = phi2T/piEquivB*pi
-    return phi2Real
+# def GetPhiOffsetReal(phi1Real, phiTOffset, omegaMultiplier):
+#     if omegaMultiplier == 1.5:
+#         piEquivA = 1/4
+#         piEquivB = 1/6
+#     phi1T = phi1Real/pi*piEquivA
+#     phi2T = phi1T+phiTOffset
+#     phi2Real = phi2T/piEquivB*pi
+#     return phi2Real
+
+def GetPhiOffset(time1, timeOffset, omega1, omega2):
+    time2 = time1+timeOffset
+    
+    omegaT = np.gcd(round(100*omega1), round(100*omega2))/100
+    totalT = 2*pi/omegaT
+    
+    phi1 = time1*omega1*totalT
+    phi2 = time2*omega2*totalT
+    
+    return phi1, phi2, totalT ,time2, omegaT
         
 # common params
 N=3;   rtol=1e-11
@@ -98,14 +109,14 @@ centres= [1,2]
 # centres = [17]
 
 a = 35
-omegaMultiplier = 1.5
+omegaMultiplier = 3
 omega1 = 5.3; omega2=omegaMultiplier*omega1
-# phiOffset = 3*pi/2
-# phi1 = 0; phi2 = phi1+phiOffset
-phiTOffset = 1/4
-phi1 = pi/4
-phi2 = GetPhiOffsetReal(phi1, phiTOffset, omegaMultiplier)
-T = 2*pi/omega1
+
+
+time1 = 1/22
+timeOffset  = -1/264 # units of total time period
+phi1, phi2, T, time2, omegaT = GetPhiOffset(time1, timeOffset, omega1, omega2)
+
 onsite = 0
 funcs = [Cosine, Cosine]
 # funcs = [Cosine]

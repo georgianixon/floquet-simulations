@@ -42,7 +42,7 @@ def filter_duplicates(x):
             return np.nan
         
 
-dfname = "analysis-G-Triangle-2Site-RemoveGauge.csv"
+dfname = "analysis-G-Triangle-2Site-RemoveGauge-1.csv"
 
 
 
@@ -51,7 +51,8 @@ dfname = "analysis-G-Triangle-2Site-RemoveGauge.csv"
 # df = pd.DataFrame(columns=["form", "func1","func2","rtol","N", 
 #                             "centre1","centre2",
 #                             "a1", "a2", 
-#                             "omega1", "omega2", 
+#                             "omega1", "omega2", "omega multiplier", "T",
+#                             "time1", "time offset",
 #                             "phi1", "phi2", 
 #                             "onsite1","onsite2",
 #                             "O-1",
@@ -67,7 +68,8 @@ dfname = "analysis-G-Triangle-2Site-RemoveGauge.csv"
 #                     columns=["form", "func1","func2","rtol","N", 
 #                             "centre1","centre2",
 #                             "a1", "a2", 
-#                             "omega1", "omega2", 
+#                             "omega1", "omega2", "omega multiplier", "T",
+#                             "time1", "time offset",
 #                             "phi1", "phi2", 
 #                             "onsite1","onsite2",
 #                             "O-1",
@@ -79,9 +81,9 @@ dfname = "analysis-G-Triangle-2Site-RemoveGauge.csv"
 #                     )
 
 
-a = [Fraction((x - y)/np.pi).limit_denominator(100) for x, y in zip(df["phi2"], df["phi1"])]
-numerators = [i.numerator for i in a]
-denominator = [i.denominator for i in a]
+# a = [Fraction((x - y)/np.pi).limit_denominator(100) for x, y in zip(df["phi2"], df["phi1"])]
+# numerators = [i.numerator for i in a]
+# denominator = [i.denominator for i in a]
 
 #%%
 # df_dtype_dict = {'form':str,'func':str, "rtol":np.float64, 'N':int, "centre":int,
@@ -118,6 +120,19 @@ df = pd.read_csv(dataLoc+dfname,
 
 #%%
 
+def GetPhiOffset(time1, timeOffset, omega1, omega2):
+    time2 = time1+timeOffset
+    
+    omegaT = np.gcd(round(100*omega1), round(100*omega2))/100
+    totalT = 2*pi/omegaT
+    
+    phi1 = time1*omega1*totalT
+    phi2 = time2*omega2*totalT
+    
+    return phi1, phi2, totalT 
+
+
+
 # need tp dp 1e-6 phi = 0
 N = 3; 
 centre1=1; centre2=2
@@ -126,7 +141,9 @@ form="Tri-RemoveGauge"#'SS-p'
 
 
 rtol = 1e-11
-phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+time1s = np.linspace(0,0.5, 12, endpoint=False)
+timeOffsets = np.linspace(0, 1, 24, endpoint=False)
+# phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
 # omegas = np.linspace(20.1, 200, 200*10-200)
 
@@ -136,19 +153,23 @@ funcname1 = "Cosine"; funcname2="Cosine"
 
 circleBoundary = 1
 
-omegaMultiplier = 1.5
+omegaMultiplier = 2
 
+time1s = time1s[2:]
+# omegas = np.linspace(18.2, 20, 19)
+# timeOffsets = np.linspace(0.5, 1, 12, endpoint=False)
     
 for a in [35]:
     
     
-    for phi1 in phis:
-        for phi2 in phis:
-            print('a=',a,'  phi1=',phi1,'  phi2=',phi2)
+    for time1 in time1s:
+        for timeOffset in timeOffsets:
+            print('a=',a,'  phi1=',time1,'  phi2=',timeOffset)
             df1 = pd.DataFrame(columns=["form", "func1","func2","rtol","N", 
                                         "centre1","centre2",
                                         "a1", "a2", 
-                                        "omega1", "omega2", "omega multiplier",
+                                        "omega1", "omega2", "omega multiplier", "T",
+                                        "time1", "timeOffset",
                                         "phi1", "phi2", 
                                         "onsite1","onsite2",
                                         "O-1",
@@ -163,9 +184,13 @@ for a in [35]:
                 
                 omega1 = round(omega1, 1)
                 print(omega1)
+                omega2 = omega1*omegaMultiplier
                 
-                T = 2*pi/omega1
-                omega2 = omegaMultiplier*omega1
+                
+                phi1, phi2, T = GetPhiOffset(time1, timeOffset, omega1, omega2)
+                
+                # T = 2*pi/omega1
+                # omega2 = omegaMultiplier*omega1
                 # elif form =="DS-p" or form == "SSDF-p":
                 #     omega2 = omegaMultiplier*omega1
                 #     aInput = [a1,a2]
@@ -178,6 +203,7 @@ for a in [35]:
         
                 for site in range(N):
                     HF = RemoveWannierGauge(HF, site, N)
+                    
                 # log matrix elements
                 Om1 = HF[0][0]
                 Om2 = HF[1][1]
@@ -204,6 +230,9 @@ for a in [35]:
                               omega1,
                               omega2,
                               omegaMultiplier,
+                              T,
+                              time1,
+                              timeOffset,
                               phi1,
                               phi2,
                               onsite1,
@@ -237,7 +266,8 @@ for a in [35]:
                       columns=["form", "func1","func2","rtol","N", 
                                         "centre1","centre2",
                                         "a1", "a2", 
-                                        "omega1", "omega2", "omega multiplier",
+                                        "omega1", "omega2", "omega multiplier", "T",
+                                        "time1", "timeOffset",
                                         "phi1", "phi2", 
                                         "onsite1","onsite2",
                               "O-1",

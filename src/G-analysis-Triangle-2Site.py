@@ -105,6 +105,7 @@ df = pd.read_csv(dataLoc+dfname,
                             "N1-3": ConvertComplex,
                             })
 
+dfN = df[df["omega multiplier"]!=1.5]
 # df["omega multiplier"] = df["omega2"] / df["omega1"]
 # df1 = df[df["omega multiplier"]==2]
 # df["omega multiplier"] = df["omega multiplier"].apply(np.int64)

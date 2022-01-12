@@ -556,7 +556,8 @@ def CreateHF(form, rtol, N, centre, a, omega, phi, onsite):
         HF = HF+term
         
     # print('   ',time.time()-start, 's')
-    HFr = RoundComplex(HF, 5)
+    HFr = RoundComplex(HF, 4) 
+    """ This should probs be 5? """
     assert(np.all(0 == (HFr - np.conj(HFr.T))))
 
     return UT, HF
@@ -586,7 +587,7 @@ def CreateHFGeneral(N, centre, func, params, T, circleBoundary):
         HF = HF+term
         
     # print('   ',time.time()-start, 's')
-    HFr = RoundComplex(HF, 5)
+    HFr = RoundComplex(HF, 4)
     assert(np.all(0 == (HFr - np.conj(HFr.T))))
 
     return UT, HF
