@@ -358,6 +358,13 @@ def F_SSHModel(t, psi, N, aas, omegas, phis, onsites):
     return -1j*np.dot(H, psi)
 
 
+from fractions import Fraction
+def ConvertFraction(s):
+    """
+    For retrieving fractions from csv's
+    """
+    maxDenom=24
+    return Fraction(s).limit_denominator(maxDenom).__float__()
 
 def ConvertComplex(s):
     """

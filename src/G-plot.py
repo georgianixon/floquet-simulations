@@ -6,7 +6,7 @@ Created on Sat Aug 22 14:01:15 2020
 """
 
 import matplotlib as mpl
-place="Georgia"
+place="Georgia Nixon"
 from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
@@ -81,7 +81,7 @@ def GetPhiOffset(time1, timeOffset, omega1, omega2):
     phi1 = time1*omega1*totalT
     phi2 = time2*omega2*totalT
     
-    return phi1, phi2, totalT ,time2, omegaT
+    return phi1, phi2, totalT 
         
 # common params
 N=3;   rtol=1e-11
@@ -109,13 +109,13 @@ centres= [1,2]
 # centres = [17]
 
 a = 35
-omegaMultiplier = 3
-omega1 = 5.3; omega2=omegaMultiplier*omega1
+omegaMultiplier = 1.5
+omega1 = 6.8; omega2=omegaMultiplier*omega1
 
 
-time1 = 1/22
-timeOffset  = -1/264 # units of total time period
-phi1, phi2, T, time2, omegaT = GetPhiOffset(time1, timeOffset, omega1, omega2)
+time1 = 4/8
+timeOffset  = 2/3 # units of total time period
+phi1, phi2, T  = GetPhiOffset(time1, timeOffset, omega1, omega2)
 
 onsite = 0
 funcs = [Cosine, Cosine]
@@ -140,7 +140,7 @@ HFabs[2,0] = -np.abs(HFabs[2,0])
 # HFabs = np.abs(HF)
 HFevalsabs, _ = GetEvalsAndEvecsGen(HFabs)
 
-#%%
+
 sz = 7
 fig, ax = plt.subplots(figsize=(sz/2,sz))
 ax.plot([0,0,0], HFevals, 'o')
@@ -153,7 +153,7 @@ ax.set_xlim([-0.3, 1.4])
 plt.show()
 
 
-#%%
+
 
 norm = mpl.colors.Normalize(vmin=-1, vmax=1)
 # linthresh = 1e-1
