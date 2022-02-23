@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -83,12 +83,13 @@ CB91_Purple = '#9D2EC5'
 CB91_Violet = '#661D98'
 CB91_Amber = '#F5B14C'
 red = "#FC4445"
+newred = "#FF1053"
 
 color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
                CB91_Purple,
                 # CB91_Violet,
                 'dodgerblue',
-                'slategrey']
+                'slategrey', newred]
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 

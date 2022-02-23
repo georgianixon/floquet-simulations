@@ -510,9 +510,7 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
         coeffs =  np.dot(np.conj(evecs.T), psi0)
         sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
         sol = np.vstack(sol).T
-        
-    
-        
+     
         
     return sol
 
@@ -739,7 +737,7 @@ def Cosine(params, t):
 
 def RemoveWannierGauge(matrix, c, N):
     phase = np.angle(matrix[c-1,c])
-    phase = phase - np.pi #because it should be np.pi
+    phase = phase - np.pi #because it should be np.pi (ie negative)
     gaugeMatrix = np.identity(N, dtype=np.complex128)
     gaugeMatrix[c,c] = np.exp(-1j*phase)
     matrix = np.matmul(np.matmul(np.conj(gaugeMatrix), matrix), gaugeMatrix)

@@ -177,7 +177,7 @@ for a in [35]:
                                         "O-3",
                                          "N1-1",
                                          "N1-2",
-                                         "N1-3"])
+                                         "N1-3"])3
             for i, omega1 in enumerate(omegas):
                 
                 start = time.time()
