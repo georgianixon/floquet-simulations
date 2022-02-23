@@ -7,7 +7,7 @@ Created on Mon Dec 13 11:09:01 2021
 
 
 
-place = "Georgia"
+place = "Georgia Nixon"
 
 from numpy.linalg import eig
 from numpy import  pi, log, exp, sin
@@ -153,9 +153,9 @@ funcname1 = "Cosine"; funcname2="Cosine"
 
 circleBoundary = 1
 
-omegaMultiplier = 2
+omegaMultiplier = 3
 
-time1s = time1s[2:]
+# time1s = time1s[2:]
 # omegas = np.linspace(18.2, 20, 19)
 # timeOffsets = np.linspace(0.5, 1, 12, endpoint=False)
     
