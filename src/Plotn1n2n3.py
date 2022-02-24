@@ -11,7 +11,7 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -22,7 +22,70 @@ from hamiltonians import Cosine
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
-dfname = "TriangleRatios.csv"
+dfname = "TriangleRatios2.csv"
+
+
+def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
+    N = len(lst1a)
+    lowerTriListA = np.zeros(N)
+    lowerTriListB = np.zeros(N)
+    
+    upperTriListX = np.zeros(N)
+    upperTriListY = np.zeros(N)
+    
+    # counts = np.zeros(N)
+    
+    for i, (a1, b1, a2, b2, a3, b3) in enumerate(list(zip(lst1a, lst1b, lst2a, lst2b, lst3a, lst3b))):
+        # count = 0
+        if a1 <=1 and b1 <=1:
+            # count +=1
+            if b1<=a1:
+                lowerTriListA[i] = a1
+                lowerTriListB[i] = b1
+                
+                upperTriListX[i] = b1
+                upperTriListY[i] = a1
+            else:
+                lowerTriListA[i] = b1
+                lowerTriListB[i] = a1
+                
+                upperTriListX[i] = a1
+                upperTriListY[i] = b1
+        elif a2 <=1 and b2 <=1:
+            # count +=1
+            if b2<=a2:
+                lowerTriListA[i] = a2
+                lowerTriListB[i] = b2
+                
+                upperTriListX[i] = b2
+                upperTriListY[i] = a2
+            else:
+                lowerTriListA[i] = b2
+                lowerTriListB[i] = a2
+                
+                upperTriListX[i] = a2
+                upperTriListY[i] = b2
+        elif a3 <=1 and b3 <=1:
+            # count+=1
+            if b3<=a3:
+                lowerTriListA[i] = a3
+                lowerTriListB[i] = b3
+                
+                upperTriListX[i] = b3
+                upperTriListY[i] = a3
+            else:
+                lowerTriListA[i] = b3
+                lowerTriListB[i] = a3
+                
+                upperTriListX[i] = a3
+                upperTriListY[i] = b3
+                
+        # counts[i] = count
+        # else:
+        #     print(i)
+        #     raise ValueError
+    return lowerTriListA, lowerTriListB, upperTriListX, upperTriListY
+
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
@@ -71,8 +134,38 @@ mpl.rcParams["text.latex.preamble"] = mpl.rcParams["text.latex.preamble"] + r'\u
 dfO = pd.read_csv(dataLoc+dfname, 
                  index_col=False)
 
-dfO = dfO.drop(dfO[(dfO['beta'] == 2) & (dfO['omega0'] < 4)].index)
+dfO["J12"] = np.abs(dfO["J12"])
+dfO["J23"] = np.abs(dfO["J23"])
+dfO["J31"] = np.abs(dfO["J31"])
 
+dfO["J12/J23"] = dfO.J12 / dfO.J23
+dfO["J31/J23"] = dfO.J31 / dfO.J23
+dfO["J31/J12"] = dfO.J31 / dfO.J12
+dfO["J23/J12"] = dfO.J23 / dfO.J12
+dfO["J23/J31"] = dfO.J23 / dfO.J31
+dfO["J12/J31"] = dfO.J12 / dfO.J31
+
+
+"""
+get point on lower triangle
+"""
+x = dfO["J12/J23"].to_numpy()
+y = dfO["J31/J23"].to_numpy()
+t = dfO["J23/J12"].to_numpy()
+d = dfO["J31/J12"].to_numpy() 
+s = dfO["J23/J31"].to_numpy() 
+p = dfO["J12/J31"].to_numpy() 
+
+lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTriangle(x, y, t, d, s, p)
+
+dfO["LowerT.X"] = lowerTriListA
+dfO["LowerT.Y"] = lowerTriListB
+dfO["UpperT.X"] = upperTriListX
+dfO["UpperT.Y"] = upperTriListY
+
+
+# dfO = dfO.drop(dfO[(dfO['beta'] == 2) & (dfO['omega0'] < 4)].index)
+dfO = dfO.round({'A2': 3, "A3":3 })
 
 #%%
 
@@ -95,14 +188,6 @@ colours = cycle(colourlist)
 iterator = cycle(colourlist)
 
 
-
-dfO["J12/J23"] = dfO.J12 / dfO.J23
-dfO["J31/J23"] = dfO.J31 / dfO.J23
-dfO["J31/J12"] = dfO.J31 / dfO.J12
-dfO["J23/J12"] = dfO.J23 / dfO.J12
-dfO["J23/J31"] = dfO.J23 / dfO.J31
-dfO["J12/J31"] = dfO.J12 / dfO.J31
-
 omegaMin = 0
 omegaMax = 20
 A2Min = 0
@@ -121,6 +206,7 @@ fig, ax = plt.subplots(figsize=(6,6))
 for alpha in [2]:
     for beta in [9]:#[2,3, 4, 5, 7, 9]:
         
+
         realOmegaMin = alpha*omegaMin
         realOmegaMax = alpha*omegaMax
         
@@ -131,7 +217,11 @@ for alpha in [2]:
                   &(dfO.A2 >= A2Min)
                   &(dfO.A2 <= A2Max)
                   &(dfO.A3 >= A3Min)
-                  &(dfO.A3 <= A3Max)]
+                  &(dfO.A3 <= A3Max)
+                  # &(dfO["LowerT.X"]>0.92)
+                  # &(dfO["LowerT.Y"]>0.42)
+                  # &(dfO["LowerT.Y"]<0.5)
+                  ]
         
         if not dfP.empty:
             colour = next(iterator)
@@ -140,9 +230,18 @@ for alpha in [2]:
             # n2s = dfP.n2.values.tolist()
             # n3s = dfP.n3.values.tolist()
             
-            x = dfP["J12/J23"].to_numpy()
-            y = dfP["J31/J23"].to_numpy()
+            # x = dfP["J12/J23"].to_numpy()
+            # y = dfP["J31/J23"].to_numpy()
             
+            xLT = dfP["LowerT.X"]
+            yLT = dfP["LowerT.Y"] 
+            # xUT = dfP["UpperT.X"]
+            # yUT = dfP["UpperT.Y"]
+            
+            # dfTri = pd.DataFrame(columns = ["LowerT.X", "LowerT.Y", "UpperT.X", "UpperT.Y"])
+            # dfTri["LowerT.X"] = xLT
+            
+            # xLT = xLT["LowerT.X">0,9]
             
             print(colour)
             # ax.plot(np.abs(x), np.abs(y), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$", markersize=ms, color = colour)
@@ -153,16 +252,17 @@ for alpha in [2]:
             # ax.plot(np.abs(x/y), np.abs(1/y), '.',  markersize=ms, color = colour)
             
             
-            t = dfP["J23/J12"].to_numpy()
-            d = dfP["J31/J12"].to_numpy() 
-            s = dfP["J23/J31"].to_numpy() 
-            p = dfP["J12/J31"].to_numpy() 
-            ax.plot(np.abs(x), np.abs(y), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$", markersize=ms, color = colour)
-            ax.plot(np.abs(y), np.abs(x), '.',  markersize=ms, color = colour)
-            ax.plot(np.abs(t), np.abs(d), '.',  markersize=ms, color = colour)
-            ax.plot(np.abs(d), np.abs(t), '.',  markersize=ms, color = colour)
-            ax.plot(np.abs(s), np.abs(p), '.', markersize=ms, color = colour)
-            ax.plot(np.abs(p), np.abs(s), '.',  markersize=ms, color = colour)
+            # t = dfP["J23/J12"].to_numpy()
+            # d = dfP["J31/J12"].to_numpy() 
+            # s = dfP["J23/J31"].to_numpy() 
+            # p = dfP["J12/J31"].to_numpy() 
+            ax.plot(np.abs(xLT), np.abs(yLT), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$", markersize=ms, color = colour)
+            # ax.plot(np.abs(xUT), np.abs(yUT), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$", markersize=ms, color = colour)
+            # ax.plot(np.abs(y), np.abs(x), '.',  markersize=ms, color = colour)
+            # ax.plot(np.abs(t), np.abs(d), '.',  markersize=ms, color = colour)
+            # ax.plot(np.abs(d), np.abs(t), '.',  markersize=ms, color = colour)
+            # ax.plot(np.abs(s), np.abs(p), '.', markersize=ms, color = colour)
+            # ax.plot(np.abs(p), np.abs(s), '.',  markersize=ms, color = colour)
             
             # ax.set_ylabel(r"$J_{31}/J_{23}$", rotation=0, labelpad=10)
             # ax.set_xlabel(r"$J_{12}/J_{23}$")
@@ -193,153 +293,119 @@ plt.show()
 
 #%%
 
-fig, ax = plt.subplots(figsize=(6,6))
-alphas = np.linspace(0,1,1000)
-betas = np.linspace(0,1,1000)
+# """
+# plot showing how alpha and beta
+# """
 
-for i, alpha in enumerate(alphas):
-    for beta in betas[:i]:
-        if i == 0:
-            beta = betas[0]
-        lst = [alpha, beta, 1]  
-        ax.plot(alpha, beta, '.', color="#E4265C", markersize=5)
-        ax.plot(beta, alpha, '.', color="#E4265C", markersize=5)
-        if alpha!=0:
-            ax.plot(1/alpha, beta/alpha, '.', color='#47DBCD', markersize=5)
-            ax.plot( beta/alpha, 1/alpha,'.', color='#47DBCD', markersize=5)
-        if beta !=0:
-            ax.plot(alpha/beta, 1/beta, '.', color='darkblue', markersize=5)
-            ax.plot(1/beta, alpha/beta, '.', color='darkblue', markersize=5)
-ax.set_xlim([0,20])
-ax.set_ylim([0,20])
-plt.show()
+# fig, ax = plt.subplots(figsize=(6,6))
+# alphas = np.linspace(0,1,1000)
+# betas = np.linspace(0,1,1000)
 
+# for i, alpha in enumerate(alphas):
+#     for beta in betas[:i]:
+#         if i == 0:
+#             beta = betas[0]
+#         lst = [alpha, beta, 1]  
+#         ax.plot(alpha, beta, '.', color="#E4265C", markersize=5)
+#         ax.plot(beta, alpha, '.', color="#E4265C", markersize=5)
+#         if alpha!=0:
+#             ax.plot(1/alpha, beta/alpha, '.', color='#47DBCD', markersize=5)
+#             ax.plot( beta/alpha, 1/alpha,'.', color='#47DBCD', markersize=5)
+#         if beta !=0:
+#             ax.plot(alpha/beta, 1/beta, '.', color='darkblue', markersize=5)
+#             ax.plot(1/beta, alpha/beta, '.', color='darkblue', markersize=5)
+# ax.set_xlim([0,20])
+# ax.set_ylim([0,20])
+# plt.show()
 
-#%%
-
-
-
-from numpy import cos
-import numpy as np
-import matplotlib.pyplot as plt
-x = np.linspace(0,10,1000)
-k = 1/np.pi
-y = cos(k*x)**2
-plt.plot(x, y)
 
 
 #%%
 
 # dfN = dfO[(dfO["alpha"]==1)&(dfO["beta"]==2)&(dfO["omega"])]
 
-import matplotlib.collections as mcoll
-import matplotlib.path as mpath
 
-def colorline(
-    x, y, z=None, cmap=plt.get_cmap('copper'), norm=plt.Normalize(0.0, 1.0),
-        linewidth=3, alpha=1.0):
-    """
-    http://nbviewer.ipython.org/github/dpsanders/matplotlib-examples/blob/master/colorline.ipynb
-    http://matplotlib.org/examples/pylab_examples/multicolored_line.html
-    Plot a colored line with coordinates x and y
-    Optionally specify colors in the array z
-    Optionally specify a colormap, a norm function and a line width
-    """
-
-    # Default colors equally spaced on [0,1]:
-    if z is None:
-        z = np.linspace(0.0, 1.0, len(x))
-
-    # Special case if a single number:
-    if not hasattr(z, "__iter__"):  # to check for numerical input -- this is a hack
-        z = np.array([z])
-
-    z = np.asarray(z)
-
-    segments = make_segments(x, y)
-    lc = mcoll.LineCollection(segments, array=z, cmap=cmap, norm=norm,
-                              linewidth=linewidth, alpha=alpha)
-
-    ax = plt.gca()
-    ax.add_collection(lc)
-
-    return lc
-
-
-def make_segments(x, y):
-    """
-    Create list of line segments from x and y coordinates, in the correct format
-    for LineCollection: an array of the form numlines x (points per line) x 2 (x
-    and y) array
-    """
-
-    points = np.array([x, y]).T.reshape(-1, 1, 2)
-    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    return segments
-
-alpha = 1; beta = 2; omegaMax= 20; omegaMin = 0;
-A2Min = 0; A2Max = 30; A3Min = 0; A3Max = 30
-
-dfP = dfO[(dfO.beta == beta)
-                  &(dfO.alpha == alpha)
-                  &(dfO.omega0 <= omegaMax)
-                  &(dfO.omega0 >= omegaMin)
-                  &(dfO.A2 >= A2Min)
-                  &(dfO.A2 <= A2Max)
-                  &(dfO.A3 >= A3Min)
-                  &(dfO.A3 <= A3Max)]
-
-def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
-    N = len(lst1a)
-    lowerTriListA = np.empty(N)
-    lowerTriListB = np.empty(N)
-    for i, (a1, b1, a2, b2, a3, b3) in enumerate(list(zip(lst1a, lst1b, lst2a, lst2b, lst3a, lst3b))):
-        if a1 <=1 and b1 <=1:
-            if b1<=a1:
-                lowerTriListA[i] = a1
-                lowerTriListB[i] = b1
-            else:
-                lowerTriListA[i] = b1
-                lowerTriListB[i] = a1
-        elif a2 <=1 and b2 <=1:
-            if b2<=a2:
-                lowerTriListA[i] = a2
-                lowerTriListB[i] = b2
-            else:
-                lowerTriListA[i] = b2
-                lowerTriListB[i] = a2
-        else:
-            if b3<=a3:
-                lowerTriListA[i] = a3
-                lowerTriListB[i] = b3
-            else:
-                lowerTriListA[i] = b3
-                lowerTriListB[i] = a3
-    return lowerTriListA, lowerTriListB
-
-            
+saveFig = "C:/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Figs/"
+# for A2 in np.linspace(0,30,31):
+for A2 in np.linspace(0,30,301):
+    A2 = np.round(A2, 2)
+    alpha = 1; beta = 2; 
+    # omegaMax= 20; omegaMin = 0;
+    omega0=5;
+    # A2 = 19
+    # A2Min = 0; A2Max = 30; A3Min = 0; A3Max = 30
+    
+    dfP = dfO[(dfO.beta == beta)
+                      &(dfO.alpha == alpha)
+                      &(dfO.omega0 == omega0)
+                        &(dfO.A2 == A2)
+                      ]
+    
+    dfP = dfP.sort_values(by=['A3'])
     
     
-x = dfP["J12/J23"].to_numpy()
-y = dfP["J31/J23"].to_numpy()
-t = dfP["J23/J12"].to_numpy()
-d = dfP["J31/J12"].to_numpy() 
-s = dfP["J23/J31"].to_numpy() 
-p = dfP["J12/J31"].to_numpy() 
+    xLT = dfP["LowerT.X"]
+    yLT = dfP["LowerT.Y"] 
+    
+    
+    
+    
+    fig, ax = plt.subplots(figsize=(6,5))
+    sc = ax.scatter(xLT, yLT, s=3, c=dfP.A3.to_numpy(), cmap="jet", marker=".")
+    ax.set_xlim([0,1])
+    ax.set_ylim([0,1])
+    cbar = plt.colorbar(sc)
+    plt.suptitle(r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r", \omega_0="+str(omega0)+r", A_2="+str(A2)+r"$")
+    cbar.ax.set_ylabel(r"$A_3$", rotation=0, labelpad=10)
+    plt.savefig(saveFig+"alpha=1,beta=2,omega0=5,More/"+"Frame"+str(A2)+".png", format='png', bbox_inches='tight')
+    plt.show()
 
-lowerTriListA, lowerTriListB = ListRatiosInLowerTriangle(x, y, t, d, s, p)
+
+#%%%
+
+saveFig = "C:/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Figs/"
 
 
+alpha = 1; beta = 2; 
+# omegaMax= 20; omegaMin = 0;
+omega0=5;
+# A2 = 19
+# A2Min = 0; A2Max = 30; A3Min = 0; A3Max = 30
+# for A2 in np.linspace(0,30,31):
+for i, A2max in enumerate(np.linspace(0,30,301)):
+    print(i)
+    A2max =  np.round(A2max, 2)
+    fig, ax = plt.subplots(figsize=(6,5))
+    
+    for A2 in np.linspace(0, A2max, i+1):
+        
+        print("    ", A2)
+        A2 =  np.round(A2, 2)
+        
+        dfP = dfO[(dfO.beta == beta)
+                          &(dfO.alpha == alpha)
+                          &(dfO.omega0 == omega0)
+                            &(dfO.A2 == A2)
+                          ]
+        
+        dfP = dfP.sort_values(by=['A3'])
+        
+        
+        xLT = dfP["LowerT.X"]
+        yLT = dfP["LowerT.Y"] 
+        
+        
+        
+        sc = ax.scatter(xLT, yLT, s=3, c=dfP.A3.to_numpy(), cmap="jet", marker=".")
+        
+    ax.set_xlim([0,1])
+    ax.set_ylim([0,1])
+    cbar = plt.colorbar(sc)
+    plt.suptitle(r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r", \omega_0="+str(omega0)+r", A_2="+str(A2max)+r"$")
+    cbar.ax.set_ylabel(r"$A_3$", rotation=0, labelpad=10)
+    plt.savefig(saveFig+"alpha=1,beta=2,omega0=5,More,Accumulate/"+"Frame"+str(A2max)+".png", format='png', bbox_inches='tight')
+    plt.show()
 
-fig, ax = plt.subplots()
-
-path = mpath.Path(np.column_stack([lowerTriListA, lowerTriListB]))
-verts = path.interpolated(steps=3).vertices
-x, y = verts[:, 0], verts[:, 1]
-z = np.linspace(0, 1, len(x))
-colorline(x, y, z, cmap=plt.get_cmap('jet'), linewidth=2)
-
-plt.show()
 
 #%%
 

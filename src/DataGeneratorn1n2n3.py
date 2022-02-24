@@ -11,7 +11,7 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -22,7 +22,7 @@ from hamiltonians import Cosine
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
-dfname = "TriangleRatios.csv"
+dfname = "TriangleRatios2.csv"
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
@@ -71,49 +71,59 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
 #%%
-A2s = np.linspace(0, 30, 31)
-A3s = np.linspace(0, 30, 31)
+A2sOld = np.linspace(0, 30, 31)
+A3sOld = np.linspace(0, 30, 31)
 
-alpha = 2
-beta = 9
-omega0s = np.linspace(2,20,18*10+1)
+A2sNew = np.linspace(0,30,301)
+A3sNew = np.linspace(0,30,301)
+
+# A2sNew = [i for i in A2sNew if i not in A2sOld]
+A3sNew = [i for i in A3sNew if i not in A3sOld]
+
+alpha = 1
+beta = 2
+omega0s = [5]
+# omega0s = np.linspace(2,20,18*10+1)
 
 
-
-dfO = pd.read_csv(dataLoc+dfname, 
+dfnameOld = "TriangleRatios2.csv"
+dfO = pd.read_csv(dataLoc+dfnameOld, 
                  index_col=False)
 
 
 
 dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31", "n1", "n2", "n3"])
 i = 0
-for j, (alpha, beta, A2, A3) in enumerate(notDone):
-    print(j, alpha, beta, A2, A3)
-    for omega0 in omega0s:
-        # print(omega0)
-    
+for A2 in A2sOld:
+    if A2 % 1 ==0:
+        print(A2)
+    for A3 in A3sNew:
+        # print( alpha, beta, A2, A3)
+        for omega0 in omega0s:
+            # print(omega0)
         
-        omega2 = alpha*omega0
-        omega3 = beta*omega0
-    
-        T = 2*pi/omega0
-    
-    
-    
-        J23_real = integrate.quad(lambda t: cos(A3/omega3*sin(omega3*t) - A2/omega2*sin(omega2*t)), -T/2, T/2)[0]
+            
+            omega2 = alpha*omega0
+            omega3 = beta*omega0
         
-        J23_imag = 1j*integrate.quad(lambda t: sin(A3/omega3*sin(omega3*t) - A2/omega2*sin(omega2*t)), -T/2, T/2)[0]
-        # we are removing esimate of absolute error
-        J23 = np.abs(omega0/2/pi*(J23_real + J23_imag))
-        J12 = jv(0,A2/omega2)
-        J31 = jv(0,A3/omega3)
+            T = 2*pi/omega0
         
-        n1 = J12 / J31
-        n2 = J23 / J12
-        n3 = J31 / J23
         
-        dfN.loc[i] = [A2, A3, omega0, alpha, beta, J12, J23, J31, n1, n2, n3]
-        i +=1
+        
+            J23_real = integrate.quad(lambda t: cos(A3/omega3*sin(omega3*t) - A2/omega2*sin(omega2*t)), -T/2, T/2)[0]
+            
+            J23_imag = 1j*integrate.quad(lambda t: sin(A3/omega3*sin(omega3*t) - A2/omega2*sin(omega2*t)), -T/2, T/2)[0]
+            # we are removing esimate of absolute error
+            J23 = np.abs(omega0/2/pi*(J23_real + J23_imag))
+            J12 = jv(0,A2/omega2)
+            J31 = jv(0,A3/omega3)
+            
+            n1 = np.nan
+            n2 = np.nan
+            n3 = np.nan
+            
+            dfN.loc[i] = [A2, A3, omega0, alpha, beta, J12, J23, J31, n1, n2, n3]
+            i +=1
 
 dfO = dfO.append(dfN, ignore_index=True, sort=False)
 dfO.to_csv(dataLoc+dfname,
