@@ -18,10 +18,10 @@ import sys
 sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 # sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
 from hamiltonians import CreateHFGeneral
-from hamiltonians import Cosine
+from hamiltonians import Cosine, ConvertComplex
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
-latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
+latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
 dfname = "TriangleRatios-v2.csv"
 
 
@@ -116,62 +116,199 @@ params = {
 mpl.rcParams.update(params)
 mpl.rcParams["text.latex.preamble"] = mpl.rcParams["text.latex.preamble"] + r'\usepackage{xfrac}'
 
-# CB91_Blue = 'darkblue'#'#2CBDFE'
-# oxfordblue = "#061A40"
-# CB91_Green = '#47DBCD'
-# CB91_Pink = '#F3A0F2'
-# CB91_Purple = '#9D2EC5'
-# CB91_Violet = '#661D98'
-# CB91_Amber = '#F5B14C'
-# red = "#FC4445"
-# newred = "#E4265C"
-# flame = "#DD6031"
+CB91_Blue = 'darkblue'#'#2CBDFE'
+oxfordblue = "#061A40"
+CB91_Green = '#47DBCD'
+CB91_Pink = '#F3A0F2'
+CB91_Purple = '#9D2EC5'
+CB91_Violet = '#661D98'
+CB91_Amber = '#F5B14C'
+red = "#FC4445"
+newred = "#E4265C"
+flame = "#DD6031"
 
-# color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
-#                CB91_Purple,
-#                 # CB91_Violet,
-#                 'dodgerblue',
-#                 'slategrey', newred]
-# plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
+color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
+                CB91_Purple,
+                # CB91_Violet,
+                'dodgerblue',
+                'slategrey', newred]
+plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
+
 
 dfO = pd.read_csv(dataLoc+dfname, 
-                 index_col=False)
+                 index_col=False, 
+                 converters={"FT-J12": ConvertComplex,
+                            "FT-J23": ConvertComplex,
+                            "FT-J31": ConvertComplex,
+                            "HE-J12": ConvertComplex,
+                            "HE-J23": ConvertComplex,
+                            "HE-J31": ConvertComplex,
+                            "HE-01": ConvertComplex,
+                            "HE-02": ConvertComplex,
+                            "HE-03": ConvertComplex
+                            })
 
-dfO["J12"] = np.abs(dfO["J12"])
-dfO["J23"] = np.abs(dfO["J23"])
-dfO["J31"] = np.abs(dfO["J31"])
 
-dfO["J12/J23"] = dfO.J12 / dfO.J23
-dfO["J31/J23"] = dfO.J31 / dfO.J23
-dfO["J31/J12"] = dfO.J31 / dfO.J12
-dfO["J23/J12"] = dfO.J23 / dfO.J12
-dfO["J23/J31"] = dfO.J23 / dfO.J31
-dfO["J12/J31"] = dfO.J12 / dfO.J31
+dfO["FT-J12-ABS"] = np.abs(dfO["FT-J12"])
+dfO["FT-J23-ABS"] = np.abs(dfO["FT-J23"])
+dfO["FT-J31-ABS"] = np.abs(dfO["FT-J31"])
+
+dfO["FT-J12-PHA"] = np.angle(dfO["FT-J12"])
+dfO["FT-J23-PHA"] = np.angle(dfO["FT-J23"])
+dfO["FT-J31-PHA"] = np.angle(dfO["FT-J31"])
 
 
-"""
-get point on lower triangle
-"""
-x = dfO["J12/J23"].to_numpy()
-y = dfO["J31/J23"].to_numpy()
-t = dfO["J23/J12"].to_numpy()
-d = dfO["J31/J12"].to_numpy() 
-s = dfO["J23/J31"].to_numpy() 
-p = dfO["J12/J31"].to_numpy() 
+dfO["HE-J12-ABS"] = np.abs(dfO["HE-J12"])
+dfO["HE-J23-ABS"] = np.abs(dfO["HE-J23"])
+dfO["HE-J31-ABS"] = np.abs(dfO["HE-J31"])
+
+dfO["HE-J12-PHA"] = np.angle(dfO["HE-J12"]*-1)
+dfO["HE-J23-PHA"] = np.angle(dfO["HE-J23"]*-1)
+dfO["HE-J31-PHA"] = np.angle(dfO["HE-J31"]*-1)
+
+
+dfO["FT-J12/J23-ABS"] = dfO["FT-J12-ABS"] / dfO["FT-J23-ABS"]
+dfO["FT-J31/J23-ABS"] = dfO["FT-J31-ABS"] / dfO["FT-J23-ABS"]
+dfO["FT-J31/J12-ABS"] = dfO["FT-J31-ABS"] / dfO["FT-J12-ABS"]
+dfO["FT-J23/J12-ABS"] = dfO["FT-J23-ABS"] / dfO["FT-J12-ABS"]
+dfO["FT-J23/J31-ABS"] = dfO["FT-J23-ABS"] / dfO["FT-J31-ABS"]
+dfO["FT-J12/J31-ABS"] = dfO["FT-J12-ABS"] / dfO["FT-J31-ABS"]
+
+# """
+# get point on lower triangle
+# """
+x = dfO["FT-J12/J23-ABS"].to_numpy()
+y = dfO["FT-J31/J23-ABS"].to_numpy()
+t = dfO["FT-J23/J12-ABS"].to_numpy()
+d = dfO["FT-J31/J12-ABS"].to_numpy() 
+s = dfO["FT-J23/J31-ABS"].to_numpy() 
+p = dfO["FT-J12/J31-ABS"].to_numpy() 
 
 lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTriangle(x, y, t, d, s, p)
 
-dfO["LowerT.X"] = lowerTriListA
-dfO["LowerT.Y"] = lowerTriListB
-dfO["UpperT.X"] = upperTriListX
-dfO["UpperT.Y"] = upperTriListY
+dfO["FT-LowerT.X"] = lowerTriListA
+dfO["FT-LowerT.Y"] = lowerTriListB
+dfO["FT-UpperT.X"] = upperTriListX
+dfO["FT-UpperT.Y"] = upperTriListY
 
 
 # dfO = dfO.drop(dfO[(dfO['beta'] == 2) & (dfO['omega0'] < 4)].index)
-dfO = dfO.round({'A2': 3, "A3":3 })
+# dfO = dfO.round({'A2': 3, "A3":3 })
 
 #%%
+"""
+Phases - keep phi constant, vary A's'
+"""
 
+phasesFigLoc = "C:/Users/Georgia/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/"
+
+
+titles = ["Ham Evolution", "First Term"]
+    # saveAs = [latexLoc + "EffectivePhases,HamEvolve,ByOmega0,alpha=1,beta=2.pdf" , latexLoc + "EffectivePhases,FirstTerm,ByOmega0,alpha=1,beta=2.pdf" ]
+    # saveAs = [latexLoc + "EffectivePhases,HamEvolve,ByPhi,alpha=1,beta=2.pdf" , latexLoc + "EffectivePhases,FirstTerm,ByPhi,alpha=1,beta=2.pdf" ]
+folder = ["HamEvolve" , 
+          "FirstTerm" ]
+# x = dfO["phi3/pi"].to_numpy()*pi
+
+entry = ["HE-J31-PHA", "FT-J31-PHA"]
+
+phiFrac = 1.5
+for column, title1, saveTit in zip(entry, titles, folder):
+    
+    
+    for omega0 in np.linspace(4,20,17):
+    
+        dfP = dfO[(dfO["phi3/pi"]==phiFrac)&
+                  (dfO["omega0"]==omega0)
+                  # (dfO["A2"]==30)
+                  ]
+        
+        data = dfP[column].to_numpy()
+    
+    
+        x = dfP["A3"].to_numpy()
+        # x = dfO["omega0"].to_numpy()
+    
+
+    
+        fig, ax = plt.subplots(figsize=(5,5))
+        title = title1 + r", $\alpha=1$, $\beta=2$, $\phi="+str(phiFrac)+r"\pi$, $\omega_0="+str(omega0)+r"$"
+        sc = ax.scatter(x, data, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
+        # ax.plot(x, data,'.', ms=1)
+        ax.set_title(title)
+        ax.set_ylabel(r"$\xi$", rotation=0)
+        ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+        ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+        # ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
+        # ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+        # ax.set_xlabel(r"$\omega_0$")
+        ax.set_xlabel(r"$A_3$")
+        ax.set_ylim([-pi-0.1, pi+0.1])
+        cbar = plt.colorbar(sc)
+        cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+        # plt.savefig(saveTit, format="pdf", bbox_inches="tight")
+        plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,omega0="+str(omega0)+".png", format='png', bbox_inches='tight')
+        plt.show()
+        
+        
+
+#%%
+"""
+Phases - vary phi
+"""
+
+phasesFigLoc = "C:/Users/Georgia/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/"
+
+
+titles = ["Ham Evolution", "First Term"]
+    # saveAs = [latexLoc + "EffectivePhases,HamEvolve,ByOmega0,alpha=1,beta=2.pdf" , latexLoc + "EffectivePhases,FirstTerm,ByOmega0,alpha=1,beta=2.pdf" ]
+    # saveAs = [latexLoc + "EffectivePhases,HamEvolve,ByPhi,alpha=1,beta=2.pdf" , latexLoc + "EffectivePhases,FirstTerm,ByPhi,alpha=1,beta=2.pdf" ]
+folder = ["HamEvolve" , 
+          "FirstTerm" ]
+# x = dfO["phi3/pi"].to_numpy()*pi
+
+entry = ["HE-J31-PHA", "FT-J31-PHA"]
+
+omega0 = 5
+for column, title1, saveTit in zip(entry, titles, folder):
+    
+    
+    for A3 in np.linspace(0,30, 7):
+    
+        dfP = dfO[(dfO["omega0"]==omega0)&
+                   (dfO["A3"]==A3)
+                  ]
+        
+        data = dfP[column].to_numpy()
+    
+    
+        x = dfP["phi3/pi"].to_numpy()*pi
+        # x = dfO["omega0"].to_numpy()
+    
+
+    
+        fig, ax = plt.subplots(figsize=(5,5))
+        title = title1 + r", $\alpha=1$, $\beta=2$, $\omega_0="+str(omega0)+r"$, $A_3="+str(A3)+r"$"
+        sc = ax.scatter(x, data, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
+        # ax.plot(x, data,'.', ms=1)
+        ax.set_title(title)
+        ax.set_ylabel(r"$\xi$", rotation=0)
+        ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+        ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+        ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
+        ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+        ax.set_xlabel(r"$\phi$")
+        ax.set_ylim([-pi-0.1, pi+0.1])
+        cbar = plt.colorbar(sc)
+        cbar.ax.set_ylabel(r"$\phi$", rotation=0, labelpad=10)
+        # plt.savefig(saveTit, format="pdf", bbox_inches="tight")
+        # plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,omega0="+str(omega0)+".png", format='png', bbox_inches='tight')
+        plt.show()
+        
+
+
+
+#%%
 
 """
 Not sure what this part does actually!
@@ -337,7 +474,7 @@ Plot showing values in lower triangle, non accumulative
 
 saveFig = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs2/"
 # for A2 in np.linspace(0,30,31):
-for A2 in np.linspace(0,30,301):
+for A2 in np.linspace(0,30,7):#np.linspace(0,30,301):
     A2 = np.round(A2, 2)
     alpha = 1; beta = 2; 
     # omegaMax= 20; omegaMin = 0;
@@ -354,8 +491,8 @@ for A2 in np.linspace(0,30,301):
     dfP = dfP.sort_values(by=['A3'])
     
     
-    xLT = dfP["LowerT.X"]
-    yLT = dfP["LowerT.Y"] 
+    xLT = dfP["FT-LowerT.X"]
+    yLT = dfP["FT-LowerT.Y"] 
     
     
     
@@ -375,9 +512,8 @@ for A2 in np.linspace(0,30,301):
 
 
 """
-Plot showing values in lower triangle accumulative
+Plot showing values in lower triangle accumulative - First Term
 """
-
 
 saveFig = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs2/"
 
@@ -390,7 +526,7 @@ omega0=10;
 # for A2 in np.linspace(0,30,31):
     
 
-for i, A2max in enumerate(np.linspace(0,30,301)):
+for i, A2max in enumerate(np.linspace(0,30,7)):#np.linspace(0,30,301)):
     # print(i)
     A2max =  np.round(A2max, 2)
     fig, ax = plt.subplots(figsize=(6,5))
@@ -411,8 +547,8 @@ for i, A2max in enumerate(np.linspace(0,30,301)):
         dfP = dfP.sort_values(by=['A3'])
         
         
-        xLT = dfP["LowerT.X"]
-        yLT = dfP["LowerT.Y"] 
+        xLT = dfP["FT-LowerT.X"]
+        yLT = dfP["FT-LowerT.Y"] 
         
         
         

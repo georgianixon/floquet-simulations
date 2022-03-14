@@ -11,7 +11,7 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -22,7 +22,7 @@ from hamiltonians import Cosine
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
-dfname = "TriangleRatios2.csv"
+dfname = "TriangleRatios3.csv"
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
@@ -71,30 +71,30 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
 #%%
-A2sOld = np.linspace(0, 30, 31)
-A3sOld = np.linspace(0, 30, 31)
+# A2sOld = np.linspace(0, 30, 31)
+# A3sOld = np.linspace(0, 30, 31)
 
 A2sNew = np.linspace(0,30,301)
 A3sNew = np.linspace(0,30,301)
 
 # A2sNew = [i for i in A2sNew if i not in A2sOld]
-A3sNew = [i for i in A3sNew if i not in A3sOld]
+# A3sNew = [i for i in A3sNew if i not in A3sOld]
 
 alpha = 1
 beta = 2
-omega0s = [5]
+omega0s = [10]
 # omega0s = np.linspace(2,20,18*10+1)
 
 
-dfnameOld = "TriangleRatios2.csv"
+dfnameOld = "TriangleRatios3.csv"
 dfO = pd.read_csv(dataLoc+dfnameOld, 
                  index_col=False)
 
 
 
-dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31", "n1", "n2", "n3"])
+dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"])
 i = 0
-for A2 in A2sOld:
+for A2 in A2sNew:
     if A2 % 1 ==0:
         print(A2)
     for A3 in A3sNew:
@@ -122,11 +122,11 @@ for A2 in A2sOld:
             n2 = np.nan
             n3 = np.nan
             
-            dfN.loc[i] = [A2, A3, omega0, alpha, beta, J12, J23, J31, n1, n2, n3]
+            dfN.loc[i] = [A2, A3, omega0, alpha, beta, J12, J23, J31]
             i +=1
 
 dfO = dfO.append(dfN, ignore_index=True, sort=False)
 dfO.to_csv(dataLoc+dfname,
                   index=False, 
-                  columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31", "n1", "n2", "n3"])
+                  columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"])
 
