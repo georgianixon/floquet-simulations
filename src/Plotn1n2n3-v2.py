@@ -22,7 +22,8 @@ from hamiltonians import Cosine, ConvertComplex
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
-dfname = "TriangleRatios-phasedata-v3.csv"
+dfname = "TriangleRatios-phasedata-v4.csv"
+dfname_nonans = "TriangleRatios-phasedata-v4-nonans.csv"
 
 
 def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
@@ -135,18 +136,46 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
-dfO = pd.read_csv(dataLoc+dfname, 
+"""
+np.where(np.isnan(column1))
+Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
+"""
+
+
+""" do this once """ #-----------------------------------------------------------------------------------------------------
+# #import df with nans
+# dfO_withnan = pd.read_csv(dataLoc+dfname, 
+#                  index_col=False
+#                  )
+# #collect nan locs
+# nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
+# #drop nan locs
+# dfO_nonans = dfO_withnan.drop(nanRows)
+# #convert to complex values
+# for headline in ["FT-J12", "FT-J23", "FT-J31", "HE-J12", "HE-J23", "HE-J31", "HE-O1", "HE-O2", "HE-O3"]:
+#     dfO_nonans[headline] = dfO_nonans[headline].apply(ConvertComplex)
+# #save to new df
+# dfO_nonans.to_csv(dataLoc+dfname_nonans,
+#                   index=False, 
+#                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
+#                   )
+#---------------------------------------------------------------------------------------------------------------------------
+
+dfO = pd.read_csv(dataLoc+dfname_nonans, 
                  index_col=False, 
-                 converters={"FT-J12": ConvertComplex,
-                            "FT-J23": ConvertComplex,
-                            "FT-J31": ConvertComplex,
-                            "HE-J12": ConvertComplex,
-                            "HE-J23": ConvertComplex,
-                            "HE-J31": ConvertComplex,
-                            "HE-01": ConvertComplex,
-                            "HE-02": ConvertComplex,
-                            "HE-03": ConvertComplex
-                            })
+                    converters={"FT-J12": ConvertComplex,
+                              "FT-J23": ConvertComplex,
+                              "FT-J31": ConvertComplex,
+                              "HE-J12": ConvertComplex,
+                              "HE-J23": ConvertComplex,
+                              "HE-J31": ConvertComplex,
+                              "HE-O1": ConvertComplex,
+                              "HE-O2": ConvertComplex,
+                              "HE-O3": ConvertComplex
+                                }
+                 )
+
+
 
 
 # G = dfO[(dfO["A2"]==30) &(dfO["A3"]==30)&(dfO["omega0"]==20)&(dfO["phi3/pi"]==0.6)]
@@ -201,14 +230,25 @@ dfO["FT-LowerT.Y"] = lowerTriListB
 dfO["FT-UpperT.X"] = upperTriListX
 dfO["FT-UpperT.Y"] = upperTriListY
 
+#get rid of data that is not full yet
+dfO.drop(dfO[dfO.A2 <= 25].index, inplace=True)
 
 # dfO = dfO.drop(dfO[(dfO['beta'] == 2) & (dfO['omega0'] < 4)].index)
 # dfO = dfO.round({'A2': 3, "A3":3 })
 
 #%%
-"""
-Phases - keep phi constant, vary A's'
-"""
+# """
+# Phases - keep phi constant
+#     |
+#     |
+# \xi |
+#     |
+#     |____________
+#           A_3
+# - \phi is constant (phiFrac)
+# - compare Ham Evolution and First Term
+# - pick A2 = 30
+# """
 
 phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/phiI=0.6,A2=30/"
 
@@ -272,39 +312,114 @@ for omega0 in np.linspace(4,20,17):
     # plt.savefig(saveTit, format="pdf", bbox_inches="tight")
     ax.set_title(title)
     plt.legend(loc="upper right")
-    plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,A2=30,phiI=0.6,omega0="+str(omega0)+".png", format='png', bbox_inches='tight')
+    # plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,A2=30,phiI=0.6,omega0="+str(omega0)+".png", format='png', bbox_inches='tight')
     plt.show()
         
       
+    
+#%%
+
+# """
+# Phases - keep phi constant
+#     |
+#     |
+# \xi |
+#     |
+#     |____________
+#           A_3
+# - \phi is constant (phiFrac)
+# - pick Ham Evolve or First Term ()
+# - have all A2 vals shown as colourbar
+# """
+
+phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/phiI=0.6,Scatter/"
+
+  # C:\Users\Georgia Nixon\OneDrive - University of Cambridge\MBQD\Figs\ShakingTriangle\Phases\V2\FirstTerm
+title1 =  "Ham Evolution"
+column = "HE-J31-PHA"
+columnTitle = "J31"
+folder = "HamEvolve"
+
+
+title1 =  "First Term" 
+column = "FT-J31-PHA"
+columnTitle = "J31"
+folder = "FirstTerm" 
+
+
+phiFrac = 0.6
+
+    
+for omega0 in np.linspace(4,20,17):
+
+    dfP = dfO[(dfO["phi3/pi"]==phiFrac)&
+              (dfO["omega0"]==omega0)
+               # &(dfO["A2"]==30)
+              ]
+    
+    fig, ax = plt.subplots(figsize=(5,5))
+    title = title1 + r", "+columnTitle+r", $\alpha=1$, $\beta=2$, $\phi="+str(phiFrac)+r"\pi$, $\omega_0="+str(omega0)+r"$"
+    
+
+    data = dfP[column].to_numpy()
+    x = dfP["A3"].to_numpy()
+
+    sc = ax.scatter(x, data, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
+        
+    ax.set_ylabel(r"$\xi$", rotation=0)
+    ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+    ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+    # ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
+    # ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+    # ax.set_xlabel(r"$\omega_0$")
+    ax.set_xlabel(r"$A_3$")
+    ax.set_ylim([-pi-0.1, pi+0.1])
+    cbar = plt.colorbar(sc)
+    cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+    ax.set_title(title)
+    # plt.savefig(phasesFigLoc+folder+"/"+folder+"Phases,"+columnTitle+",alpha=1,beta=2,phiI=0.6,omega0="+str(omega0)+".png", format='png', bbox_inches='tight')
+    plt.show()
+
+
 
 #%%
+
+# """
+# Phases - keep omega_0 constant (omega0=5)
+#     |
+#     |
+# \xi |
+#     |
+#     |____________
+#           \phi
+# - omega_0 constant (omega0=5)
+# - compare Ham Evolution and First Term
+# - pick A2 = 30
+# """
+
+
 """
 Phases - vary phi
 """
 
-phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/omega0=5,A2=30/"
+phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/omega0=10,A2=30/"
 
 
 titles = ["Ham Evolution", "First Term"]
-    # saveAs = [latexLoc + "EffectivePhases,HamEvolve,ByOmega0,alpha=1,beta=2.pdf" , latexLoc + "EffectivePhases,FirstTerm,ByOmega0,alpha=1,beta=2.pdf" ]
-    # saveAs = [latexLoc + "EffectivePhases,HamEvolve,ByPhi,alpha=1,beta=2.pdf" , latexLoc + "EffectivePhases,FirstTerm,ByPhi,alpha=1,beta=2.pdf" ]
 folder = ["HamEvolve" , 
           "FirstTerm" ]
-# x = dfO["phi3/pi"].to_numpy()*pi
-
 entry = ["HE-J31-PHA", "FT-J31-PHA"]
-
 saveTit = "Both"
 
 colours = ["#D30C7B", "#1BB18C"]
-omega0 = 5
-# for column, title1, saveTit in zip(entry, titles, folder):
+omega0 = 10
+A2 = 30
     
 
 for A3 in np.linspace(0,30, 31):
 
     dfP = dfO[(dfO["omega0"]==omega0)&
-              (dfO["A2"]==30)&
+              (dfO["A2"]==A2)&
                (dfO["A3"]==A3)
               ]
     
@@ -328,14 +443,72 @@ for A3 in np.linspace(0,30, 31):
     ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
     ax.set_xlabel(r"$\phi$")
     ax.set_ylim([-pi-0.1, pi+0.1])
-    # cbar = plt.colorbar(sc)
-    # cbar.ax.set_ylabel(r"$\phi$", rotation=0, labelpad=10)
-    # plt.savefig(saveTit, format="pdf", bbox_inches="tight")
-    plt.legend()
-    plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,A2=30,omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+    plt.legend(loc="upper right")
+    plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,A2="+str(A2)+",omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
     plt.show()
         
 
+
+    
+#%%
+
+# """
+# Scatter plot
+# Phases - keep omega0 constant
+#     |
+#     |
+# \xi |
+#     |
+#     |____________
+#           A_3
+# - omega_0 is constant omega0=5
+# - pick Ham Evolve or First Term ()
+# - have all A2 vals shown as colourbar
+# """
+
+phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/omega0=16,Scatter/"
+
+# title1 =  "Ham Evolution"
+# column = "HE-J31-PHA"
+# folder = "HamEvolve"
+
+
+title1 =  "First Term" 
+column = "FT-J31-PHA"
+folder = "FirstTerm" 
+
+
+omega0 = 16
+    
+for A3 in np.linspace(0,30, 31):
+    
+
+    dfP = dfO[(dfO["omega0"]==omega0)&
+               (dfO["A3"]==A3)
+              ]
+    
+    fig, ax = plt.subplots(figsize=(5,5))
+    title = title1 +r", $\alpha=1$, $\beta=2$, $\omega_0="+str(omega0)+r"$, $A_3="+str(A3)+r"$"
+    
+
+    data = dfP[column].to_numpy()
+    x = dfP["phi3/pi"].to_numpy()*pi
+
+    sc = ax.scatter(x, data, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
+        
+    ax.set_ylabel(r"$\xi$", rotation=0)
+    ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+    ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+    ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
+    ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+    ax.set_xlabel(r"$\omega_0$")
+    # ax.set_xlabel(r"$A_3$")
+    ax.set_ylim([-pi-0.1, pi+0.1])
+    cbar = plt.colorbar(sc)
+    cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+    ax.set_title(title)
+    plt.savefig(phasesFigLoc+folder+"/"+folder+"Phases,alpha=1,beta=2,omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+    plt.show()
 
 
 #%%
