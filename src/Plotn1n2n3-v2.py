@@ -11,7 +11,7 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -22,12 +22,12 @@ from hamiltonians import Cosine, ConvertComplex
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
-dfname = "TriangleRatios-v2.csv"
+dfname = "TriangleRatios-phasedata-v3.csv"
 
 
 def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
     """
-    Go thourgh (x1,y1), (x2,y2) (x3,y3) combinations and find the one in the bottom right triangle
+    Go through (x1,y1), (x2,y2) (x3,y3) combinations and find the one in the bottom right triangle
     """
     N = len(lst1a)
     lowerTriListA = np.zeros(N)
@@ -149,22 +149,32 @@ dfO = pd.read_csv(dataLoc+dfname,
                             })
 
 
+# G = dfO[(dfO["A2"]==30) &(dfO["A3"]==30)&(dfO["omega0"]==20)&(dfO["phi3/pi"]==0.6)]
+# print(np.angle(G["HE-J31"].to_numpy()[0]), np.angle(G["FT-J31"].to_numpy()[0]))
+# print(G["HE-J31-PHA"].to_numpy()[0], G["FT-J31-PHA"].to_numpy()[0])
+
+# dfO["FT-J12"] = np.conj(dfO["FT-J12"]*-1)
+# dfO["FT-J23"] = np.conj(dfO["FT-J23"]*-1)
+# dfO["FT-J31"] = np.conj(dfO["FT-J31"]*-1)
+
 dfO["FT-J12-ABS"] = np.abs(dfO["FT-J12"])
 dfO["FT-J23-ABS"] = np.abs(dfO["FT-J23"])
 dfO["FT-J31-ABS"] = np.abs(dfO["FT-J31"])
 
-dfO["FT-J12-PHA"] = np.angle(dfO["FT-J12"])
-dfO["FT-J23-PHA"] = np.angle(dfO["FT-J23"])
-dfO["FT-J31-PHA"] = np.angle(dfO["FT-J31"])
+#negative to account for the fact that matrix element is negative
+dfO["FT-J12-PHA"] = np.angle(-dfO["FT-J12"])
+dfO["FT-J23-PHA"] = np.angle(-dfO["FT-J23"])
+dfO["FT-J31-PHA"] = np.angle(-dfO["FT-J31"])
 
 
 dfO["HE-J12-ABS"] = np.abs(dfO["HE-J12"])
 dfO["HE-J23-ABS"] = np.abs(dfO["HE-J23"])
 dfO["HE-J31-ABS"] = np.abs(dfO["HE-J31"])
 
-dfO["HE-J12-PHA"] = np.angle(dfO["HE-J12"]*-1)
-dfO["HE-J23-PHA"] = np.angle(dfO["HE-J23"]*-1)
-dfO["HE-J31-PHA"] = np.angle(dfO["HE-J31"]*-1)
+#negative to account for the fact that matrix element is negative
+dfO["HE-J12-PHA"] = np.angle(-dfO["HE-J12"])
+dfO["HE-J23-PHA"] = np.angle(-dfO["HE-J23"])
+dfO["HE-J31-PHA"] = np.angle(-dfO["HE-J31"])
 
 
 dfO["FT-J12/J23-ABS"] = dfO["FT-J12-ABS"] / dfO["FT-J23-ABS"]
@@ -200,64 +210,79 @@ dfO["FT-UpperT.Y"] = upperTriListY
 Phases - keep phi constant, vary A's'
 """
 
-phasesFigLoc = "C:/Users/Georgia/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/"
+phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/phiI=0.6,A2=30/"
 
-
-titles = ["Ham Evolution", "First Term"]
+  # C:\Users\Georgia Nixon\OneDrive - University of Cambridge\MBQD\Figs\ShakingTriangle\Phases\V2\FirstTerm
+titles = [
+    "Ham Evolution", "First Term"]
     # saveAs = [latexLoc + "EffectivePhases,HamEvolve,ByOmega0,alpha=1,beta=2.pdf" , latexLoc + "EffectivePhases,FirstTerm,ByOmega0,alpha=1,beta=2.pdf" ]
     # saveAs = [latexLoc + "EffectivePhases,HamEvolve,ByPhi,alpha=1,beta=2.pdf" , latexLoc + "EffectivePhases,FirstTerm,ByPhi,alpha=1,beta=2.pdf" ]
-folder = ["HamEvolve" , 
-          "FirstTerm" ]
+folder = [
+    "HamEvolve" , 
+           "FirstTerm",]
 # x = dfO["phi3/pi"].to_numpy()*pi
 
+saveTit="Both"
 entry = ["HE-J31-PHA", "FT-J31-PHA"]
+colours = ["#D30C7B", "#1BB18C"]
 
-phiFrac = 1.5
-for column, title1, saveTit in zip(entry, titles, folder):
+phiFrac = 0.6
+# for  title1, saveTit in zip( titles, folder):
     
+for omega0 in np.linspace(4,20,17):
+# for omega0 in [20]:
+
+    dfP = dfO[(dfO["phi3/pi"]==phiFrac)&
+              (dfO["omega0"]==omega0)
+               &(dfO["A2"]==30)
+              ]
     
-    for omega0 in np.linspace(4,20,17):
+    fig, ax = plt.subplots(figsize=(5,5))
+    # title = title1 + r", $\alpha=1$, $\beta=2$, $\phi="+str(phiFrac)+r"\pi$, $A_2 = 30$, $\omega_0="+str(omega0)+r"$"
+    title = r"$\alpha=1$, $\beta=2$, $\phi="+str(phiFrac)+r"\pi$, $A_2 = 30$, $\omega_0="+str(omega0)+r"$"
     
-        dfP = dfO[(dfO["phi3/pi"]==phiFrac)&
-                  (dfO["omega0"]==omega0)
-                  # (dfO["A2"]==30)
-                  ]
+    for lab, column, co in zip(titles, entry, colours):
         
         data = dfP[column].to_numpy()
-    
+        # if column == "FT-J31-PHA":
+        #     print(1)
+        #     data = np.conj(data)
     
         x = dfP["A3"].to_numpy()
         # x = dfO["omega0"].to_numpy()
-    
+        
+        
 
     
-        fig, ax = plt.subplots(figsize=(5,5))
-        title = title1 + r", $\alpha=1$, $\beta=2$, $\phi="+str(phiFrac)+r"\pi$, $\omega_0="+str(omega0)+r"$"
-        sc = ax.scatter(x, data, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
-        # ax.plot(x, data,'.', ms=1)
-        ax.set_title(title)
-        ax.set_ylabel(r"$\xi$", rotation=0)
-        ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
-        ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-        # ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
-        # ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
-        # ax.set_xlabel(r"$\omega_0$")
-        ax.set_xlabel(r"$A_3$")
-        ax.set_ylim([-pi-0.1, pi+0.1])
-        cbar = plt.colorbar(sc)
-        cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
-        # plt.savefig(saveTit, format="pdf", bbox_inches="tight")
-        plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,omega0="+str(omega0)+".png", format='png', bbox_inches='tight')
-        plt.show()
         
+        # sc = ax.scatter(x, data, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
+        ax.plot(x, data,'.', ms=1, color=co, label=lab)
+        # ax.plot(x, data, 'x', ms=1, )
         
+    ax.set_ylabel(r"$\xi$", rotation=0)
+    ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+    ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+    # ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
+    # ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+    # ax.set_xlabel(r"$\omega_0$")
+    ax.set_xlabel(r"$A_3$")
+    ax.set_ylim([-pi-0.1, pi+0.1])
+    # cbar = plt.colorbar(sc)
+    # cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+    # plt.savefig(saveTit, format="pdf", bbox_inches="tight")
+    ax.set_title(title)
+    plt.legend(loc="upper right")
+    plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,A2=30,phiI=0.6,omega0="+str(omega0)+".png", format='png', bbox_inches='tight')
+    plt.show()
+        
+      
 
 #%%
 """
 Phases - vary phi
 """
 
-phasesFigLoc = "C:/Users/Georgia/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/"
+phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/omega0=5,A2=30/"
 
 
 titles = ["Ham Evolution", "First Term"]
@@ -269,41 +294,46 @@ folder = ["HamEvolve" ,
 
 entry = ["HE-J31-PHA", "FT-J31-PHA"]
 
+saveTit = "Both"
+
+colours = ["#D30C7B", "#1BB18C"]
 omega0 = 5
-for column, title1, saveTit in zip(entry, titles, folder):
-    
-    
-    for A3 in np.linspace(0,30, 7):
-    
-        dfP = dfO[(dfO["omega0"]==omega0)&
-                   (dfO["A3"]==A3)
-                  ]
-        
-        data = dfP[column].to_numpy()
-    
-    
-        x = dfP["phi3/pi"].to_numpy()*pi
-        # x = dfO["omega0"].to_numpy()
+# for column, title1, saveTit in zip(entry, titles, folder):
     
 
+for A3 in np.linspace(0,30, 31):
+
+    dfP = dfO[(dfO["omega0"]==omega0)&
+              (dfO["A2"]==30)&
+               (dfO["A3"]==A3)
+              ]
     
-        fig, ax = plt.subplots(figsize=(5,5))
-        title = title1 + r", $\alpha=1$, $\beta=2$, $\omega_0="+str(omega0)+r"$, $A_3="+str(A3)+r"$"
-        sc = ax.scatter(x, data, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
-        # ax.plot(x, data,'.', ms=1)
-        ax.set_title(title)
-        ax.set_ylabel(r"$\xi$", rotation=0)
-        ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
-        ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-        ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
-        ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
-        ax.set_xlabel(r"$\phi$")
-        ax.set_ylim([-pi-0.1, pi+0.1])
-        cbar = plt.colorbar(sc)
-        cbar.ax.set_ylabel(r"$\phi$", rotation=0, labelpad=10)
-        # plt.savefig(saveTit, format="pdf", bbox_inches="tight")
-        # plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,omega0="+str(omega0)+".png", format='png', bbox_inches='tight')
-        plt.show()
+    fig, ax = plt.subplots(figsize=(5,5))
+    # title = title1 + r", $\alpha=1$, $\beta=2$, $\omega_0="+str(omega0)+r"$, $A_2=30$, $A_3="+str(A3)+r"$"
+    title = r"$\alpha=1$, $\beta=2$, $\omega_0="+str(omega0)+r"$, $A_2=30$, $A_3="+str(A3)+r"$"
+    for lab, column, co in zip(titles, entry, colours):
+        data = dfP[column].to_numpy()
+
+        x = dfP["phi3/pi"].to_numpy()*pi
+        # x = dfO["omega0"].to_numpy()
+
+    # sc = ax.scatter(x, data, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
+        ax.plot(x, data,'.', ms=1, color=co, label=lab)#"#D30C7B")
+        
+    ax.set_title(title)
+    ax.set_ylabel(r"$\xi$", rotation=0)
+    ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+    ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+    ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
+    ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+    ax.set_xlabel(r"$\phi$")
+    ax.set_ylim([-pi-0.1, pi+0.1])
+    # cbar = plt.colorbar(sc)
+    # cbar.ax.set_ylabel(r"$\phi$", rotation=0, labelpad=10)
+    # plt.savefig(saveTit, format="pdf", bbox_inches="tight")
+    plt.legend()
+    plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,A2=30,omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+    plt.show()
         
 
 

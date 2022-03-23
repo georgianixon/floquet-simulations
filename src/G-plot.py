@@ -197,8 +197,8 @@ cax = plt.axes([1.03, 0.2, 0.03, 0.6])
 fig.colorbar(pcm, cax=cax)
     
 latexLoc = "C:/Users/Georgia/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
-fig.savefig(latexLoc+"G,Triangle,Example,Gauged.pdf", 
-        format='pdf', bbox_inches='tight')
+# fig.savefig(latexLoc+"G,Triangle,Example,Gauged.pdf", 
+#         format='pdf', bbox_inches='tight')
 plt.show()
 
 

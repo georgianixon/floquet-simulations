@@ -597,6 +597,37 @@ def CreateHFGeneral(N, centre, func, params, T, circleBoundary):
 
     return UT, HF
 
+def CreateHFGeneralLoopA(N, centre, func, params, T, circleBoundary): 
+
+    tspan = (0,T)
+    UT = np.zeros([N,N], dtype=np.complex_)
+    nTimesteps = 100
+    
+    for A_site_start in range(N):
+    #    print(A_site_start)
+        psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
+        sol = SolveSchrodingerGeneral(N, centre, func, params, tspan, nTimesteps, psi0, circleBoundary=circleBoundary)
+        UT[:,A_site_start]=sol[:,-1] 
+    
+    # print(time.time()-start, 'seconds.')
+    
+    # evals_U, evecs = eig(UT)
+    evals_U, evecs = GetEvalsAndEvecsGen(UT) #evals can be imaginary
+    evals_H = 1j / T *log(evals_U)
+    
+    HF = np.zeros([N,N], dtype=np.complex_)
+    for i in range(N):
+        term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
+        HF = HF+term
+        
+    # print('   ',time.time()-start, 's')
+    HFr = RoundComplex(HF, 4)
+    if np.all(0 == (HFr - np.conj(HFr.T))):
+        return UT, HF
+    else:
+        return np.nan, np.nan
+    
+
 def hoppingHF(N, centre, a, omega, phi):
     HF =  np.zeros([N,N], dtype=np.complex_)
     HF = HF + np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1) 
