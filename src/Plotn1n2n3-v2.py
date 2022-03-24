@@ -145,8 +145,8 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 """ do this once """ #-----------------------------------------------------------------------------------------------------
 # #import df with nans
 # dfO_withnan = pd.read_csv(dataLoc+dfname, 
-#                  index_col=False
-#                  )
+#                   index_col=False
+#                   )
 # #collect nan locs
 # nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
 # #drop nan locs
@@ -161,6 +161,8 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 #                   )
 #---------------------------------------------------------------------------------------------------------------------------
 
+
+#%%
 dfO = pd.read_csv(dataLoc+dfname_nonans, 
                  index_col=False, 
                     converters={"FT-J12": ConvertComplex,
@@ -176,7 +178,8 @@ dfO = pd.read_csv(dataLoc+dfname_nonans,
                  )
 
 
-
+#get rid of data that is not full yet
+dfO.drop(dfO[dfO.A2 <= 24].index, inplace=True)
 
 # G = dfO[(dfO["A2"]==30) &(dfO["A3"]==30)&(dfO["omega0"]==20)&(dfO["phi3/pi"]==0.6)]
 # print(np.angle(G["HE-J31"].to_numpy()[0]), np.angle(G["FT-J31"].to_numpy()[0]))
@@ -213,28 +216,42 @@ dfO["FT-J23/J12-ABS"] = dfO["FT-J23-ABS"] / dfO["FT-J12-ABS"]
 dfO["FT-J23/J31-ABS"] = dfO["FT-J23-ABS"] / dfO["FT-J31-ABS"]
 dfO["FT-J12/J31-ABS"] = dfO["FT-J12-ABS"] / dfO["FT-J31-ABS"]
 
+
+dfO["HE-J12/J23-ABS"] = dfO["HE-J12-ABS"] / dfO["HE-J23-ABS"]
+dfO["HE-J31/J23-ABS"] = dfO["HE-J31-ABS"] / dfO["HE-J23-ABS"]
+dfO["HE-J31/J12-ABS"] = dfO["HE-J31-ABS"] / dfO["HE-J12-ABS"]
+dfO["HE-J23/J12-ABS"] = dfO["HE-J23-ABS"] / dfO["HE-J12-ABS"]
+dfO["HE-J23/J31-ABS"] = dfO["HE-J23-ABS"] / dfO["HE-J31-ABS"]
+dfO["HE-J12/J31-ABS"] = dfO["HE-J12-ABS"] / dfO["HE-J31-ABS"]
+
+
 # """
 # get point on lower triangle
 # """
-x = dfO["FT-J12/J23-ABS"].to_numpy()
-y = dfO["FT-J31/J23-ABS"].to_numpy()
-t = dfO["FT-J23/J12-ABS"].to_numpy()
-d = dfO["FT-J31/J12-ABS"].to_numpy() 
-s = dfO["FT-J23/J31-ABS"].to_numpy() 
-p = dfO["FT-J12/J31-ABS"].to_numpy() 
 
-lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTriangle(x, y, t, d, s, p)
-
+lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTriangle(dfO["FT-J12/J23-ABS"].to_numpy(),
+                                                                                       dfO["FT-J31/J23-ABS"].to_numpy(), 
+                                                                                       dfO["FT-J23/J12-ABS"].to_numpy(), 
+                                                                                       dfO["FT-J31/J12-ABS"].to_numpy(),
+                                                                                       dfO["FT-J23/J31-ABS"].to_numpy(),
+                                                                                       dfO["FT-J12/J31-ABS"].to_numpy())
 dfO["FT-LowerT.X"] = lowerTriListA
 dfO["FT-LowerT.Y"] = lowerTriListB
 dfO["FT-UpperT.X"] = upperTriListX
 dfO["FT-UpperT.Y"] = upperTriListY
 
-#get rid of data that is not full yet
-dfO.drop(dfO[dfO.A2 <= 25].index, inplace=True)
+lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTriangle(dfO["HE-J12/J23-ABS"].to_numpy(),
+                                                                                       dfO["HE-J31/J23-ABS"].to_numpy(), 
+                                                                                       dfO["HE-J23/J12-ABS"].to_numpy(), 
+                                                                                       dfO["HE-J31/J12-ABS"].to_numpy(),
+                                                                                       dfO["HE-J23/J31-ABS"].to_numpy(),
+                                                                                       dfO["HE-J12/J31-ABS"].to_numpy())
+dfO["HE-LowerT.X"] = lowerTriListA
+dfO["HE-LowerT.Y"] = lowerTriListB
+dfO["HE-UpperT.X"] = upperTriListX
+dfO["HE-UpperT.Y"] = upperTriListY
 
-# dfO = dfO.drop(dfO[(dfO['beta'] == 2) & (dfO['omega0'] < 4)].index)
-# dfO = dfO.round({'A2': 3, "A3":3 })
+
 
 #%%
 # """
@@ -449,6 +466,79 @@ for A3 in np.linspace(0,30, 31):
         
 
 
+#%%
+
+# """
+# ABS VAL - keep omega_0 constant (omega0=10)
+#     |
+#     |
+# \xi |
+#     |
+#     |____________
+#           \phi
+# - omega_0 constant (omega0=5)
+# - compare Ham Evolution and First Term
+# - color is A2
+# - increase A3 over time
+# """
+
+
+"""
+Phases - vary phi
+"""
+omega0 = 5
+
+phasesFigLoc = ("C:/Users/"+place
+                +"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/omega0="
+                +str(omega0)+",Scatter/")
+
+for ele in [ r"12",r"23", r"31"]:
+    
+    title1 =  "Ham Evolution"
+    column = "HE-J"+ele+"-ABS"
+    folder = "J"+ele+"AbsHamEvolve"
+    ylabel=r"$|J_{"+ele+"}|$"
+    
+    # title1 =  "First Term" 
+    # column = "FT-J"+ele+"-ABS"
+    # folder = "J"+ele+"AbsFirstTerm" 
+    # ylabel=r"$|J_{"+ele+"}|$"
+    
+    
+        
+    
+    for A3 in np.linspace(0,30, 31):
+    
+        dfP = dfO[(dfO["omega0"]==omega0)&
+                   (dfO["A3"]==A3)
+                  ]
+        
+        fig, ax = plt.subplots(figsize=(5,3))
+        title = title1 +r", $\alpha=1$, $\beta=2$, $\omega_0="+str(omega0)+r"$, $A_3="+str(A3)+r"$"
+        
+    
+        data = dfP[column].to_numpy()
+        x = dfP["phi3/pi"].to_numpy()*pi
+        colour = dfP.A2.to_numpy()
+        sc = ax.scatter(x, data, s=3, c=colour, cmap="jet", marker=".")
+    
+    
+        ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
+        ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+        ax.set_xlabel(r"$\phi$")
+        
+        ax.set_ylabel(ylabel, rotation=0, labelpad=12)
+        ax.set_ylim([-0.1,1.1])
+        
+        cbar = plt.colorbar(sc)
+        cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+        # cbar.ax.set_yticklabels(['0', r'$\pi/2$', r'$\pi$', r"$3\pi/2$", r"$2\pi$"])
+        
+        ax.set_title(title)
+        plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+        plt.show()
+    
+
     
 #%%
 
@@ -466,7 +556,7 @@ for A3 in np.linspace(0,30, 31):
 # - have all A2 vals shown as colourbar
 # """
 
-phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/omega0=16,Scatter/"
+phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/omega0=9,Scatter/"
 
 # title1 =  "Ham Evolution"
 # column = "HE-J31-PHA"
@@ -478,7 +568,7 @@ column = "FT-J31-PHA"
 folder = "FirstTerm" 
 
 
-omega0 = 16
+omega0 = 9
     
 for A3 in np.linspace(0,30, 31):
     
@@ -501,7 +591,7 @@ for A3 in np.linspace(0,30, 31):
     ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
     ax.set_xticks([0,pi/2, pi, 3*pi/2, 2*pi])
     ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
-    ax.set_xlabel(r"$\omega_0$")
+    ax.set_xlabel(r"$\phi$")
     # ax.set_xlabel(r"$A_3$")
     ax.set_ylim([-pi-0.1, pi+0.1])
     cbar = plt.colorbar(sc)
@@ -511,47 +601,187 @@ for A3 in np.linspace(0,30, 31):
     plt.show()
 
 
+
+    
 #%%
 
+# """
+# Scatter plot
+# Phases - keep A2 constant
+#     |
+#     |
+# \xi |
+#     |
+#     |____________
+#        \omega_0
+# - A2 is constant A2=25
+# - pick Ham Evolve or First Term ()
+# - have all \phi3 vals shown as colourbar
+# - have A3 evolve over time from 0 - 30
+# """
+
+# title1 =  "Ham Evolution"
+# column = "HE-J31-PHA"
+# folder = "HamEvolve"
+
+
+# title1 =  "First Term" 
+# column = "FT-J31-ABS"
+# folder = "FirstTerm" 
+
+
+A2 = 30
+
+phasesFigLoc = ("C:/Users/"+place
+                +"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/A2="
+                +str(A2)+",Scatter/")
+
+for ele in [ r"12",r"23", r"31"]:
+    
+    # title1 =  "Ham Evolution"
+    # column = "HE-J"+ele+"-ABS"
+    # folder = "J"+ele+"AbsHamEvolve"
+    # ylabel=r"$|J_{"+ele+"}|$"
+    
+    title1 =  "First Term" 
+    column = "FT-J"+ele+"-ABS"
+    folder = "J"+ele+"AbsFirstTerm" 
+    ylabel=r"$|J_{"+ele+"}|$"
+    
+    
+
+    for A3 in np.linspace(0,30, 31):
+        
+    
+        dfP = dfO[(dfO["A2"]==A2)&
+                   (dfO["A3"]==A3)
+                  ]
+        
+        fig, ax = plt.subplots(figsize=(5,3))
+        title = title1 +r", $\alpha=1$, $\beta=2$, $A_2="+str(A2)+r"$, $A_3="+str(A3)+r"$"
+        
+    
+        data = dfP[column].to_numpy()
+        x = dfP["omega0"].to_numpy()
+        colour = dfP["phi3/pi"].to_numpy()*pi
+        sc = ax.scatter(x, data, s=3, c=colour, cmap="jet", marker=".")
+            
+        # ax.set_ylabel(r"$\xi$", rotation=0)
+        # ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+        # ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+        # ax.set_ylim([-pi-0.1, pi+0.1])
+        
+        ax.set_ylabel(ylabel, rotation=0, labelpad=10)
+        ax.set_ylim([-0.1,1.1])
+        # ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+        # ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+        
+        ax.set_xticks([4,8,12,16,20])
+        # ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+        ax.set_xlabel(r"$\omega_0$")
+        
+        cbar = plt.colorbar(sc, ticks=[0, pi/2, pi, 3*pi/2, 2*pi])
+        cbar.ax.set_ylabel(r"$\phi_3$", rotation=0, labelpad=5)
+        cbar.ax.set_yticklabels(['0', r'$\pi/2$', r'$\pi$', r"$3\pi/2$", r"$2\pi$"])
+        ax.set_title(title)
+        plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,A2="+str(A2)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+        plt.show()
+
+#%%
+
+
+# """
+# Scatter plot
+# ABS VALS - keep A2 constant
+#     |
+#     |
+# \xi |
+#     |
+#     |____________
+#        \omega_0
+# - A2 is constant A2=30
+# - pick Ham Evolve or First Term ()
+# - have all \phi3 vals shown as colourbar
+# - have A3 evolve over time from 0 - 30
+# """
+
+phasesFigLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/ShakingTriangle/Phases/V2/A2=30,Scatter/"
+
+# title1 =  "Ham Evolution"
+# column = "HE-J31-ABS"
+# folder = "J31AbsHamEvolve"
+# ylabel=r"$|J_{31}|$"
+
+title1 =  "First Term" 
+column = "FT-J31-ABS"
+folder = "J31AbsFirstTerm" 
+ylabel=r"$|J_{31}|$"
+
+
+A2 = 25
+
+
+for A3 in np.linspace(0,30, 31):
+    
+
+    dfP = dfO[(dfO["A2"]==A2)&
+               (dfO["A3"]==A3)
+              ]
+    
+    fig, ax = plt.subplots(figsize=(5,3))
+    title = title1 +r", $\alpha=1$, $\beta=2$, $A_2="+str(A2)+r"$, $A_3="+str(A3)+r"$"
+    
+
+    data = dfP[column].to_numpy()
+    x = dfP["omega0"].to_numpy()
+    colour = dfP["phi3/pi"].to_numpy()*pi
+    sc = ax.scatter(x, data, s=3, c=colour, cmap="jet", marker=".")
+        
+    # ax.set_ylabel(r"$\xi$", rotation=0)
+    # ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+    # ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+    # ax.set_ylim([-pi-0.1, pi+0.1])
+    
+    ax.set_ylabel(ylabel, rotation=0, labelpad=12)
+    ax.set_ylim([-0.1,1.1])
+    # ax.set_yticks([-pi,-pi/2, 0,pi/2, pi])
+    # ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+    
+    ax.set_xticks([4,8,12,16,20])
+    # ax.set_xticklabels([ '0',r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$",  r"$2\pi$"])
+    ax.set_xlabel(r"$\omega_0$")
+    
+    cbar = plt.colorbar(sc, ticks=[0, pi/2, pi, 3*pi/2, 2*pi])
+    cbar.ax.set_ylabel(r"$\phi_3$", rotation=0, labelpad=5)
+    cbar.ax.set_yticklabels(['0', r'$\pi/2$', r'$\pi$', r"$3\pi/2$", r"$2\pi$"])
+    ax.set_title(title)
+    plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,A2="+str(A2)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+    plt.show()
+
+
+
+#%%
+
+
 """
-Not sure what this part does actually!
+ABSOLUTE VALUE RATIO PLOTS
+
+1) Plot everything 
 """
-from itertools import cycle
-darkblue = 'darkblue'#'#2CBDFE'
-oxfordblue = "#061A40"
-CB91_Green = '#47DBCD'
-CB91_Pink = '#F3A0F2'
-CB91_Purple = '#9D2EC5'
-CB91_Violet = '#661D98'
-CB91_Amber = '#F5B14C'
-red = "#FC4445"
-newred = "#E4265C"
-flame = "#DD6031"
-
-
-colourlist = [darkblue, CB91_Green, CB91_Pink, CB91_Purple, CB91_Violet , CB91_Amber, newred, flame]
-colours = cycle(colourlist)
-
-iterator = cycle(colourlist)
-
-
-omegaMin = 0
+omegaMin = 6
 omegaMax = 20
-A2Min = 0
+A2Min = 25
 A2Max = 30
 A3Min = 0
 A3Max = 30
 
-
 sz =10
-# fig, ax = plt.subplots(ncols=3, nrows=1, figsize=(sz,sz/3),
-#                            constrained_layout=True, sharey=True, sharex=True)
 
 ms = 1.5
 fig, ax = plt.subplots(figsize=(6,6))
 
-for alpha in [2]:
-    for beta in [9]:#[2,3, 4, 5, 7, 9]:
+for alpha in [1]:
+    for beta in [2]:
         
 
         realOmegaMin = alpha*omegaMin
@@ -559,82 +789,32 @@ for alpha in [2]:
         
         dfP = dfO[(dfO.beta == beta)
                   &(dfO.alpha == alpha)
-                  &(dfO.omega0 <= omegaMax)
-                  &(dfO.omega0 >= omegaMin)
-                  &(dfO.A2 >= A2Min)
-                  &(dfO.A2 <= A2Max)
-                  &(dfO.A3 >= A3Min)
-                  &(dfO.A3 <= A3Max)
+                  # &(dfO.omega0 <= omegaMax)
+                   &(dfO.omega0 >= omegaMin)
+                  # &(dfO.A2 >= A2Min)
+                  # &(dfO.A2 <= A2Max)
+                  # &(dfO.A3 >= A3Min)
+                  # &(dfO.A3 <= A3Max)
                   # &(dfO["LowerT.X"]>0.92)
                   # &(dfO["LowerT.Y"]>0.42)
                   # &(dfO["LowerT.Y"]<0.5)
                   ]
         
         if not dfP.empty:
-            colour = next(iterator)
-            print(colour)
-            # n1s = dfP.n1.values.tolist()
-            # n2s = dfP.n2.values.tolist()
-            # n3s = dfP.n3.values.tolist()
             
-            # x = dfP["J12/J23"].to_numpy()
-            # y = dfP["J31/J23"].to_numpy()
-            
-            xLT = dfP["LowerT.X"]
-            yLT = dfP["LowerT.Y"] 
-            # xUT = dfP["UpperT.X"]
-            # yUT = dfP["UpperT.Y"]
-            
-            # dfTri = pd.DataFrame(columns = ["LowerT.X", "LowerT.Y", "UpperT.X", "UpperT.Y"])
-            # dfTri["LowerT.X"] = xLT
-            
-            # xLT = xLT["LowerT.X">0,9]
-            
-            print(colour)
-            # ax.plot(np.abs(x), np.abs(y), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$", markersize=ms, color = colour)
-            # ax.plot(np.abs(y), np.abs(x), '.',  markersize=ms, color = colour)
-            # ax.plot(np.abs(1/x), np.abs(y/x), '.',  markersize=ms, color = colour)
-            # ax.plot(np.abs(y/x), np.abs(1/x), '.',  markersize=ms, color = colour)
-            # ax.plot(np.abs(1/y), np.abs(x/y), '.', markersize=ms, color = colour)
-            # ax.plot(np.abs(x/y), np.abs(1/y), '.',  markersize=ms, color = colour)
-            
-            
-            # t = dfP["J23/J12"].to_numpy()
-            # d = dfP["J31/J12"].to_numpy() 
-            # s = dfP["J23/J31"].to_numpy() 
-            # p = dfP["J12/J31"].to_numpy() 
-            ax.plot(np.abs(xLT), np.abs(yLT), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$", markersize=ms, color = colour)
-            # ax.plot(np.abs(xUT), np.abs(yUT), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$", markersize=ms, color = colour)
-            # ax.plot(np.abs(y), np.abs(x), '.',  markersize=ms, color = colour)
-            # ax.plot(np.abs(t), np.abs(d), '.',  markersize=ms, color = colour)
-            # ax.plot(np.abs(d), np.abs(t), '.',  markersize=ms, color = colour)
-            # ax.plot(np.abs(s), np.abs(p), '.', markersize=ms, color = colour)
-            # ax.plot(np.abs(p), np.abs(s), '.',  markersize=ms, color = colour)
-            
+            xLT = dfP["HE-LowerT.X"]
+            yLT = dfP["HE-LowerT.Y"] 
+
+            ax.plot(np.abs(xLT), np.abs(yLT), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$", markersize=ms)
+
             # ax.set_ylabel(r"$J_{31}/J_{23}$", rotation=0, labelpad=10)
             # ax.set_xlabel(r"$J_{12}/J_{23}$")
             ax.set_ylim([0,1])
             ax.set_xlim([0,1])
-            
-            # ax[0].plot(np.abs(n1s), np.abs(n2s), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$")
-            # ax[0].set_ylabel("n2", rotation=0, labelpad=10)
-            # ax[0].set_xlabel("n1")
-            
-            # ax[1].plot(np.abs(n2s), np.abs(n3s), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$")
-            # ax[1].set_ylim([0,5])
-            # ax[1].set_ylabel("n3", rotation=0, labelpad=15)
-            # ax[1].set_xlabel("n2")
-            
-            # ax[2].plot(np.abs(n3s), np.abs(n1s), '.', label=r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r"$")
-            # ax[2].set_xlim([0,5])
-            # ax[2].set_ylabel("n1", rotation=0, labelpad=15)
-            # ax[2].set_xlabel("n3")
 
 fig.suptitle(r"$\omega \in ["+str(omegaMin)+r", "+str(omegaMax)+r"], \> A_2 \in ["+str(A2Min)+r", "+str(A2Max)+r"],\>  A_3 \in ["+str(A3Min)+r", "+str(A3Max)+r"]$")
 plt.legend(loc="upper right")
 # fig.savefig(latexLoc+'Fig-n1n2n3.png', format='png', bbox_inches='tight')
-# fig.savefig(latexLoc+'Fig-n1n2n3.pdf', format='pdf', bbox_inches='tight')
-
 plt.show()
 
 
@@ -670,43 +850,47 @@ plt.show()
 #%%
 
 """
-Plot showing values in lower triangle, non accumulative
+2) Plot showing values in lower triangle, non accumulative
 """
 # dfN = dfO[(dfO["alpha"]==1)&(dfO["beta"]==2)&(dfO["omega"])]
 
 
-saveFig = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs2/"
+saveFig = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/"
 # for A2 in np.linspace(0,30,31):
-for A2 in np.linspace(0,30,7):#np.linspace(0,30,301):
-    A2 = np.round(A2, 2)
-    alpha = 1; beta = 2; 
+alpha = 1; beta = 2; omega0=5; phi3=0
+for A3 in np.linspace(0,30,31):
+    A3 = np.round(A3, 1)
+    
     # omegaMax= 20; omegaMin = 0;
-    omega0=10;
     # A2 = 19
     # A2Min = 0; A2Max = 30; A3Min = 0; A3Max = 30
     
     dfP = dfO[(dfO.beta == beta)
-                      &(dfO.alpha == alpha)
-                      &(dfO.omega0 == omega0)
-                        &(dfO.A2 == A2)
+             &(dfO.alpha == alpha)
+              &(dfO.omega0 == omega0)
+             &(dfO.A3 == A3)
+              &(dfO["phi3/pi"]==phi3)
                       ]
     
-    dfP = dfP.sort_values(by=['A3'])
+    dfP = dfP.sort_values(by=['A2'])
     
     
     xLT = dfP["FT-LowerT.X"]
     yLT = dfP["FT-LowerT.Y"] 
     
     
-    
-    
     fig, ax = plt.subplots(figsize=(6,5))
-    sc = ax.scatter(xLT, yLT, s=3, c=dfP.A3.to_numpy(), cmap="jet", marker=".")
+    sc = ax.scatter(xLT, yLT, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
     ax.set_xlim([0,1])
     ax.set_ylim([0,1])
     cbar = plt.colorbar(sc)
-    plt.suptitle(r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r", \omega_0="+str(omega0)+r", A_2="+str(A2)+r"$")
-    cbar.ax.set_ylabel(r"$A_3$", rotation=0, labelpad=10)
+    title = (r"$\alpha="+str(alpha)+r", \beta="+str(beta)+
+              r", \omega_0="+str(omega0)+
+              r", \phi_3="+str(phi3)+r"\pi"
+             r", A_3="+str(A3)
+             +r"$")
+    plt.suptitle(title)
+    cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
     # plt.savefig(saveFig+"alpha=1,beta=2,omega0=10,More,Accumulate/"+"Frame"+str(A2)+".png", format='png', bbox_inches='tight')
     plt.show()
 
@@ -721,30 +905,30 @@ Plot showing values in lower triangle accumulative - First Term
 saveFig = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs2/"
 
 
-alpha = 1; beta = 2; 
+alpha = 1; beta = 2; omega0=5; phi=0
 # omegaMax= 20; omegaMin = 0;
-omega0=10;
+
 # A2 = 19
 # A2Min = 0; A2Max = 30; A3Min = 0; A3Max = 30
 # for A2 in np.linspace(0,30,31):
     
-
-for i, A2max in enumerate(np.linspace(0,30,7)):#np.linspace(0,30,301)):
+for i, A3max in enumerate(np.linspace(0,30,31)):#np.linspace(0,30,301)):
     # print(i)
-    A2max =  np.round(A2max, 2)
+    A3max =  np.round(A3max, 2)
     fig, ax = plt.subplots(figsize=(6,5))
     
     
     
-    for A2 in np.linspace(0, A2max, i+1):
+    for A3 in np.linspace(0, A3max, i+1):
         
         # print("    ", A2)
-        A2 =  np.round(A2, 2)
+        A3 =  np.round(A3, 2)
         
         dfP = dfO[(dfO.beta == beta)
                           &(dfO.alpha == alpha)
                           &(dfO.omega0 == omega0)
-                            &(dfO.A2 == A2)
+                            &(dfO.A3 == A3)
+                            &(dfO["phi3/pi"]==phi)
                           ]
         
         dfP = dfP.sort_values(by=['A3'])
@@ -755,13 +939,18 @@ for i, A2max in enumerate(np.linspace(0,30,7)):#np.linspace(0,30,301)):
         
         
         
-        sc = ax.scatter(xLT, yLT, s=3, c=dfP.A3.to_numpy(), cmap="jet", marker=".")
+        sc = ax.scatter(xLT, yLT, s=3, c=dfP.A2.to_numpy(), cmap="jet", marker=".")
         
     ax.set_xlim([0,1])
     ax.set_ylim([0,1])
     cbar = plt.colorbar(sc)
-    plt.suptitle(r"$\alpha="+str(alpha)+r", \beta="+str(beta)+r", \omega_0="+str(omega0)+r", A_2="+str(A2max)+r"$")
-    cbar.ax.set_ylabel(r"$A_3$", rotation=0, labelpad=10)
+    title = (r"$\alpha="+str(alpha)+r", \beta="+str(beta)+
+              r", \omega_0="+str(omega0)+
+              r", \phi_3="+str(phi3)+r"\pi"
+             r", A_3="+str(A3max)
+             +r"$")
+    plt.suptitle(title)
+    cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
     # plt.savefig(saveFig+"alpha=1,beta=2,omega0=10,More,AccumulateR/"+"Frame"+str(A2max)+".png", format='png', bbox_inches='tight')
     plt.show()
 
