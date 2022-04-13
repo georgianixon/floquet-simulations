@@ -157,7 +157,7 @@ def FirstTerm(params):
     
     return FT_lowerTriListA, FT_lowerTriListB, phase
  
-    
+    g
     
 A3_start = 5
 A2_start = 5
