@@ -178,7 +178,7 @@ def FirstTerm(x):
     
     return FT_lowerTriListA, FT_lowerTriListB, phase
  
-    
+    g
     
 A3 = 20
 A2 = 30
