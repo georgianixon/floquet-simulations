@@ -23,12 +23,12 @@ import time
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
-dfname = "TriangleRatios-phasedata-v4.csv"
+dfname = "TriangleRatios-phasedata-v7.csv"
 
 
 #%%
 
-A2s = np.linspace(0,30,31)
+A2s = np.linspace(0,18,19)
 A3s = np.linspace(0,30,31)
 
 
@@ -52,19 +52,19 @@ onsite2 = 0
 onsite3 = 0
 
 
-dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
-                            "FT-J12", "FT-J23", "FT-J31", 
-                            "HE-J12", "HE-J23", "HE-J31",
-                            "HE-O1", "HE-O2", "HE-O3"  ])
+# dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
+#                             "FT-J12", "FT-J23", "FT-J31", 
+#                             "HE-J12", "HE-J23", "HE-J31",
+#                             "HE-O1", "HE-O2", "HE-O3"  ])
 
-dfN = dfN.astype({"A2":float,
-                  "A3":float,
-                  "omega0":float,
-                  "alpha": float,
-                  "beta":float,
-                  "phi3/pi":float})
+# dfN = dfN.astype({"A2":float,
+#                   "A3":float,
+#                   "omega0":float,
+#                   "alpha": float,
+#                   "beta":float,
+#                   "phi3/pi":float})
  
-i = 0
+i = 2455572
 
 for A2 in reversed(A2s):
         
@@ -128,10 +128,14 @@ for A2 in reversed(A2s):
                     O2 = HF[1][1]
                     O3 = HF[2][2]
         
-                    dfN.loc[i] = [A2, A3, omega0, alpha, beta, phi3_frac, 
-                                  J12, J23, J31, 
-                                  J12_Ham, J23_Ham, J31_Ham,
-                                  O1, O2, O3]
+                    dfN.loc[i] = [np.float32(A2), np.float32(A3), np.float32(omega0), np.uint32(alpha), np.uint32(beta)
+                                  , np.float32(phi3_frac), 
+                                  np.complex128(J12), np.complex128(J23), np.complex128(J31), 
+                                  np.complex128(J12_Ham), np.complex128(J23_Ham), np.complex128(J31_Ham),
+                                  np.complex128(O1), np.complex128(O2), np.complex128(O3)]
+                    
+                    
+                    
                 else:
                     dfN.loc[i] = [A2, A3, omega0, alpha, beta, phi3_frac, 
                                   np.nan, np.nan, np.nan, 
@@ -139,14 +143,31 @@ for A2 in reversed(A2s):
                                   np.nan, np.nan, np.nan]
                 i +=1
         
-        dfN['A2'] = dfN['A2'].apply(np.real)
-        dfN['A3'] = dfN['A3'].apply(np.real)
-        dfN['omega0'] = dfN['omega0'].apply(np.real)
-        dfN['alpha'] = dfN['alpha'].apply(np.real)
-        dfN['beta'] = dfN['beta'].apply(np.real)
-        dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
+        # dfN['A2'] = dfN['A2'].apply(np.real)
+        # dfN['A3'] = dfN['A3'].apply(np.real)
+        # dfN['omega0'] = dfN['omega0'].apply(np.real)
+        # dfN['alpha'] = dfN['alpha'].apply(np.real)
+        # dfN['beta'] = dfN['beta'].apply(np.real)
+        # dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
         
         # dfO = dfO.append(dfN, ignore_index=True, sort=False)
+        dfN = dfN.astype({'A2': np.float32,
+                         'A3': np.float32,
+                         'omega0': np.float32,
+                         "alpha":np.uint32,
+                         "beta":np.uint32,
+                         "phi3/pi":np.float32,
+                         "FT-J12":np.complex128,
+                         "FT-J23":np.complex128,
+                         "FT-J31":np.complex128,
+                         "HE-J12":np.complex128,
+                         "HE-J23":np.complex128,
+                         "HE-J31":np.complex128,
+                         "HE-O1":np.complex128,
+                         "HE-O2":np.complex128,
+                         "HE-O3":np.complex128
+                         })
+        
         dfN.to_csv(dataLoc+dfname,
                   index=False, 
                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
@@ -157,19 +178,34 @@ for A2 in reversed(A2s):
         
         
 
-dfN['A2'] = dfN['A2'].apply(np.real)
-dfN['A3'] = dfN['A3'].apply(np.real)
-dfN['omega0'] = dfN['omega0'].apply(np.real)
-dfN['alpha'] = dfN['alpha'].apply(np.real)
-dfN['beta'] = dfN['beta'].apply(np.real)
-dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
+# dfN['A2'] = dfN['A2'].apply(np.real)
+# dfN['A3'] = dfN['A3'].apply(np.real)
+# dfN['omega0'] = dfN['omega0'].apply(np.real)
+# dfN['alpha'] = dfN['alpha'].apply(np.real)
+# dfN['beta'] = dfN['beta'].apply(np.real)
+# dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
 
+dfN = dfN.astype({'A2': np.float32,
+                         'A3': np.float32,
+                         'omega0': np.float32,
+                         "alpha":np.uint32,
+                         "beta":np.uint32,
+                         "phi3/pi":np.float32,
+                         "FT-J12":np.complex128,
+                         "FT-J23":np.complex128,
+                         "FT-J31":np.complex128,
+                         "HE-J12":np.complex128,
+                         "HE-J23":np.complex128,
+                         "HE-J31":np.complex128,
+                         "HE-O1":np.complex128,
+                         "HE-O2":np.complex128,
+                         "HE-O3":np.complex128
+                         })
 
 dfN.to_csv(dataLoc+dfname,
                   index=False, 
                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
                   )
-
 
 
 
