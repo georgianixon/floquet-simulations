@@ -179,7 +179,7 @@ dfO = pd.read_csv(dataLoc+dfname_nonans,
 
 
 #get rid of data that is not full yet
-dfO.drop(dfO[dfO.A2 <= 24].index, inplace=True)
+dfO.drop(dfO[dfO.A2 <= 19].index, inplace=True)
 
 # G = dfO[(dfO["A2"]==30) &(dfO["A3"]==30)&(dfO["omega0"]==20)&(dfO["phi3/pi"]==0.6)]
 # print(np.angle(G["HE-J31"].to_numpy()[0]), np.angle(G["FT-J31"].to_numpy()[0]))
@@ -237,8 +237,8 @@ lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTr
                                                                                        dfO["FT-J12/J31-ABS"].to_numpy())
 dfO["FT-LowerT.X"] = lowerTriListA
 dfO["FT-LowerT.Y"] = lowerTriListB
-dfO["FT-UpperT.X"] = upperTriListX
-dfO["FT-UpperT.Y"] = upperTriListY
+# dfO["FT-UpperT.X"] = upperTriListX
+# dfO["FT-UpperT.Y"] = upperTriListY
 
 lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTriangle(dfO["HE-J12/J23-ABS"].to_numpy(),
                                                                                        dfO["HE-J31/J23-ABS"].to_numpy(), 
@@ -248,11 +248,19 @@ lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTr
                                                                                        dfO["HE-J12/J31-ABS"].to_numpy())
 dfO["HE-LowerT.X"] = lowerTriListA
 dfO["HE-LowerT.Y"] = lowerTriListB
-dfO["HE-UpperT.X"] = upperTriListX
-dfO["HE-UpperT.Y"] = upperTriListY
+# dfO["HE-UpperT.X"] = upperTriListX
+# dfO["HE-UpperT.Y"] = upperTriListY
 
 
+#%%
 
+dfO = dfO.drop(columns=["HE-J12/J23-ABS","HE-J31/J23-ABS","HE-J12/J31-ABS","HE-J23/J31-ABS",
+                        "HE-J23/J12-ABS","HE-J31/J12-ABS"])
+dfO = dfO.drop(columns=["FT-J12/J23-ABS","FT-J31/J23-ABS","FT-J12/J31-ABS","FT-J23/J31-ABS",
+                        "FT-J23/J12-ABS","FT-J31/J12-ABS"])
+dfO = dfO.drop(columns=["FT-J12-ABS","FT-J23-ABS","FT-J31-ABS","FT-J12-PHA","FT-J23-PHA",
+                        "HE-J12-ABS","HE-J23-ABS","HE-J31-ABS","HE-J12-PHA","HE-J23-PHA"])
+# dfO=dfO.drop(columns=["FT-UpperT.X", "FT-UpperT.Y", "HE-UpperT.X", "HE-UpperT.Y"])
 #%%
 # """
 # Phases - keep phi constant
@@ -358,10 +366,10 @@ columnTitle = "J31"
 folder = "HamEvolve"
 
 
-title1 =  "First Term" 
-column = "FT-J31-PHA"
-columnTitle = "J31"
-folder = "FirstTerm" 
+# title1 =  "First Term" 
+# column = "FT-J31-PHA"
+# columnTitle = "J31"
+# folder = "FirstTerm" 
 
 
 phiFrac = 0.6
@@ -461,7 +469,7 @@ for A3 in np.linspace(0,30, 31):
     ax.set_xlabel(r"$\phi$")
     ax.set_ylim([-pi-0.1, pi+0.1])
     plt.legend(loc="upper right")
-    plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,A2="+str(A2)+",omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+    # plt.savefig(phasesFigLoc+saveTit+"/"+saveTit+"Phases,alpha=1,beta=2,A2="+str(A2)+",omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
     plt.show()
         
 
@@ -535,7 +543,7 @@ for ele in [ r"12",r"23", r"31"]:
         # cbar.ax.set_yticklabels(['0', r'$\pi/2$', r'$\pi$', r"$3\pi/2$", r"$2\pi$"])
         
         ax.set_title(title)
-        plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+        # plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
         plt.show()
     
 
@@ -597,7 +605,7 @@ for A3 in np.linspace(0,30, 31):
     cbar = plt.colorbar(sc)
     cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
     ax.set_title(title)
-    plt.savefig(phasesFigLoc+folder+"/"+folder+"Phases,alpha=1,beta=2,omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+    # plt.savefig(phasesFigLoc+folder+"/"+folder+"Phases,alpha=1,beta=2,omega0="+str(omega0)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
     plt.show()
 
 
@@ -684,7 +692,7 @@ for ele in [ r"12",r"23", r"31"]:
         cbar.ax.set_ylabel(r"$\phi_3$", rotation=0, labelpad=5)
         cbar.ax.set_yticklabels(['0', r'$\pi/2$', r'$\pi$', r"$3\pi/2$", r"$2\pi$"])
         ax.set_title(title)
-        plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,A2="+str(A2)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+        # plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,A2="+str(A2)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
         plt.show()
 
 #%%
@@ -755,7 +763,7 @@ for A3 in np.linspace(0,30, 31):
     cbar.ax.set_ylabel(r"$\phi_3$", rotation=0, labelpad=5)
     cbar.ax.set_yticklabels(['0', r'$\pi/2$', r'$\pi$', r"$3\pi/2$", r"$2\pi$"])
     ax.set_title(title)
-    plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,A2="+str(A2)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
+    # plt.savefig(phasesFigLoc+folder+"/"+folder+",alpha=1,beta=2,A2="+str(A2)+",A3="+str(A3)+".png", format='png', bbox_inches='tight')
     plt.show()
 
 
