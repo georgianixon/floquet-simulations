@@ -23,7 +23,7 @@ import time
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
-dfname = "TriangleRatios-phasedata-v7.csv"
+dfname = "TriangleRatios-phasedata-v9.csv"
 
 
 #%%
@@ -201,6 +201,7 @@ dfN = dfN.astype({'A2': np.float32,
                          "HE-O2":np.complex128,
                          "HE-O3":np.complex128
                          })
+
 
 dfN.to_csv(dataLoc+dfname,
                   index=False, 
