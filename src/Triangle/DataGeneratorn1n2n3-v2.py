@@ -11,7 +11,7 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -19,18 +19,61 @@ sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 # sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
 from hamiltonians import CreateHFGeneral, CreateHFGeneralLoopA
 from hamiltonians import Cosine,  RemoveWannierGauge
+from hamiltonians import Cosine, ConvertComplex
 import time
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
-dfname = "TriangleRatios-phasedata-v7.csv"
+# dfname = "TriangleRatios-phasedata-v7.csv"
 
+dfname = "TriangleRatios-phasedata-v10.csv"
+
+# df18 = pd.read_csv(dataLoc+dfname, 
+#                   index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+#                   )
+
+
+dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
+                            "FT-J12", "FT-J23", "FT-J31", 
+                            "HE-J12", "HE-J23", "HE-J31",
+                            "HE-O1", "HE-O2", "HE-O3"  ])
+
+dfN = dfN.astype({'A2': np.float32,
+                         'A3': np.float32,
+                         'omega0': np.float32,
+                         "alpha":np.uint8,
+                         "beta":np.uint8,
+                         "phi3/pi":np.float32,
+                         "FT-J12":np.complex128,
+                         "FT-J23":np.complex128,
+                         "FT-J31":np.complex128,
+                         "HE-J12":np.complex128,
+                         "HE-J23":np.complex128,
+                         "HE-J31":np.complex128,
+                         "HE-O1":np.complex128,
+                         "HE-O2":np.complex128,
+                         "HE-O3":np.complex128
+                         })
+
+
+# df18.drop(df18[(df18.A2 == 17)&(df18.A3==11)].index, inplace=True)
 
 #%%
 
-A2s = np.linspace(0,18,19)
+A2s = np.linspace(0,16,17)
+# A2s = [17]
 A3s = np.linspace(0,30,31)
-
+# A3s = np.linspace(0,4,5)
 
 alpha = 1
 beta = 2
@@ -52,19 +95,9 @@ onsite2 = 0
 onsite3 = 0
 
 
-# dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
-#                             "FT-J12", "FT-J23", "FT-J31", 
-#                             "HE-J12", "HE-J23", "HE-J31",
-#                             "HE-O1", "HE-O2", "HE-O3"  ])
 
-# dfN = dfN.astype({"A2":float,
-#                   "A3":float,
-#                   "omega0":float,
-#                   "alpha": float,
-#                   "beta":float,
-#                   "phi3/pi":float})
  
-i = 2455572
+i = len(dfN)
 
 for A2 in reversed(A2s):
         
@@ -154,8 +187,8 @@ for A2 in reversed(A2s):
         dfN = dfN.astype({'A2': np.float32,
                          'A3': np.float32,
                          'omega0': np.float32,
-                         "alpha":np.uint32,
-                         "beta":np.uint32,
+                         "alpha":np.uint8,
+                         "beta":np.uint8,
                          "phi3/pi":np.float32,
                          "FT-J12":np.complex128,
                          "FT-J23":np.complex128,
