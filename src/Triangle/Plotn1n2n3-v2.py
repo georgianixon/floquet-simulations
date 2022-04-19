@@ -11,7 +11,7 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -22,8 +22,14 @@ from hamiltonians import Cosine, ConvertComplex
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
-dfname = "TriangleRatios-phasedata-v6.csv"
-dfname_nonans = "TriangleRatios-phasedata-v6-nonans.csv"
+
+dfname1930 = "TriangleRatios-phasedata-v6-19-30.csv"
+dfname_nonans1930 = "TriangleRatios-phasedata-v6-nonans-19-30.csv"
+# dfname18 = "TriangleRatios-phasedata-v9.csv"
+# dfname_nonans18 = "TriangleRatios-phasedata-v9-nonans.csv"
+dfname1718 = "TriangleRatios-phasedata-v9-fillendof17.csv"
+dfname_nonans1718 = "TriangleRatios-phasedata-v9-fillendof17-nonans.csv"
+
 
 
 def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
@@ -144,9 +150,9 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 
 """ do this once """ #-----------------------------------------------------------------------------------------------------
 # #import df with nans
-dfO_withnan = pd.read_csv(dataLoc+dfname, 
-                  index_col=False
-                  )
+# dfO_withnan = pd.read_csv(dataLoc+dfname, 
+#                   index_col=False
+#                   )
 # #collect nan locs
 # nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
 # #drop nan locs
@@ -155,7 +161,7 @@ dfO_withnan = pd.read_csv(dataLoc+dfname,
 # for headline in ["FT-J12", "FT-J23", "FT-J31", "HE-J12", "HE-J23", "HE-J31", "HE-O1", "HE-O2", "HE-O3"]:
 #     dfO_nonans[headline] = dfO_nonans[headline].apply(ConvertComplex)
 # #save to new df
-# dfO_nonans.to_csv(dataLoc+dfname_nonans,
+# dfO_nonans.to_csv(dataLoc+dfname_nonans1718,
 #                   index=False, 
 #                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
 #                   )
@@ -163,7 +169,7 @@ dfO_withnan = pd.read_csv(dataLoc+dfname,
 
 
 #%%
-dfO = pd.read_csv(dataLoc+dfname_nonans, 
+df19 = pd.read_csv(dataLoc+dfname_nonans1930, 
                  index_col=False, 
                     converters={"FT-J12": ConvertComplex,
                               "FT-J23": ConvertComplex,
@@ -177,9 +183,25 @@ dfO = pd.read_csv(dataLoc+dfname_nonans,
                                 }
                  )
 
+df17 = pd.read_csv(dataLoc+dfname_nonans1718, 
+                  index_col=False, 
+                    converters={"FT-J12": ConvertComplex,
+                              "FT-J23": ConvertComplex,
+                              "FT-J31": ConvertComplex,
+                              "HE-J12": ConvertComplex,
+                              "HE-J23": ConvertComplex,
+                              "HE-J31": ConvertComplex,
+                              "HE-O1": ConvertComplex,
+                              "HE-O2": ConvertComplex,
+                              "HE-O3": ConvertComplex
+                                }
+                  )
+
+#%%
+dfO = pd.concat([df19, df17])
 
 #get rid of data that is not full yet
-dfO.drop(dfO[dfO.A2 <= 19].index, inplace=True)
+# dfO.drop(dfO[dfO.A2 <= 17].index, inplace=True)
 
 # G = dfO[(dfO["A2"]==30) &(dfO["A3"]==30)&(dfO["omega0"]==20)&(dfO["phi3/pi"]==0.6)]
 # print(np.angle(G["HE-J31"].to_numpy()[0]), np.angle(G["FT-J31"].to_numpy()[0]))
@@ -258,8 +280,9 @@ dfO = dfO.drop(columns=["HE-J12/J23-ABS","HE-J31/J23-ABS","HE-J12/J31-ABS","HE-J
                         "HE-J23/J12-ABS","HE-J31/J12-ABS"])
 dfO = dfO.drop(columns=["FT-J12/J23-ABS","FT-J31/J23-ABS","FT-J12/J31-ABS","FT-J23/J31-ABS",
                         "FT-J23/J12-ABS","FT-J31/J12-ABS"])
-dfO = dfO.drop(columns=["FT-J12-ABS","FT-J23-ABS","FT-J31-ABS","FT-J12-PHA","FT-J23-PHA",
-                        "HE-J12-ABS","HE-J23-ABS","HE-J31-ABS","HE-J12-PHA","HE-J23-PHA"])
+# "FT-J12-ABS","FT-J23-ABS","FT-J31-ABS","HE-J12-ABS","HE-J23-ABS","HE-J31-ABS",
+dfO = dfO.drop(columns=["FT-J12-PHA","FT-J23-PHA",
+                        "HE-J12-PHA","HE-J23-PHA"])
 # dfO=dfO.drop(columns=["FT-UpperT.X", "FT-UpperT.Y", "HE-UpperT.X", "HE-UpperT.Y"])
 #%%
 # """
@@ -877,7 +900,7 @@ for A3 in np.linspace(0,30,31):
              &(dfO.alpha == alpha)
               &(dfO.omega0 == omega0)
              &(dfO.A3 == A3)
-              &(dfO["phi3/pi"]==phi3)
+              # &(dfO["phi3/pi"]==phi3)
                       ]
     
     dfP = dfP.sort_values(by=['A2'])
@@ -894,7 +917,7 @@ for A3 in np.linspace(0,30,31):
     cbar = plt.colorbar(sc)
     title = (r"$\alpha="+str(alpha)+r", \beta="+str(beta)+
               r", \omega_0="+str(omega0)+
-              r", \phi_3="+str(phi3)+r"\pi"
+              # r", \phi_3="+str(phi3)+r"\pi"
              r", A_3="+str(A3)
              +r"$")
     plt.suptitle(title)
@@ -936,7 +959,7 @@ for i, A3max in enumerate(np.linspace(0,30,31)):#np.linspace(0,30,301)):
                           &(dfO.alpha == alpha)
                           &(dfO.omega0 == omega0)
                             &(dfO.A3 == A3)
-                            &(dfO["phi3/pi"]==phi)
+                            # &(dfO["phi3/pi"]==phi)
                           ]
         
         dfP = dfP.sort_values(by=['A3'])
@@ -954,11 +977,162 @@ for i, A3max in enumerate(np.linspace(0,30,31)):#np.linspace(0,30,301)):
     cbar = plt.colorbar(sc)
     title = (r"$\alpha="+str(alpha)+r", \beta="+str(beta)+
               r", \omega_0="+str(omega0)+
-              r", \phi_3="+str(phi3)+r"\pi"
+              # r", \phi_3="+str(phi3)+r"\pi"
              r", A_3="+str(A3max)
              +r"$")
     plt.suptitle(title)
     cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
     # plt.savefig(saveFig+"alpha=1,beta=2,omega0=10,More,AccumulateR/"+"Frame"+str(A2max)+".png", format='png', bbox_inches='tight')
     plt.show()
+
+#%%
+
+"""
+Pick square in the lower triangle (brackets [ ])
+See what sort of phases we can get in that square
+"""
+
+
+# def maxDeltas(ns):
+#     '''Each of the maximally differing successive pairs
+#        in ns, each preceded by the value of the difference.
+#     '''
+#     pairs = [
+#         abs(ns[i] - ns[i + 1]) for i
+#         in range(len(ns)-1)]
+#     delta = max(pairs)
+#     return delta
+
+
+def maxDeltas(ns):
+    '''Each of the maximally differing successive pairs
+       in ns, each preceded by the value of the difference.
+    '''
+    pairs = [
+        (abs(a - b), (a, b)) for a, b
+        in zip(ns, ns[1:])
+    ]
+    delta = max(pairs, key=lambda ab: ab[0])
+ 
+    return delta
+
+import random
+rad = 0.05
+
+# df = pd.DataFrame(columns = ["CentreX", "CentreY", "Radius", "MaxDelta", "PhaseOpening", "PhaseClosing"])
+i = len(df)
+for sqCentreX in np.linspace(0,1,101)[:-1]:
+    for sqCentreY in np.linspace(0.0, sqCentreX, round((sqCentreX)/0.01 + 1)):
+
+        
+        sqCentreX = np.round(sqCentreX, 3)
+        sqCentreY = np.round(sqCentreY, 3)
+        
+        sqCentreX = 0.94
+        sqCentreY = 0.94
+        rad = 0.01
+        print(sqCentreX, sqCentreY)
+        
+        dfP = dfO[((dfO["HE-LowerT.X"] - sqCentreX)**2 + (dfO["HE-LowerT.Y"] - sqCentreY)**2 <= rad**2)]
+        
+        # dfP = dfO[(dfO["HE-LowerT.X"] < sqCentreX+rad)&
+        #           (dfO["HE-LowerT.X"] > sqCentreX-rad)&
+        #           (dfO["HE-LowerT.Y"] < sqCentreY+rad)&
+        #           (dfO["HE-LowerT.Y"] > sqCentreY-rad)
+        #           ]
+        
+        phases = dfP["HE-J31-PHA"].to_numpy()
+        
+        colour = dfP.A2.to_numpy()
+        yaxis = dfP["phi3/pi"].to_numpy()
+        title = (r"$\alpha=1$, $\beta=2$, centre$=("+"{0:.4g}".format(sqCentreX)+r","+"{0:4g}".format(sqCentreY)+r")$, rad$="+"{0:.4g}".format(rad)+r"$")
+        fig, ax = plt.subplots(figsize=(5,3))
+        sc = ax.scatter( phases,yaxis, s=1, c=colour, cmap="jet", marker=".")
+        ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
+        ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+        ax.set_xlabel(r"effective $\phi$")
+        cbar = plt.colorbar(sc)
+        cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+        ax.set_title(title)
+        ax.set_ylabel(r"$\frac{\theta_3}{\pi} $", rotation=0, labelpad = 12)
+        plt.show()
+        
+        
+        fig, ax = plt.subplots(figsize=(5,3))
+        sc = ax.scatter( phases,[0]*len(phases), s=1, c=colour, cmap="jet", marker=".")
+        ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
+        ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+        ax.set_xlabel(r"effective $\phi$")
+        ax.set_yticks([0])
+        cbar = plt.colorbar(sc)
+        cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+        ax.set_title(title)
+        plt.show()
+
+        phases = np.sort(phases)
+        maxDelta = maxDeltas(phases)
+        df.loc[i] = [sqCentreX, sqCentreY, rad, maxDelta[0], maxDelta[1][0], maxDelta[1][1]]
+        i +=1
+        
+
+#%%
+rad = 0.01
+dfP =df[(df.Radius == rad)
+        &(df.CentreX !=1)
+        &(df.CentreY != 0)
+        ]
+
+sz = 3
+fig, ax = plt.subplots(figsize=(1.6*sz,sz))
+sc = ax.scatter(dfP.CentreX, dfP.CentreY, c=dfP.MaxDelta, s=1, cmap="jet", marker=".")
+ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+ax.set_xlabel(r"$\frac{\mathrm{J}_a}{\mathrm{J}_c}$",  fontsize=14)
+ax.set_ylabel(r"$\frac{\mathrm{J}_b}{\mathrm{J}_c}$", rotation = 0, labelpad=10, fontsize=14)
+cbar = plt.colorbar(sc)
+cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
+ax.set_title("Circle Radius = "+str(rad))
+plt.show()  
+        
+fig, ax = plt.subplots(figsize=(1.6*sz,sz))
+sc = ax.scatter(dfP.PhaseOpening, dfP.PhaseClosing, c=dfP.MaxDelta, s=1, cmap="jet", marker=".")
+ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
+ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+ax.set_yticks([-pi, -pi/2, 0,pi/2, pi])
+ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+ax.set_xlabel(r"$\phi_{\mathrm{open}}$")
+ax.set_ylabel(r"$\phi_{\mathrm{close}}$", rotation = 0, labelpad=10)
+cbar = plt.colorbar(sc)
+cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
+ax.set_title("Circle Radius = "+str(rad))
+plt.show()
+
+
+# sqCentreX = 0.5
+# sqCentreY = 0.2
+# rad = 0.01
+
+# x = dfP["HE-LowerT.X"]
+# y = dfP["HE-LowerT.Y"]
+                                    
+# fig, ax = plt.subplots(figsize=(5,3))
+# sc = ax.scatter( x,y, s=1, cmap="jet", marker=".")
+# plt.show()        
+     
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
