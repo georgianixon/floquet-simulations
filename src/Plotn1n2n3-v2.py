@@ -22,8 +22,8 @@ from hamiltonians import Cosine, ConvertComplex
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
-dfname = "TriangleRatios-phasedata-v4.csv"
-dfname_nonans = "TriangleRatios-phasedata-v4-nonans.csv"
+dfname = "TriangleRatios-phasedata-v6.csv"
+dfname_nonans = "TriangleRatios-phasedata-v6-nonans.csv"
 
 
 def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
@@ -144,9 +144,9 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 
 """ do this once """ #-----------------------------------------------------------------------------------------------------
 # #import df with nans
-# dfO_withnan = pd.read_csv(dataLoc+dfname, 
-#                   index_col=False
-#                   )
+dfO_withnan = pd.read_csv(dataLoc+dfname, 
+                  index_col=False
+                  )
 # #collect nan locs
 # nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
 # #drop nan locs
