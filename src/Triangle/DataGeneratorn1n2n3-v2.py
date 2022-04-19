@@ -65,7 +65,6 @@ dfN = dfN.astype({'A2': np.float32,
                          "HE-O3":np.complex128
                          })
 
-
 # df18.drop(df18[(df18.A2 == 17)&(df18.A3==11)].index, inplace=True)
 
 #%%
@@ -234,6 +233,7 @@ dfN = dfN.astype({'A2': np.float32,
                          "HE-O2":np.complex128,
                          "HE-O3":np.complex128
                          })
+
 
 dfN.to_csv(dataLoc+dfname,
                   index=False, 
