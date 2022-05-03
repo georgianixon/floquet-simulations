@@ -26,8 +26,11 @@ dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/f
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
 # dfname = "TriangleRatios-phasedata-v7.csv"
 
-dfname = "TriangleRatios-phasedata-v10.csv"
+dfname = "TriangleRatios-phasedata-v13-v2.csv"
+# dfname = "TriangleRatios-phasedata-v12-restof6-v2.csv"
+# dfname = "TriangleRatios-phasedata-v11-restof7-v.csv"
 
+# dfname = "TriangleRatios-phasedata-v11-restof7-v2.csv"
 # df18 = pd.read_csv(dataLoc+dfname, 
 #                   index_col=False, 
 #                     converters={"FT-J12": ConvertComplex,
@@ -42,36 +45,49 @@ dfname = "TriangleRatios-phasedata-v10.csv"
 #                                 }
 #                   )
 
+# dfN = pd.read_csv(dataLoc+dfname, 
+#                   index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+                  # )
 
 dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
                             "FT-J12", "FT-J23", "FT-J31", 
                             "HE-J12", "HE-J23", "HE-J31",
                             "HE-O1", "HE-O2", "HE-O3"  ])
 
-dfN = dfN.astype({'A2': np.float32,
-                         'A3': np.float32,
-                         'omega0': np.float32,
-                         "alpha":np.uint8,
-                         "beta":np.uint8,
-                         "phi3/pi":np.float32,
-                         "FT-J12":np.complex128,
-                         "FT-J23":np.complex128,
-                         "FT-J31":np.complex128,
-                         "HE-J12":np.complex128,
-                         "HE-J23":np.complex128,
-                         "HE-J31":np.complex128,
-                         "HE-O1":np.complex128,
-                         "HE-O2":np.complex128,
-                         "HE-O3":np.complex128
-                         })
+# dfN = dfN.astype({'A2': np.float32,
+#                          'A3': np.float32,
+#                          'omega0': np.float32,
+#                          "alpha":np.uint8,
+#                          "beta":np.uint8,
+#                          "phi3/pi":np.float32,
+#                          "FT-J12":np.complex128,
+#                          "FT-J23":np.complex128,
+#                          "FT-J31":np.complex128,
+#                          "HE-J12":np.complex128,
+#                          "HE-J23":np.complex128,
+#                          "HE-J31":np.complex128,
+#                          "HE-O1":np.complex128,
+#                          "HE-O2":np.complex128,
+#                          "HE-O3":np.complex128
+#                          })
 
 # df18.drop(df18[(df18.A2 == 17)&(df18.A3==11)].index, inplace=True)
 
 #%%
 
-A2s = np.linspace(0,16,17)
-# A2s = [17]
-A3s = np.linspace(0,30,31)
+# A2s = np.linspace(0,5,6)
+A2s = [5]
+A3s = np.linspace(0,29,30)
 # A3s = np.linspace(0,4,5)
 
 alpha = 1
@@ -183,12 +199,13 @@ for A2 in reversed(A2s):
         # dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
         
         # dfO = dfO.append(dfN, ignore_index=True, sort=False)
-        dfN = dfN.astype({'A2': np.float32,
-                         'A3': np.float32,
-                         'omega0': np.float32,
-                         "alpha":np.uint8,
-                         "beta":np.uint8,
-                         "phi3/pi":np.float32,
+        dfN = dfN.astype({
+            'A2': np.float32,
+                          'A3': np.float32,
+                          'omega0': np.float32,
+                          "alpha":np.uint8,
+                           "beta":np.uint8,
+                           "phi3/pi":np.float32,
                          "FT-J12":np.complex128,
                          "FT-J23":np.complex128,
                          "FT-J31":np.complex128,

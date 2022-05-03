@@ -23,12 +23,26 @@ from hamiltonians import Cosine, ConvertComplex
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
 
-dfname1930 = "TriangleRatios-phasedata-v6-19-30.csv"
-dfname_nonans1930 = "TriangleRatios-phasedata-v6-nonans-19-30.csv"
-# dfname18 = "TriangleRatios-phasedata-v9.csv"
-# dfname_nonans18 = "TriangleRatios-phasedata-v9-nonans.csv"
-dfname1718 = "TriangleRatios-phasedata-v9-fillendof17.csv"
-dfname_nonans1718 = "TriangleRatios-phasedata-v9-fillendof17-nonans.csv"
+# dfname1930 = "TriangleRatios-phasedata-v6-19-30.csv"
+dfname_nonans19 = "TriangleRatios-phasedata-v6-nonans-19-30.csv"
+# # dfname18 = "TriangleRatios-phasedata-v9.csv"
+# # dfname_nonans18 = "TriangleRatios-phasedata-v9-nonans.csv"
+# dfname1718 = "TriangleRatios-phasedata-v9-fillendof17.csv"
+
+dfname_nonans17 = "TriangleRatios-phasedata-v9-fillendof17-nonans.csv"
+
+
+# dfname = "TriangleRatios-phasedata-v10.csv"
+dfname_nonans7 = "TriangleRatios-phasedata-v10-nonans.csv"
+
+# dfname = "TriangleRatios-phasedata-v12.csv"
+
+dfname6 = "TriangleRatios-phasedata-v12-restof6-v2.csv"
+dfname_nonans6 = "TriangleRatios-phasedata-v12-restof6-v2-nonans.csv"
+
+dfname7 = "TriangleRatios-phasedata-v11-restof7-v3.csv"
+
+dfname_nonans77 = "TriangleRatios-phasedata-v11-restof7-v3-nonans.csv"
 
 
 
@@ -147,29 +161,33 @@ np.where(np.isnan(column1))
 Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 """
 
+# dfOMBQD = pd.read_csv(dataLoc+dfMBQD, index_col=False)
 
 """ do this once """ #-----------------------------------------------------------------------------------------------------
 # #import df with nans
-# dfO_withnan = pd.read_csv(dataLoc+dfname, 
-#                   index_col=False
-#                   )
-# #collect nan locs
-# nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
-# #drop nan locs
-# dfO_nonans = dfO_withnan.drop(nanRows)
-# #convert to complex values
-# for headline in ["FT-J12", "FT-J23", "FT-J31", "HE-J12", "HE-J23", "HE-J31", "HE-O1", "HE-O2", "HE-O3"]:
-#     dfO_nonans[headline] = dfO_nonans[headline].apply(ConvertComplex)
-# #save to new df
-# dfO_nonans.to_csv(dataLoc+dfname_nonans1718,
-#                   index=False, 
-#                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
-#                   )
+dfO_withnan = pd.read_csv(dataLoc+dfname6, 
+                  index_col=False
+                  )
+#collect nan locs
+nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
+#drop nan locs
+dfO_nonans = dfO_withnan.drop(nanRows)
+#convert to complex values
+for headline in ["FT-J12", "FT-J23", "FT-J31", "HE-J12", "HE-J23", "HE-J31", "HE-O1", "HE-O2", "HE-O3"]:
+    dfO_nonans[headline] = dfO_nonans[headline].apply(ConvertComplex)
+#save to new df
+dfO_nonans.to_csv(dataLoc+dfname_nonans6,
+                  index=False, 
+                  # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
+                  )
 #---------------------------------------------------------------------------------------------------------------------------
 
-
+dfO.to_csv(dataLoc+"FullTriangleData.csv",
+                  index=False, 
+                  # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
+                  )
 #%%
-df19 = pd.read_csv(dataLoc+dfname_nonans1930, 
+df19 = pd.read_csv(dataLoc+dfname_nonans19, 
                  index_col=False, 
                     converters={"FT-J12": ConvertComplex,
                               "FT-J23": ConvertComplex,
@@ -183,7 +201,7 @@ df19 = pd.read_csv(dataLoc+dfname_nonans1930,
                                 }
                  )
 
-df17 = pd.read_csv(dataLoc+dfname_nonans1718, 
+df17 = pd.read_csv(dataLoc+dfname_nonans17, 
                   index_col=False, 
                     converters={"FT-J12": ConvertComplex,
                               "FT-J23": ConvertComplex,
@@ -197,9 +215,53 @@ df17 = pd.read_csv(dataLoc+dfname_nonans1718,
                                 }
                   )
 
-#%%
-dfO = pd.concat([df19, df17])
+df7 = pd.read_csv(dataLoc+dfname_nonans7, 
+                  index_col=False, 
+                    converters={"FT-J12": ConvertComplex,
+                              "FT-J23": ConvertComplex,
+                              "FT-J31": ConvertComplex,
+                              "HE-J12": ConvertComplex,
+                              "HE-J23": ConvertComplex,
+                              "HE-J31": ConvertComplex,
+                              "HE-O1": ConvertComplex,
+                              "HE-O2": ConvertComplex,
+                              "HE-O3": ConvertComplex
+                                }
+                  )
 
+df77 = pd.read_csv(dataLoc+dfname_nonans77, 
+                  index_col=False, 
+                    converters={"FT-J12": ConvertComplex,
+                              "FT-J23": ConvertComplex,
+                              "FT-J31": ConvertComplex,
+                              "HE-J12": ConvertComplex,
+                              "HE-J23": ConvertComplex,
+                              "HE-J31": ConvertComplex,
+                              "HE-O1": ConvertComplex,
+                              "HE-O2": ConvertComplex,
+                              "HE-O3": ConvertComplex
+                                }
+                  )
+
+df6 = pd.read_csv(dataLoc+dfname_nonans6, 
+                  index_col=False, 
+                    converters={"FT-J12": ConvertComplex,
+                              "FT-J23": ConvertComplex,
+                              "FT-J31": ConvertComplex,
+                              "HE-J12": ConvertComplex,
+                              "HE-J23": ConvertComplex,
+                              "HE-J31": ConvertComplex,
+                              "HE-O1": ConvertComplex,
+                              "HE-O2": ConvertComplex,
+                              "HE-O3": ConvertComplex
+                                }
+                  )
+
+
+#%%
+dfO = pd.concat([df19, df17, df7, df77, df6])
+
+#%%
 #get rid of data that is not full yet
 # dfO.drop(dfO[dfO.A2 <= 17].index, inplace=True)
 
@@ -581,7 +643,7 @@ for ele in [ r"12",r"23", r"31"]:
 # \xi |
 #     |
 #     |____________
-#           A_3
+#           \phi
 # - omega_0 is constant omega0=5
 # - pick Ham Evolve or First Term ()
 # - have all A2 vals shown as colourbar
@@ -1028,9 +1090,9 @@ for sqCentreX in np.linspace(0,1,101)[:-1]:
         sqCentreX = np.round(sqCentreX, 3)
         sqCentreY = np.round(sqCentreY, 3)
         
-        sqCentreX = 0.94
-        sqCentreY = 0.94
-        rad = 0.01
+        # sqCentreX = 0.94
+        # sqCentreY = 0.94
+        # rad = 0.01
         print(sqCentreX, sqCentreY)
         
         dfP = dfO[((dfO["HE-LowerT.X"] - sqCentreX)**2 + (dfO["HE-LowerT.Y"] - sqCentreY)**2 <= rad**2)]
@@ -1043,31 +1105,31 @@ for sqCentreX in np.linspace(0,1,101)[:-1]:
         
         phases = dfP["HE-J31-PHA"].to_numpy()
         
-        colour = dfP.A2.to_numpy()
-        yaxis = dfP["phi3/pi"].to_numpy()
-        title = (r"$\alpha=1$, $\beta=2$, centre$=("+"{0:.4g}".format(sqCentreX)+r","+"{0:4g}".format(sqCentreY)+r")$, rad$="+"{0:.4g}".format(rad)+r"$")
-        fig, ax = plt.subplots(figsize=(5,3))
-        sc = ax.scatter( phases,yaxis, s=1, c=colour, cmap="jet", marker=".")
-        ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
-        ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-        ax.set_xlabel(r"effective $\phi$")
-        cbar = plt.colorbar(sc)
-        cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
-        ax.set_title(title)
-        ax.set_ylabel(r"$\frac{\theta_3}{\pi} $", rotation=0, labelpad = 12)
-        plt.show()
+        # colour = dfP.A2.to_numpy()
+        # yaxis = dfP["phi3/pi"].to_numpy()
+        # title = (r"$\alpha=1$, $\beta=2$, centre$=("+"{0:.4g}".format(sqCentreX)+r","+"{0:4g}".format(sqCentreY)+r")$, rad$="+"{0:.4g}".format(rad)+r"$")
+        # fig, ax = plt.subplots(figsize=(5,3))
+        # sc = ax.scatter( phases,yaxis, s=1, c=colour, cmap="jet", marker=".")
+        # ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
+        # ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+        # ax.set_xlabel(r"effective $\phi$")
+        # cbar = plt.colorbar(sc)
+        # cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+        # ax.set_title(title)
+        # ax.set_ylabel(r"$\frac{\theta_3}{\pi} $", rotation=0, labelpad = 12)
+        # plt.show()
         
         
-        fig, ax = plt.subplots(figsize=(5,3))
-        sc = ax.scatter( phases,[0]*len(phases), s=1, c=colour, cmap="jet", marker=".")
-        ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
-        ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-        ax.set_xlabel(r"effective $\phi$")
-        ax.set_yticks([0])
-        cbar = plt.colorbar(sc)
-        cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
-        ax.set_title(title)
-        plt.show()
+        # fig, ax = plt.subplots(figsize=(5,3))
+        # sc = ax.scatter( phases,[0]*len(phases), s=1, c=colour, cmap="jet", marker=".")
+        # ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
+        # ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+        # ax.set_xlabel(r"effective $\phi$")
+        # ax.set_yticks([0])
+        # cbar = plt.colorbar(sc)
+        # cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+        # ax.set_title(title)
+        # plt.show()
 
         phases = np.sort(phases)
         maxDelta = maxDeltas(phases)
@@ -1076,7 +1138,7 @@ for sqCentreX in np.linspace(0,1,101)[:-1]:
         
 
 #%%
-rad = 0.01
+rad = 0.02
 dfP =df[(df.Radius == rad)
         &(df.CentreX !=1)
         &(df.CentreY != 0)

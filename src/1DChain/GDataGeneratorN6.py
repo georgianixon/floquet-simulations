@@ -5,7 +5,7 @@ Created on Thu Sep 23 16:46:24 2021
 @author: Georgia Nixon
 """
 
-place = "Georgia Nixon"
+place = "Georgia"
 
 from numpy.linalg import eig
 from numpy import  pi, log, exp, sin
@@ -38,43 +38,43 @@ def filter_duplicates(x):
             return np.nan
         
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
-dfname = "analysis-G-N6.csv"
+# dfname = "analysis-G-N6.csv"
 
 
-# df = pd.DataFrame(columns=["form", "rtol","N", 
-#                            "centre",
-#                             "a", 
-#                             "omega", 
-#                             "phi", 
-#                             "onsite",
-#                             "O-3",
-#                             "O-2",
-#                             "O-1",
-#                             "O",
-#                             "O+1",
-#                             "O+2",
-#                             "O+3",
-#                             "N1-3",
-#                             "N1-2",
-#                             "N1-1",
-#                             "N1+1",
-#                             "N1+2",
-#                             "N1+3",
-#                             "N2-2",
-#                             "N2-1",
-#                             "N2",
-#                             "N2+1",
-#                             "N2+2",
-#                             "N3-2",
-#                             "N3-1",
-#                             "N3+1",
-#                             "N3+2",
-#                             "N4-1",
-#                             "N4",
-#                             "N4+1",
-#                             "N5-1",
-#                             "N5+1",
-#                             "N6"])
+df = pd.DataFrame(columns=["form", "rtol","N", 
+                            "centre",
+                            "a", 
+                            "omega", 
+                            "phi", 
+                            "onsite",
+                            "O-3",
+                            "O-2",
+                            "O-1",
+                            "O",
+                            "O+1",
+                            "O+2",
+                            "O+3",
+                            "N1-3",
+                            "N1-2",
+                            "N1-1",
+                            "N1+1",
+                            "N1+2",
+                            "N1+3",
+                            "N2-2",
+                            "N2-1",
+                            "N2",
+                            "N2+1",
+                            "N2+2",
+                            "N3-2",
+                            "N3-1",
+                            "N3+1",
+                            "N3+2",
+                            "N4-1",
+                            "N4",
+                            "N4+1",
+                            "N5-1",
+                            "N5+1",
+                            "N6"])
     
 # df.to_csv(sh+dfname,
 #                     index=False, 
@@ -114,7 +114,7 @@ dfname = "analysis-G-N6.csv"
 #                     )
 
 #%%
-df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int, "centre":int,
+df_dtype_dict = {'form':str, "rtol":np.float64, 'N':np.int64, "centre":np.int64,
                  'a':np.float64, 
                  'omega':np.float64, 
                  'phi':np.float64,
@@ -187,8 +187,9 @@ df = pd.read_csv(dataLoc+dfname,
 # need tp dp 1e-6 phi = 0
 N = 51; 
 centre=25;
-form="SS-p-RemoveGauge"#"StepFunc"#'SS-p' 
+# form="SS-p-RemoveGauge"#"StepFunc"#'SS-p' 
 
+form = "linear"
 rtol = 1e-11
 phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
 onsite = 0
@@ -241,7 +242,7 @@ for a in [5, 10, 15, 20, 30]:
             omega1 = round(omega1, 1)
             print(omega1)
             
-            if form == "SS-p" or form == "StepFunc" or form =="SS-p-RemoveGauge":
+            if form == "SS-p" or form == "StepFunc" or form =="SS-p-RemoveGauge" or form =="linear":
                 aInput = a
                 omegaInput = omega1
                 phiInput = phi
@@ -360,38 +361,38 @@ for a in [5, 10, 15, 20, 30]:
     #                                }).reset_index()
         
         print('   saving..')
-        df.to_csv(dataLoc+dfname,
-                  index=False, 
-                  columns=['form', 'rtol','N', "centre",
-                           'a', 
-                           'omega', 
-                           'phi',
-                           "onsite",
-                          "O-3",
-                                "O-2",
-                                "O-1",
-                                "O",
-                                "O+1",
-                                "O+2",
-                                "O+3",
-                                "N1-3",
-                                "N1-2",
-                                "N1-1",
-                                "N1+1",
-                                "N1+2",
-                                "N1+3",
-                                "N2-2",
-                                "N2-1",
-                                "N2",
-                                "N2+1",
-                                "N2+2",
-                                "N3-2",
-                                "N3-1",
-                                "N3+1",
-                                "N3+2",
-                                "N4-1",
-                                "N4",
-                                "N4+1",
-                                "N5-1",
-                                "N5+1",
-                                "N6"])
+        # df.to_csv(dataLoc+dfname,
+        #           index=False, 
+        #           columns=['form', 'rtol','N', "centre",
+        #                    'a', 
+        #                    'omega', 
+        #                    'phi',
+        #                    "onsite",
+        #                   "O-3",
+        #                         "O-2",
+        #                         "O-1",
+        #                         "O",
+        #                         "O+1",
+        #                         "O+2",
+        #                         "O+3",
+        #                         "N1-3",
+        #                         "N1-2",
+        #                         "N1-1",
+        #                         "N1+1",
+        #                         "N1+2",
+        #                         "N1+3",
+        #                         "N2-2",
+        #                         "N2-1",
+        #                         "N2",
+        #                         "N2+1",
+        #                         "N2+2",
+        #                         "N3-2",
+        #                         "N3-1",
+        #                         "N3+1",
+        #                         "N3+2",
+        #                         "N4-1",
+        #                         "N4",
+        #                         "N4+1",
+        #                         "N5-1",
+        #                         "N5+1",
+        #                         "N6"])
