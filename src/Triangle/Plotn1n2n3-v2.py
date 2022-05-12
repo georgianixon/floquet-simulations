@@ -11,7 +11,7 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -165,101 +165,112 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 
 """ do this once """ #-----------------------------------------------------------------------------------------------------
 # #import df with nans
-dfO_withnan = pd.read_csv(dataLoc+dfname6, 
-                  index_col=False
-                  )
-#collect nan locs
-nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
-#drop nan locs
-dfO_nonans = dfO_withnan.drop(nanRows)
-#convert to complex values
-for headline in ["FT-J12", "FT-J23", "FT-J31", "HE-J12", "HE-J23", "HE-J31", "HE-O1", "HE-O2", "HE-O3"]:
-    dfO_nonans[headline] = dfO_nonans[headline].apply(ConvertComplex)
-#save to new df
-dfO_nonans.to_csv(dataLoc+dfname_nonans6,
-                  index=False, 
-                  # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
-                  )
+# dfO_withnan = pd.read_csv(dataLoc+dfname6, 
+#                   index_col=False
+#                   )
+# #collect nan locs
+# nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
+# #drop nan locs
+# dfO_nonans = dfO_withnan.drop(nanRows)
+# #convert to complex values
+# for headline in ["FT-J12", "FT-J23", "FT-J31", "HE-J12", "HE-J23", "HE-J31", "HE-O1", "HE-O2", "HE-O3"]:
+#     dfO_nonans[headline] = dfO_nonans[headline].apply(ConvertComplex)
+# #save to new df
+# dfO_nonans.to_csv(dataLoc+dfname_nonans6,
+#                   index=False, 
+#                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
+#                   )
 #---------------------------------------------------------------------------------------------------------------------------
 
-dfO.to_csv(dataLoc+"FullTriangleData.csv",
-                  index=False, 
-                  # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
-                  )
-#%%
-df19 = pd.read_csv(dataLoc+dfname_nonans19, 
-                 index_col=False, 
-                    converters={"FT-J12": ConvertComplex,
-                              "FT-J23": ConvertComplex,
-                              "FT-J31": ConvertComplex,
-                              "HE-J12": ConvertComplex,
-                              "HE-J23": ConvertComplex,
-                              "HE-J31": ConvertComplex,
-                              "HE-O1": ConvertComplex,
-                              "HE-O2": ConvertComplex,
-                              "HE-O3": ConvertComplex
-                                }
-                 )
-
-df17 = pd.read_csv(dataLoc+dfname_nonans17, 
-                  index_col=False, 
-                    converters={"FT-J12": ConvertComplex,
-                              "FT-J23": ConvertComplex,
-                              "FT-J31": ConvertComplex,
-                              "HE-J12": ConvertComplex,
-                              "HE-J23": ConvertComplex,
-                              "HE-J31": ConvertComplex,
-                              "HE-O1": ConvertComplex,
-                              "HE-O2": ConvertComplex,
-                              "HE-O3": ConvertComplex
-                                }
-                  )
-
-df7 = pd.read_csv(dataLoc+dfname_nonans7, 
-                  index_col=False, 
-                    converters={"FT-J12": ConvertComplex,
-                              "FT-J23": ConvertComplex,
-                              "FT-J31": ConvertComplex,
-                              "HE-J12": ConvertComplex,
-                              "HE-J23": ConvertComplex,
-                              "HE-J31": ConvertComplex,
-                              "HE-O1": ConvertComplex,
-                              "HE-O2": ConvertComplex,
-                              "HE-O3": ConvertComplex
-                                }
-                  )
-
-df77 = pd.read_csv(dataLoc+dfname_nonans77, 
-                  index_col=False, 
-                    converters={"FT-J12": ConvertComplex,
-                              "FT-J23": ConvertComplex,
-                              "FT-J31": ConvertComplex,
-                              "HE-J12": ConvertComplex,
-                              "HE-J23": ConvertComplex,
-                              "HE-J31": ConvertComplex,
-                              "HE-O1": ConvertComplex,
-                              "HE-O2": ConvertComplex,
-                              "HE-O3": ConvertComplex
-                                }
-                  )
-
-df6 = pd.read_csv(dataLoc+dfname_nonans6, 
-                  index_col=False, 
-                    converters={"FT-J12": ConvertComplex,
-                              "FT-J23": ConvertComplex,
-                              "FT-J31": ConvertComplex,
-                              "HE-J12": ConvertComplex,
-                              "HE-J23": ConvertComplex,
-                              "HE-J31": ConvertComplex,
-                              "HE-O1": ConvertComplex,
-                              "HE-O2": ConvertComplex,
-                              "HE-O3": ConvertComplex
-                                }
-                  )
-
 
 #%%
-dfO = pd.concat([df19, df17, df7, df77, df6])
+# df19 = pd.read_csv(dataLoc+dfname_nonans19, 
+#                  index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+#                  )
+
+# df17 = pd.read_csv(dataLoc+dfname_nonans17, 
+#                   index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+#                   )
+
+# df7 = pd.read_csv(dataLoc+dfname_nonans7, 
+#                   index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+#                   )
+
+# df77 = pd.read_csv(dataLoc+dfname_nonans77, 
+#                   index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+#                   )
+
+# df6 = pd.read_csv(dataLoc+dfname_nonans6, 
+#                   index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+#                   )
+
+
+dfO = pd.read_csv(dataLoc+"FullTriangleData.csv",
+                  index_col=False, 
+                    converters={"FT-J12": ConvertComplex,
+                              "FT-J23": ConvertComplex,
+                              "FT-J31": ConvertComplex,
+                              "HE-J12": ConvertComplex,
+                              "HE-J23": ConvertComplex,
+                              "HE-J31": ConvertComplex,
+                              "HE-O1": ConvertComplex,
+                              "HE-O2": ConvertComplex,
+                              "HE-O3": ConvertComplex
+                                }
+                  )
+
+#%%
+# dfO = pd.concat([df19, df17, df7, df77, df6])
 
 #%%
 #get rid of data that is not full yet

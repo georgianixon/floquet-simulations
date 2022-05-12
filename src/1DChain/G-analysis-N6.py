@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -25,7 +25,7 @@ import sys
 sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
 from hamiltonians import  hoppingHF, ConvertComplex, PhiString
 
-
+posterLoc = "/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Presentations - Me/20220504_OxfordConf/"
 
 def filter_duplicates(x):
     """
@@ -291,8 +291,8 @@ omegaMax = 20
 omegaMin = 4
 ymax = None
 ymin = None
-# form = "SS-p";
-form = "StepFunc"; 
+form = "SS-p";
+# form = "StepFunc"; 
 # form = "DS-p"; 
 # form = "SSDF-p"; 
 
@@ -332,7 +332,7 @@ look = termsDict[0][0]
 matrixEl = termsDict[0][1]
 
 
-sz =3.2
+sz =5
 # sz = 20
 fig, ax = plt.subplots(figsize=(sz,0.6*sz),constrained_layout=True, sharey=True)
 
@@ -375,12 +375,15 @@ for a in aas:
             # ax.plot(df_plot["omega"], np.real(df_plot[look].values), 
             #             label=r"$J' = -" +matrixEl+"$")
             ax.plot(df_plot["x-axis"], -np.real((df_plot[look].values)), 
-                        label=r"$J' = -" +matrixEl+"$")
+                        # label=r"$J' = -" +matrixEl+"$"
+                        label = r"$J_{b-1, b}^{\mathrm{eff}}$"
+                        )
             # ax.set_ylabel()
-            ax.set_xlabel(r'$\sfrac{A}{\omega}$', fontsize=13)
+            ax.set_xlabel(r'$\sfrac{A}{\omega}$')
             # ax.set_xlabel(r'$\omega$')
         ax.plot(df_plot["x-axis"], jv(0, df_plot["x-axis"]), '--', 
                         label=r"$\mathcal{J}_0 (A / \omega)$")
+        ax.set_ylabel(r"$J_{b-1, b}^{\mathrm{eff}}$", rotation = 0, labelpad = 23)
 
     
 handles_legend, labels_legend = ax.get_legend_handles_labels()    
@@ -388,7 +391,8 @@ fig.legend(handles_legend, labels_legend, loc='upper right')
 plt.grid(True)
 ax.set_ylim([ymin, ymax])
 paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
-fig.savefig(paper+'ElementG-StepFunc-Tunnelling.pdf', format='pdf', bbox_inches='tight')
+# fig.savefig(paper+'ElementG-StepFunc-Tunnelling.pdf', format='pdf', bbox_inches='tight')
+fig.savefig(posterLoc+'ElementG-SS-Tunnelling.png', format='png', bbox_inches='tight', dpi=300)
 plt.show()
                                                               
    #%%
