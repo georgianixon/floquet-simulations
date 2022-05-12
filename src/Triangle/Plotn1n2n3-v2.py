@@ -21,6 +21,7 @@ from hamiltonians import CreateHFGeneral
 from hamiltonians import Cosine, ConvertComplex
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
+figLoc =  "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Presentations - Me/20220504_OxfordConf/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
 
 # dfname1930 = "TriangleRatios-phasedata-v6-19-30.csv"
@@ -32,19 +33,29 @@ dfname_nonans19 = "TriangleRatios-phasedata-v6-nonans-19-30.csv"
 dfname_nonans17 = "TriangleRatios-phasedata-v9-fillendof17-nonans.csv"
 
 
-# dfname = "TriangleRatios-phasedata-v10.csv"
 dfname_nonans7 = "TriangleRatios-phasedata-v10-nonans.csv"
 
-# dfname = "TriangleRatios-phasedata-v12.csv"
 
-dfname6 = "TriangleRatios-phasedata-v12-restof6-v2.csv"
-dfname_nonans6 = "TriangleRatios-phasedata-v12-restof6-v2-nonans.csv"
 
 dfname7 = "TriangleRatios-phasedata-v11-restof7-v3.csv"
 
 dfname_nonans77 = "TriangleRatios-phasedata-v11-restof7-v3-nonans.csv"
 
 
+dfname_nonans77 = "TriangleRatios-phasedata-v11-restof7-v3-nonans.csv"
+
+
+dfname6 = "TriangleRatios-phasedata-v12-restof6-v2.csv"
+dfname_nonans6 = "TriangleRatios-phasedata-v12-restof6-v2-nonans.csv"
+
+
+
+# "TriangleRatios-phasedata-v12-restof6-v2-nonans.csv"
+
+# "TriangleRatios-phasedata-v13-v2.csv"
+# "TriangleRatios-phasedata-v14.csv"
+
+dfnameFull = "FullTriangleData.csv"
 
 def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
     """
@@ -113,7 +124,7 @@ def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
 
 sns.set(style="darkgrid")
 sns.set(rc={'axes.facecolor':'0.96'})
-size=12
+size=18
 params = {
             'legend.fontsize': size*0.7,
           'axes.labelsize': size,
@@ -182,6 +193,11 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 #                   )
 #---------------------------------------------------------------------------------------------------------------------------
 
+
+# dfO.to_csv(dataLoc+"FullTriangleData.csv",
+#                   index=False, 
+#                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
+#                   )
 
 #%%
 # df19 = pd.read_csv(dataLoc+dfname_nonans19, 
@@ -255,19 +271,22 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 #                   )
 
 
-dfO = pd.read_csv(dataLoc+"FullTriangleData.csv",
-                  index_col=False, 
-                    converters={"FT-J12": ConvertComplex,
-                              "FT-J23": ConvertComplex,
-                              "FT-J31": ConvertComplex,
-                              "HE-J12": ConvertComplex,
-                              "HE-J23": ConvertComplex,
-                              "HE-J31": ConvertComplex,
-                              "HE-O1": ConvertComplex,
-                              "HE-O2": ConvertComplex,
-                              "HE-O3": ConvertComplex
-                                }
-                  )
+
+# dfO = pd.read_csv(dataLoc+"FullTriangleData.csv",
+
+# dfFull =  pd.read_csv(dataLoc+dfnameFull, 
+#                   index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+#                   )
 
 #%%
 # dfO = pd.concat([df19, df17, df7, df77, df6])
@@ -1149,12 +1168,33 @@ for sqCentreX in np.linspace(0,1,101)[:-1]:
         
 
 #%%
-rad = 0.02
+rad = 0.05
 dfP =df[(df.Radius == rad)
         &(df.CentreX !=1)
         &(df.CentreY != 0)
         ]
+size=12
+params = {
+            'legend.fontsize': size*0.7,
+          'axes.labelsize': size,
+          'axes.titlesize': size,
+          'xtick.labelsize': size*0.7,
+          'ytick.labelsize': size*0.7,
+          'font.size': size,
+          'font.family': 'STIXGeneral',
+#          'axes.titlepad': 25,
+          'mathtext.fontset': 'stix',
+          
+          # 'axes.facecolor': 'white',
+          'axes.edgecolor': 'white',
+          'axes.grid': True,
+          'grid.alpha': 1,
+          # 'grid.color': "0.9"
+          "text.usetex": True
+          }
 
+
+mpl.rcParams.update(params)
 sz = 3
 fig, ax = plt.subplots(figsize=(1.6*sz,sz))
 sc = ax.scatter(dfP.CentreX, dfP.CentreY, c=dfP.MaxDelta, s=1, cmap="jet", marker=".")
@@ -1165,6 +1205,7 @@ ax.set_ylabel(r"$\frac{\mathrm{J}_b}{\mathrm{J}_c}$", rotation = 0, labelpad=10,
 cbar = plt.colorbar(sc)
 cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
 ax.set_title("Circle Radius = "+str(rad))
+plt.savefig(figLoc + 'PhaseOpenings.png', dpi=300, format="png", bbox_inches='tight')
 plt.show()  
         
 fig, ax = plt.subplots(figsize=(1.6*sz,sz))
@@ -1178,6 +1219,7 @@ ax.set_ylabel(r"$\phi_{\mathrm{close}}$", rotation = 0, labelpad=10)
 cbar = plt.colorbar(sc)
 cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
 ax.set_title("Circle Radius = "+str(rad))
+plt.savefig(figLoc + 'PhaseOpeningSizesOnRelTriangle.png', dpi=300, format="png",bbox_inches='tight')
 plt.show()
 
 
