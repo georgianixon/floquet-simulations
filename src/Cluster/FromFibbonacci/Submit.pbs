@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -q defaultQ
+#PBS -N BASHJOB
+#PBS -j oe
+#PBS -P Fib
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=BASHWALLTIME:00:00
+#PBS -l mem=BASHMEMORY
+#PBS -V
+#PBS -J 0-BASHTRIALS
+#PBS -o "/project/Fib/OutputFilesG/BASHFILENAMETr^array_index^OUT.txt"
+
+cp -r "/project/Fib/BASHFILENAME" "/project/Fib/RunningCodeG/BASHFILENAMETr${PBS_ARRAY_INDEX}"
+cd "/project/Fib/RunningCodeG/BASHFILENAMETr${PBS_ARRAY_INDEX}"
+module load gcc
+
+sed -i -e "s/QSUBFILENAME/BASHFILENAMETr${PBS_ARRAY_INDEX}/g" main.cpp
+sed -i -e "s/QSUBTRIAL/${PBS_ARRAY_INDEX}/g" main.cpp
+
+make
+./run
+
+cp ./*.csv /project/Fib/DataOutputG
+
+cd ..
+rm -r "/project/Fib/RunningCodeG/BASHFILENAMETr${PBS_ARRAY_INDEX}"
+exit
