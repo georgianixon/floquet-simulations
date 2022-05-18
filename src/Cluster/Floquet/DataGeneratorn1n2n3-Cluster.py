@@ -7,7 +7,6 @@ import pandas as pd
 
 from functions import CreateHFGeneral, CreateHFGeneralLoopA
 from functions import Cosine,  RemoveWannierGauge
-from functions import Cosine, ConvertComplex
 
 
 if __name__ == "__main__":
@@ -39,18 +38,19 @@ if __name__ == "__main__":
     
     
     
-    
-    A2s = [30]
-    A3s = [30]
+    A2s = [0]
+    A3s = [0]
     # A3s = np.linspace(0,30,31)
     
     alpha = 1
     beta = 3
     # omega0s = [10]
-    omega0s = np.linspace(4,20,16*10+1)
+    # omega0s = np.linspace(4,20,16*10+1)
+    omega0s = [10]
     phi2 = 0 
-    phi3s = np.linspace(0, 2, 41)
-    phi3s = [round(i,2) for i in phi3s]
+    phi3s = [0, 1, 2]
+    # phi3s = np.linspace(0, 2, 41)
+    # phi3s = [round(i,2) for i in phi3s]
     
     
     centres = [1,2]
@@ -201,6 +201,7 @@ if __name__ == "__main__":
     
     
     dfN.to_csv(dfname,index=False )
+    dfN.to_csv(dirname + dfname,index=False )
 
 
 

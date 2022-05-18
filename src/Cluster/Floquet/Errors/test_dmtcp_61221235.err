@@ -1,0 +1,12 @@
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LANG = "C.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+/var/spool/slurm/slurmd/job61221235/slurm_script: line 83: ../.bashrc: No such file or directory
+Traceback (most recent call last):
+  File "DataGeneratorn1n2n3-Cluster.py", line 2, in <module>
+    from scipy.special import jv
+ModuleNotFoundError: No module named 'scipy'
