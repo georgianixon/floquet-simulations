@@ -5,14 +5,14 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 import pandas as pd
 
-from functions import CreateHFGeneral, CreateHFGeneralLoopA
+from functions import CreateHFGeneralLoopA
 from functions import Cosine,  RemoveWannierGauge
 
+import sys
 
 if __name__ == "__main__":
     
-    dirname = "/rds/user/gmon2/hpc-work/"
-    dfname = "TriangleRatios-ClusterTest.csv"
+   
 
     dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
                                 "FT-J12", "FT-J23", "FT-J31", 
@@ -38,18 +38,25 @@ if __name__ == "__main__":
     
     
     
-    A2s = [0]
-    A3s = [0]
-    # A3s = np.linspace(0,30,31)
+    A2s = [BASHA2]
+    A3s = [BASHA3]
     
     alpha = 1
     beta = 3
+    # omega0 = np.float64(sys.argv[1])
+    # omega0 = BASHOMEGA
+    omega0s = np.linspace(4,20,16*100+1)
+    # omega0s = [4,4.1,4.2]
+    
+    
+    
+    dirname = "/rds/user/gmon2/hpc-work/"
+    dfname = "TriangleRatios,alpha=1,beta=3,A2="+str(A2s[0])+",A3="+str(A3s[0])+",omega0=var.csv"
+    
+    
     # omega0s = [10]
-    # omega0s = np.linspace(4,20,16*10+1)
-    omega0s = [10]
-    phi2 = 0 
-    phi3s = [0, 1, 2]
-    # phi3s = np.linspace(0, 2, 41)
+    # phi3s = np.linspace(0,2,3)
+    phi3s = np.linspace(0, 2, 201)
     # phi3s = [round(i,2) for i in phi3s]
     
     
@@ -65,14 +72,9 @@ if __name__ == "__main__":
     for A2 in reversed(A2s):
             
         for A3 in reversed(A3s):
-            
-            # A3start = time.time()
-            # print( alpha, beta, A2, A3)
             for omega0 in omega0s:
                 omega0 = np.round(omega0, 2)
                 
-                
-                # print(A2, A3, omega0)
                 for phi3_frac in phi3s:
                     phi3_frac = np.round(phi3_frac, 3)
                     
@@ -138,47 +140,14 @@ if __name__ == "__main__":
                                       np.nan, np.nan, np.nan,
                                       np.nan, np.nan, np.nan]
                     i +=1
-            
-            # dfN['A2'] = dfN['A2'].apply(np.real)
-            # dfN['A3'] = dfN['A3'].apply(np.real)
-            # dfN['omega0'] = dfN['omega0'].apply(np.real)
-            # dfN['alpha'] = dfN['alpha'].apply(np.real)
-            # dfN['beta'] = dfN['beta'].apply(np.real)
-            # dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
-            
+
     
-            
-            # dfN = dfN.astype({
-            #     'A2': np.float64,
-            #                   'A3': np.float64,
-            #                   'omega0': np.float64,
-            #                   "alpha":np.uint32,
-            #                    "beta":np.uint32,
-            #                    "phi3/pi":np.float64,
-            #                  "FT-J12":np.complex128,
-            #                  "FT-J23":np.complex128,
-            #                  "FT-J31":np.complex128,
-            #                  "HE-J12":np.complex128,
-            #                  "HE-J23":np.complex128,
-            #                  "HE-J31":np.complex128,
-            #                  "HE-O1":np.complex128,
-            #                  "HE-O2":np.complex128,
-            #                  "HE-O3":np.complex128
-            #                  })
-            
-            # dfN.to_csv(dfname,
-            #           index=False, 
-            #           )
-            
-            
-            
-    
-    # dfN['A2'] = dfN['A2'].apply(np.real)
-    # dfN['A3'] = dfN['A3'].apply(np.real)
-    # dfN['omega0'] = dfN['omega0'].apply(np.real)
-    # dfN['alpha'] = dfN['alpha'].apply(np.real)
-    # dfN['beta'] = dfN['beta'].apply(np.real)
-    # dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
+    dfN['A2'] = dfN['A2'].apply(np.real)
+    dfN['A3'] = dfN['A3'].apply(np.real)
+    dfN['omega0'] = dfN['omega0'].apply(np.real)
+    dfN['alpha'] = dfN['alpha'].apply(np.real)
+    dfN['beta'] = dfN['beta'].apply(np.real)
+    dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
     
     dfN = dfN.astype({
                 'A2': np.float64,
@@ -200,7 +169,7 @@ if __name__ == "__main__":
             
     
     
-    dfN.to_csv(dfname,index=False )
+    # dfN.to_csv(dfname,index=False )
     dfN.to_csv(dirname + dfname,index=False )
 
 

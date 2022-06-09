@@ -781,3 +781,68 @@ def RemoveWannierGauge(matrix, c, N):
     matrix = np.matmul(np.matmul(np.conj(gaugeMatrix), matrix), gaugeMatrix)
     return matrix
         
+#%%
+
+def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
+    """
+    Go through (x1,y1), (x2,y2) (x3,y3) combinations and find the one in the bottom right triangle
+    """
+    N = len(lst1a)
+    lowerTriListA = np.zeros(N)
+    lowerTriListB = np.zeros(N)
+    
+    upperTriListX = np.zeros(N)
+    upperTriListY = np.zeros(N)
+    
+    # counts = np.zeros(N)
+    
+    for i, (a1, b1, a2, b2, a3, b3) in enumerate(list(zip(lst1a, lst1b, lst2a, lst2b, lst3a, lst3b))):
+        # count = 0
+        if a1 <=1 and b1 <=1:
+            # count +=1
+            if b1<=a1:
+                lowerTriListA[i] = a1
+                lowerTriListB[i] = b1
+                
+                upperTriListX[i] = b1
+                upperTriListY[i] = a1
+            else:
+                lowerTriListA[i] = b1
+                lowerTriListB[i] = a1
+                
+                upperTriListX[i] = a1
+                upperTriListY[i] = b1
+        elif a2 <=1 and b2 <=1:
+            # count +=1
+            if b2<=a2:
+                lowerTriListA[i] = a2
+                lowerTriListB[i] = b2
+                
+                upperTriListX[i] = b2
+                upperTriListY[i] = a2
+            else:
+                lowerTriListA[i] = b2
+                lowerTriListB[i] = a2
+                
+                upperTriListX[i] = a2
+                upperTriListY[i] = b2
+        elif a3 <=1 and b3 <=1:
+            # count+=1
+            if b3<=a3:
+                lowerTriListA[i] = a3
+                lowerTriListB[i] = b3
+                
+                upperTriListX[i] = b3
+                upperTriListY[i] = a3
+            else:
+                lowerTriListA[i] = b3
+                lowerTriListB[i] = a3
+                
+                upperTriListX[i] = a3
+                upperTriListY[i] = b3
+                
+        # counts[i] = count
+        # else:
+        #     print(i)
+        #     raise ValueError
+    return lowerTriListA, lowerTriListB, upperTriListX, upperTriListY

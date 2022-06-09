@@ -25,7 +25,7 @@ import sys
 sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
 from hamiltonians import  hoppingHF, ConvertComplex, PhiString
 
-posterLoc = "/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Presentations - Me/20220504_OxfordConf/"
+posterLoc = "/Users/Georgia Nixon/OneDrive - University of Cambridge/MBQD/Posters/202205 DAMOP/Final/"
 
 def filter_duplicates(x):
     """
@@ -46,51 +46,52 @@ def filter_duplicates(x):
         else:
             return np.nan
 
+
+def Plot():    
+    
+    sns.set(style="darkgrid")
+    sns.set(rc={'axes.facecolor':'0.96'})
+    size=23
+    params = {
+                'legend.fontsize': size*0.9,
+              'axes.labelsize': size,
+              'axes.titlesize': size,
+              'xtick.labelsize': size*0.9,
+              'ytick.labelsize': size*0.9,
+              'font.size': size,
+              'font.family': 'STIXGeneral',
+    #          'axes.titlepad': 25,
+              'mathtext.fontset': 'stix',
+              
+              # 'axes.facecolor': 'white',
+              'axes.edgecolor': 'white',
+              'axes.grid': True,
+              'grid.alpha': 1,
+              # 'grid.color': "0.9"
+              "text.usetex": True
+              }
     
     
+    mpl.rcParams.update(params)
+    mpl.rcParams["text.latex.preamble"] = mpl.rcParams["text.latex.preamble"] + r'\usepackage{xfrac}'
     
-
-sns.set(style="darkgrid")
-sns.set(rc={'axes.facecolor':'0.96'})
-size=20
-params = {
-            'legend.fontsize': size*0.7,
-          'axes.labelsize': size,
-          'axes.titlesize': size,
-          'xtick.labelsize': size*0.7,
-          'ytick.labelsize': size*0.7,
-          'font.size': size,
-          'font.family': 'STIXGeneral',
-#          'axes.titlepad': 25,
-          'mathtext.fontset': 'stix',
-          
-          # 'axes.facecolor': 'white',
-          'axes.edgecolor': 'white',
-          'axes.grid': True,
-          'grid.alpha': 1,
-          # 'grid.color': "0.9"
-          "text.usetex": True
-          }
-
-
-mpl.rcParams.update(params)
-mpl.rcParams["text.latex.preamble"] = mpl.rcParams["text.latex.preamble"] + r'\usepackage{xfrac}'
-
-CB91_Blue = 'darkblue'#'#2CBDFE'
-CB91_Green = '#47DBCD'
-CB91_Pink = '#F3A0F2'
-CB91_Purple = '#9D2EC5'
-CB91_Violet = '#661D98'
-CB91_Amber = '#F5B14C'
-red = "#FC4445"
-newred = "#FF1053"
-
-color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
-               CB91_Purple,
-                # CB91_Violet,
-                'dodgerblue',
-                'slategrey', newred]
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
+    CB91_Blue = 'darkblue'#'#2CBDFE'
+    CB91_Green = '#47DBCD'
+    CB91_Pink = '#F3A0F2'
+    CB91_Purple = '#9D2EC5'
+    CB91_Violet = '#661D98'
+    CB91_Amber = '#F5B14C'
+    red = "#FC4445"
+    newred = "#FF1053"
+    
+    color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
+                   CB91_Purple,
+                    # CB91_Violet,
+                    'dodgerblue',
+                    'slategrey', newred]
+    plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
+    
+Plot()
 
 
 # sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
@@ -392,7 +393,7 @@ plt.grid(True)
 ax.set_ylim([ymin, ymax])
 paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
 # fig.savefig(paper+'ElementG-StepFunc-Tunnelling.pdf', format='pdf', bbox_inches='tight')
-fig.savefig(posterLoc+'ElementG-SS-Tunnelling.png', format='png', bbox_inches='tight', dpi=300)
+# fig.savefig(posterLoc+'ElementG-SS-Tunnelling.png', format='png', bbox_inches='tight', dpi=300)
 plt.show()
                                                               
    #%%
@@ -474,3 +475,86 @@ for look, matrixEl in termsDict:
     # fig.savefig(paper+'ElementG-Tunnelling-A=35-poster.pdf', format='pdf', bbox_inches='tight')
     plt.show()                                                           
 
+#%%
+# for DAMOP poster
+
+      
+#For paper
+
+N = 51; 
+centre = 25
+
+rtol=1e-11
+aas = [35]
+phi = 0
+apply = [np.abs]
+omegaMax = 20
+omegaMin = 4
+ymax = None
+ymin = None
+form = "SS-p";
+# form = "StepFunc"; 
+# form = "DS-p"; 
+# form = "SSDF-p"; 
+
+termsDict = [ 
+            ("N1-1","G_{b-1, b}"),
+            ]
+
+
+look = termsDict[0][0]
+matrixEl = termsDict[0][1]
+
+
+sz =4
+# sz = 20
+fig, ax = plt.subplots(figsize=(sz,0.6*sz),constrained_layout=True, sharey=True)
+
+
+# df.loc[df['form'] == 'SS-p','phi offset'] = np.nan
+        
+for a in aas:
+
+
+    df_plot = df[(df['form']==form)&
+             (df['N']==N)&
+              (df['a']==a)&
+              (df['phi']==phi)&
+              (df["centre"]==centre)]
+        # df_plot.loc[:,"x-axis"] = df_plot.loc[:,"a"]/df_plot.loc[:,"omega"]
+        
+        
+    if not df_plot.empty:
+        df_plot["x-axis"] = df_plot.apply(
+            lambda row: row["a"]/row["omega"], axis=1)
+        
+        
+        df_plot = df_plot.sort_values(by=['x-axis'])
+        
+        # df_plot = df_plot.sort_values(by=['omega'])
+        # df_plot = df_plot[df_plot["omega"] < omegaMax]
+        # df_plot = df_plot[df_plot["omega"] > omegaMin]
+        
+
+        # ax.plot(df_plot["omega"], np.real(df_plot[look].values), 
+        #             label=r"$J' = -" +matrixEl+"$")
+        ax.plot(df_plot["x-axis"], -np.real((df_plot[look].values)), 
+                    # label=r"$J' = -" +matrixEl+"$"
+                    label = r"$J_{b-1, b}^{\mathrm{eff}}$"
+                    )
+        # ax.set_ylabel()
+        ax.set_xlabel(r'$\sfrac{A}{\omega}$')
+        # ax.set_xlabel(r'$\omega$')
+    ax.plot(df_plot["x-axis"], jv(0, df_plot["x-axis"]), '--', 
+                    label=r"$\mathcal{J}_0 (A / \omega)$")
+    ax.set_ylabel(r"J'", rotation = 0, labelpad = 23)
+
+    
+handles_legend, labels_legend = ax.get_legend_handles_labels()    
+fig.legend(handles_legend, labels_legend, loc='upper right')
+plt.grid(True)
+ax.set_ylim([ymin, ymax])
+paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
+# fig.savefig(posterLoc+'ElementG-SS-Tunnelling.pdf', format='pdf', bbox_inches='tight')
+# fig.savefig(posterLoc+'ElementG-SS-Tunnelling.png', format='png', bbox_inches='tight', dpi=300)
+plt.show()

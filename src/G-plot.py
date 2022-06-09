@@ -6,7 +6,7 @@ Created on Sat Aug 22 14:01:15 2020
 """
 
 import matplotlib as mpl
-place="Georgia"
+place="Georgia Nixon"
 from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ from scipy.special import jn_zeros, jv
 from fractions import Fraction 
 from hamiltonians import Cosine, PhiString
     
-posterLoc = "C:/Users/Georgia/OneDrive - University of Cambridge/MBQD/Posters/2022-03 - Student Conf Jesus/"
+posterLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Posters/202205 DAMOP/Final/"
 # def RemoveWannierGauge(matrix, c, N):
 #     phase = np.angle(matrix[c-1,c])
 #     gaugeMatrix = np.identity(N, dtype=np.complex128)
@@ -29,29 +29,32 @@ posterLoc = "C:/Users/Georgia/OneDrive - University of Cambridge/MBQD/Posters/20
 #     return matrix
 
 
-size=15
-params = {
-            'legend.fontsize': size*0.8,
-#          'figure.figsize': (20,8),
-          'axes.labelsize': size,
-          'axes.titlesize': size,
-          'xtick.labelsize': size*0.8,
-          'ytick.labelsize': size*0.8,
-          'font.size': size,
-          'xtick.bottom':True,
-          'xtick.top':False,
-          'ytick.left': True,
-          'ytick.right':False,
-          ## draw ticks on the left side
-#          'axes.titlepad': 25
-          'axes.edgecolor' :'white',
-          'xtick.minor.visible': False,
-          'axes.grid':False,
-          'font.family' : 'STIXGeneral',
-          'mathtext.fontset':'stix'
-          }
-mpl.rcParams.update(params)
+def Plot():
+    size=22
+    params = {
+                'legend.fontsize': size*0.8,
+    #          'figure.figsize': (20,8),
+              'axes.labelsize': size,
+              'axes.titlesize': size,
+              'xtick.labelsize': size*0.8,
+              'ytick.labelsize': size*0.8,
+              'font.size': size,
+              'xtick.bottom':True,
+              'xtick.top':False,
+              'ytick.left': True,
+              'ytick.right':False,
+              ## draw ticks on the left side
+    #          'axes.titlepad': 25
+              'axes.edgecolor' :'white',
+              'xtick.minor.visible': False,
+              'axes.grid':False,
+              'font.family' : "sans-serif",#"Arial"#'STIXGeneral',
+              "font.sans-serif":"Arial",
+               'mathtext.fontset':"Arial"#'stix'
+              }
+    
 
+Plot()
 
 
 
@@ -85,7 +88,7 @@ def GetPhiOffset(time1, timeOffset, omega1, omega2):
     return phi1, phi2, totalT 
         
 # common params
-N=3;   rtol=1e-11
+N=8;   rtol=1e-11
 
 # form="SS-p"
 # phi1 = pi/4
@@ -98,26 +101,26 @@ N=3;   rtol=1e-11
 # omegas = [omega1, omega2]
 
 
-# form = "SSHModel"
-# centre = np.nan
-# a = [35, 15]
-# omega1 = 10; omega = [omega1, 2*omega1 ]
-# phi = [0, 0]
-# onsite = [0,0]
-# UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
+form = "SSHModel"
+centre = np.nan
+a = [35, 15]
+omega1 = 10; omega = [omega1, 2*omega1 ]
+phi = [0, 0]
+onsite = [0,0]
+UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
 #triangle
-centres= [1,2]
-funcs = [Cosine, Cosine]
-a1 = 25; a2 = 53;
-omega0 = 6
-T = 2*pi/omega0
-alpha = 1; beta = 2
-omega1 = alpha*omega0; omega2 = beta*omega0
-phi1 = 0; phi2 = pi/3
-onsite = 0
-paramss = [[a1, omega1, phi1, onsite], [a2, omega2, phi2, onsite]]
-circleBoundary = 1
+# centres= [1,2]
+# funcs = [Cosine, Cosine]
+# a1 = 25; a2 = 53;
+# omega0 = 6
+# T = 2*pi/omega0
+# alpha = 1; beta = 2
+# omega1 = alpha*omega0; omega2 = beta*omega0
+# phi1 = 0; phi2 = pi/3
+# onsite = 0
+# paramss = [[a1, omega1, phi1, onsite], [a2, omega2, phi2, onsite]]
+# circleBoundary = 1
 
 
 # a = 35
@@ -128,16 +131,25 @@ circleBoundary = 1
 # phi1, phi2, T  = GetPhiOffset(time1, timeOffset, omega1, omega2)
 
 
-_, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
+
+#full lattice shake
+# form = 'linear'
+# centre = np.nan
+# a = 10
+# omega = 10
+# phi = pi/3
+# onsite = np.nan
+# _, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
 
-for site in range(N):
-    HF = RemoveWannierGauge(HF, site, N)
+# _, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
+
+
+# for site in range(N):
+#     HF = RemoveWannierGauge(HF, site, N)
 
 
 
-
-# UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
 # HFevals, _ = GetEvalsAndEvecsGen(HF)
 # HFabs = np.copy(HF)
@@ -259,14 +271,15 @@ norm = mpl.colors.Normalize(vmin=-1, vmax=1)
 # 
 
 '''abs real imag'''
-
+Plot()
+cmap = "RdBu"#"PuOr"
 
 sz = 2
 fig, ax = plt.subplots(nrows=1, ncols=1, constrained_layout=True, 
                        figsize=(sz,sz))
 
-pcm = ax.matshow(np.real(HF), interpolation='none', cmap='PuOr',  norm=norm)
-ax.set_title(r'$\mathrm{Real}\{G_{n,m}\}$')
+pcm = ax.matshow(np.real(HF), interpolation='none', cmap=cmap,  norm=norm)
+ax.set_title(r'$\mathrm{Real}\{H_{n,m}^{\mathrm{eff}}\}$')
 ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
   labeltop=False)  
 ax.set_xlabel('m')
@@ -293,6 +306,7 @@ norm = mpl.colors.Normalize(vmin=0, vmax=1)
 # 
 
 '''abs real imag'''
+
 
 
 sz = 2

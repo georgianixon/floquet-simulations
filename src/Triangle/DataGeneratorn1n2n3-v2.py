@@ -162,8 +162,8 @@ for A2 in reversed(A2s):
                     O2 = HF[1][1]
                     O3 = HF[2][2]
         
-                    dfN.loc[i] = [np.float32(A2), np.float32(A3), np.float32(omega0), np.uint32(alpha), np.uint32(beta)
-                                  , np.float32(phi3_frac), 
+                    dfN.loc[i] = [np.float64(A2), np.float64(A3), np.float64(omega0), np.uint32(alpha), np.uint32(beta)
+                                  , np.float64(phi3_frac), 
                                   np.complex128(J12), np.complex128(J23), np.complex128(J31), 
                                   np.complex128(J12_Ham), np.complex128(J23_Ham), np.complex128(J31_Ham),
                                   np.complex128(O1), np.complex128(O2), np.complex128(O3)]
@@ -187,11 +187,11 @@ for A2 in reversed(A2s):
         # dfO = dfO.append(dfN, ignore_index=True, sort=False)
         dfN = dfN.astype({
             'A2': np.float32,
-                          'A3': np.float32,
-                          'omega0': np.float32,
-                          "alpha":np.uint8,
-                           "beta":np.uint8,
-                           "phi3/pi":np.float32,
+                          'A3': np.float64,
+                          'omega0': np.float64,
+                          "alpha":np.uint32,
+                           "beta":np.uint32,
+                           "phi3/pi":np.float64,
                          "FT-J12":np.complex128,
                          "FT-J23":np.complex128,
                          "FT-J31":np.complex128,
@@ -220,12 +220,12 @@ for A2 in reversed(A2s):
 # dfN['beta'] = dfN['beta'].apply(np.real)
 # dfN['phi3/pi'] = dfN['phi3/pi'].apply(np.real)
 
-dfN = dfN.astype({'A2': np.float32,
-                         'A3': np.float32,
-                         'omega0': np.float32,
+dfN = dfN.astype({'A2': np.float64,
+                         'A3': np.float64,
+                         'omega0': np.float64,
                          "alpha":np.uint32,
                          "beta":np.uint32,
-                         "phi3/pi":np.float32,
+                         "phi3/pi":np.float64,
                          "FT-J12":np.complex128,
                          "FT-J23":np.complex128,
                          "FT-J31":np.complex128,

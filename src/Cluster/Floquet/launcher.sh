@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-start_depth=1.5;
-end_depth=11.6;
-step_depth=0.25;
+start=4;
+end=20;
+step=0.1;
 
-for depth in `seq $start_depth $step_depth $end_depth`; do sbatch slurm_submit $depth; done
+for val in `seq $start $step $end`; do 
+sbatch slurm_submit $val; 
+done
