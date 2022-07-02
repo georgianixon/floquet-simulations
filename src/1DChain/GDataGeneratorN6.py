@@ -37,44 +37,44 @@ def filter_duplicates(x):
         else:
             return np.nan
         
-dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
-# dfname = "analysis-G-N6.csv"
+dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/1D/"
+dfname = "analysis-G-N6.csv"
+dfSave = "analysis-G-N6-v2.csv"
 
-
-df = pd.DataFrame(columns=["form", "rtol","N", 
-                            "centre",
-                            "a", 
-                            "omega", 
-                            "phi", 
-                            "onsite",
-                            "O-3",
-                            "O-2",
-                            "O-1",
-                            "O",
-                            "O+1",
-                            "O+2",
-                            "O+3",
-                            "N1-3",
-                            "N1-2",
-                            "N1-1",
-                            "N1+1",
-                            "N1+2",
-                            "N1+3",
-                            "N2-2",
-                            "N2-1",
-                            "N2",
-                            "N2+1",
-                            "N2+2",
-                            "N3-2",
-                            "N3-1",
-                            "N3+1",
-                            "N3+2",
-                            "N4-1",
-                            "N4",
-                            "N4+1",
-                            "N5-1",
-                            "N5+1",
-                            "N6"])
+# df = pd.DataFrame(columns=["form", "rtol","N", 
+#                             "centre",
+#                             "a", 
+#                             "omega", 
+#                             "phi", 
+#                             "onsite",
+#                             "O-3",
+#                             "O-2",
+#                             "O-1",
+#                             "O",
+#                             "O+1",
+#                             "O+2",
+#                             "O+3",
+#                             "N1-3",
+#                             "N1-2",
+#                             "N1-1",
+#                             "N1+1",
+#                             "N1+2",
+#                             "N1+3",
+#                             "N2-2",
+#                             "N2-1",
+#                             "N2",
+#                             "N2+1",
+#                             "N2+2",
+#                             "N3-2",
+#                             "N3-1",
+#                             "N3+1",
+#                             "N3+2",
+#                             "N4-1",
+#                             "N4",
+#                             "N4+1",
+#                             "N5-1",
+#                             "N5+1",
+#                             "N6"])
     
 # df.to_csv(sh+dfname,
 #                     index=False, 
@@ -119,34 +119,34 @@ df_dtype_dict = {'form':str, "rtol":np.float64, 'N':np.int64, "centre":np.int64,
                  'omega':np.float64, 
                  'phi':np.float64,
                  "onsite":np.float64,
-                 "O-3":np.float64,
-                "O-2":np.float64,
-                "O-1":np.float64,
-                "O":np.float64,
-                "O+1":np.float64,
-                "O+2":np.float64,
-                "O+3":np.float64,
-                "N1-3":np.float64,
-                "N1-2":np.float64,
-                "N1-1":np.float64,
-                "N1+1":np.float64,
-                "N1+2":np.float64,
-                "N1+3":np.float64,
-                "N2-2":np.float64,
-                "N2-1":np.float64,
-                "N2":np.float64,
-                "N2+1":np.float64,
-                "N2+2":np.float64,
-                "N3-2":np.float64,
-                "N3-1":np.float64,
-                "N3+1":np.float64,
-                "N3+2":np.float64,
-                "N4-1":np.float64,
-                "N4":np.float64,
-                "N4+1":np.float64,
-                "N5-1":np.float64,
-                "N5+1":np.float64,
-                "N6":np.float64}
+                 "O-3":np.complex128,
+                "O-2":np.complex128,
+                "O-1":np.complex128,
+                "O":np.complex128,
+                "O+1":np.complex128,
+                "O+2":np.complex128,
+                "O+3":np.complex128,
+                "N1-3":np.complex128,
+                "N1-2":np.complex128,
+                "N1-1":np.complex128,
+                "N1+1":np.complex128,
+                "N1+2":np.complex128,
+                "N1+3":np.complex128,
+                "N2-2":np.complex128,
+                "N2-1":np.complex128,
+                "N2":np.complex128,
+                "N2+1":np.complex128,
+                "N2+2":np.complex128,
+                "N3-2":np.complex128,
+                "N3-1":np.complex128,
+                "N3+1":np.complex128,
+                "N3+2":np.complex128,
+                "N4-1":np.complex128,
+                "N4":np.complex128,
+                "N4+1":np.complex128,
+                "N5-1":np.complex128,
+                "N5+1":np.complex128,
+                "N6":np.complex128}
 
 df = pd.read_csv(dataLoc+dfname, 
                  index_col=False, 
@@ -180,7 +180,7 @@ df = pd.read_csv(dataLoc+dfname,
                             "N6": ConvertComplex
                             })
 
-
+df = df.astype(df_dtype_dict)
 
 #%%
 
@@ -189,15 +189,17 @@ N = 51;
 centre=25;
 # form="SS-p-RemoveGauge"#"StepFunc"#'SS-p' 
 
-form = "linear"
+form = "SS-p"#"linear"
 rtol = 1e-11
-phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+# phis = [0, pi/7, pi/6, pi/5, pi/4, pi/3, pi/2]
+phis = [0]
 onsite = 0
-omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
+# omegas = np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)
+omegas = np.linspace(4,5, 1000, endpoint=True)
 # omegas = np.linspace(20.1, 200, 200*10-200)
     
     
-for a in [5, 10, 15, 20, 30]:
+for a in [35]:
     
     
     for phi in phis:
@@ -239,7 +241,7 @@ for a in [5, 10, 15, 20, 30]:
             
             start = time.time()
             
-            omega1 = round(omega1, 1)
+            omega1 = round(omega1, 3)
             print(omega1)
             
             if form == "SS-p" or form == "StepFunc" or form =="SS-p-RemoveGauge" or form =="linear":
@@ -348,7 +350,7 @@ for a in [5, 10, 15, 20, 30]:
     
     
         df = df.append(df1, ignore_index=True, sort=False)
-        # df= df.astype(dtype=df_dtype_dict)
+        df= df.astype(dtype=df_dtype_dict)
         
     #        print('  grouping..')
     #        df = df.groupby(by=['form', 'rtol', 'a', 'omega', 'phi', 
@@ -361,38 +363,38 @@ for a in [5, 10, 15, 20, 30]:
     #                                }).reset_index()
         
         print('   saving..')
-        # df.to_csv(dataLoc+dfname,
-        #           index=False, 
-        #           columns=['form', 'rtol','N', "centre",
-        #                    'a', 
-        #                    'omega', 
-        #                    'phi',
-        #                    "onsite",
-        #                   "O-3",
-        #                         "O-2",
-        #                         "O-1",
-        #                         "O",
-        #                         "O+1",
-        #                         "O+2",
-        #                         "O+3",
-        #                         "N1-3",
-        #                         "N1-2",
-        #                         "N1-1",
-        #                         "N1+1",
-        #                         "N1+2",
-        #                         "N1+3",
-        #                         "N2-2",
-        #                         "N2-1",
-        #                         "N2",
-        #                         "N2+1",
-        #                         "N2+2",
-        #                         "N3-2",
-        #                         "N3-1",
-        #                         "N3+1",
-        #                         "N3+2",
-        #                         "N4-1",
-        #                         "N4",
-        #                         "N4+1",
-        #                         "N5-1",
-        #                         "N5+1",
-        #                         "N6"])
+        df.to_csv(dataLoc+dfSave,
+                  index=False, 
+                  columns=['form', 'rtol','N', "centre",
+                            'a', 
+                            'omega', 
+                            'phi',
+                            "onsite",
+                          "O-3",
+                                "O-2",
+                                "O-1",
+                                "O",
+                                "O+1",
+                                "O+2",
+                                "O+3",
+                                "N1-3",
+                                "N1-2",
+                                "N1-1",
+                                "N1+1",
+                                "N1+2",
+                                "N1+3",
+                                "N2-2",
+                                "N2-1",
+                                "N2",
+                                "N2+1",
+                                "N2+2",
+                                "N3-2",
+                                "N3-1",
+                                "N3+1",
+                                "N3+2",
+                                "N4-1",
+                                "N4",
+                                "N4+1",
+                                "N5-1",
+                                "N5+1",
+                                "N6"])

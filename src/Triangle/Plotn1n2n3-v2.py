@@ -11,7 +11,7 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -19,11 +19,9 @@ sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 # sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
 from hamiltonians import CreateHFGeneral
 from hamiltonians import Cosine, ConvertComplex
-from hamiltonians import ListRatiosInLowerTriangle
 
 dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
-# figLoc =  "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Presentations - Me/20220504_OxfordConf/"
-figLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Posters/202205 DAMOP/"
+figLoc =  "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Presentations - Me/20220504_OxfordConf/"
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
 
 # dfname1930 = "TriangleRatios-phasedata-v6-19-30.csv"
@@ -47,6 +45,7 @@ dfname_nonans77 = "TriangleRatios-phasedata-v11-restof7-v3-nonans.csv"
 dfname_nonans77 = "TriangleRatios-phasedata-v11-restof7-v3-nonans.csv"
 
 
+
 dfname6 = "TriangleRatios-phasedata-v12-restof6-v2.csv"
 dfname_nonans6 = "TriangleRatios-phasedata-v12-restof6-v2-nonans.csv"
 
@@ -54,61 +53,121 @@ dfname_nonans6 = "TriangleRatios-phasedata-v12-restof6-v2-nonans.csv"
 
 # "TriangleRatios-phasedata-v12-restof6-v2-nonans.csv"
 
-# "TriangleRatios-phasedata-v13-v2.csv"
-# "TriangleRatios-phasedata-v14.csv"
+dfname5 = "TriangleRatios-phasedata-v13-v2.csv"
+dfname_nonans5 = "TriangleRatios-phasedata-v13-v2-nonans.csv"
+
+dfname4 = "TriangleRatios-phasedata-v14.csv"
 
 dfnameFull = "FullTriangleData.csv"
 
-
-
-
-
-
-def UpdatePlots():
-   
+def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
+    """
+    Go through (x1,y1), (x2,y2) (x3,y3) combinations and find the one in the bottom right triangle
+    """
+    N = len(lst1a)
+    lowerTriListA = np.zeros(N)
+    lowerTriListB = np.zeros(N)
     
-    CB91_Blue = 'darkblue'#'#2CBDFE'
-    oxfordblue = "#061A40"
-    CB91_Green = '#47DBCD'
-    CB91_Pink = '#F3A0F2'
-    CB91_Purple = '#9D2EC5'
-    CB91_Violet = '#661D98'
-    CB91_Amber = '#F5B14C'
-    red = "#FC4445"
-    newred = "#E4265C"
-    flame = "#DD6031"
+    upperTriListX = np.zeros(N)
+    upperTriListY = np.zeros(N)
     
-    color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
-                    CB91_Purple,
-                    # CB91_Violet,
-                    'dodgerblue',
-                    'slategrey', newred]
-    plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
+    # counts = np.zeros(N)
+    
+    for i, (a1, b1, a2, b2, a3, b3) in enumerate(list(zip(lst1a, lst1b, lst2a, lst2b, lst3a, lst3b))):
+        # count = 0
+        if a1 <=1 and b1 <=1:
+            # count +=1
+            if b1<=a1:
+                lowerTriListA[i] = a1
+                lowerTriListB[i] = b1
+                
+                upperTriListX[i] = b1
+                upperTriListY[i] = a1
+            else:
+                lowerTriListA[i] = b1
+                lowerTriListB[i] = a1
+                
+                upperTriListX[i] = a1
+                upperTriListY[i] = b1
+        elif a2 <=1 and b2 <=1:
+            # count +=1
+            if b2<=a2:
+                lowerTriListA[i] = a2
+                lowerTriListB[i] = b2
+                
+                upperTriListX[i] = b2
+                upperTriListY[i] = a2
+            else:
+                lowerTriListA[i] = b2
+                lowerTriListB[i] = a2
+                
+                upperTriListX[i] = a2
+                upperTriListY[i] = b2
+        elif a3 <=1 and b3 <=1:
+            # count+=1
+            if b3<=a3:
+                lowerTriListA[i] = a3
+                lowerTriListB[i] = b3
+                
+                upperTriListX[i] = b3
+                upperTriListY[i] = a3
+            else:
+                lowerTriListA[i] = b3
+                lowerTriListB[i] = a3
+                
+                upperTriListX[i] = a3
+                upperTriListY[i] = b3
+                
+        # counts[i] = count
+        # else:
+        #     print(i)
+        #     raise ValueError
+    return lowerTriListA, lowerTriListB, upperTriListX, upperTriListY
 
-    sns.set(style="darkgrid")
-    sns.set(rc={'axes.facecolor':'0.96'})
-    size=18
-    params = {
-                'legend.fontsize': size*0.7,
-              'axes.labelsize': size,
-              'axes.titlesize': size,
-              'xtick.labelsize': size*0.7,
-              'ytick.labelsize': size*0.7,
-              'font.size': size,
-              'font.family': 'STIXGeneral',
-    #          'axes.titlepad': 25,
-              'mathtext.fontset': 'stix',
-              
-              # 'axes.facecolor': 'white',
-              'axes.edgecolor': 'white',
-              'axes.grid': True,
-              'grid.alpha': 1,
-              # 'grid.color': "0.9"
-              "text.usetex": True
-              }    
-    mpl.rcParams.update(params)
-    mpl.rcParams["text.latex.preamble"] = mpl.rcParams["text.latex.preamble"] + r'\usepackage{xfrac}'
-UpdatePlots()
+
+sns.set(style="darkgrid")
+sns.set(rc={'axes.facecolor':'0.96'})
+size=18
+params = {
+            'legend.fontsize': size*0.7,
+          'axes.labelsize': size,
+          'axes.titlesize': size,
+          'xtick.labelsize': size*0.7,
+          'ytick.labelsize': size*0.7,
+          'font.size': size,
+          'font.family': 'STIXGeneral',
+#          'axes.titlepad': 25,
+          'mathtext.fontset': 'stix',
+          
+          # 'axes.facecolor': 'white',
+          'axes.edgecolor': 'white',
+          'axes.grid': True,
+          'grid.alpha': 1,
+          # 'grid.color': "0.9"
+          "text.usetex": True
+          }
+
+
+mpl.rcParams.update(params)
+mpl.rcParams["text.latex.preamble"] = mpl.rcParams["text.latex.preamble"] + r'\usepackage{xfrac}'
+
+CB91_Blue = 'darkblue'#'#2CBDFE'
+oxfordblue = "#061A40"
+CB91_Green = '#47DBCD'
+CB91_Pink = '#F3A0F2'
+CB91_Purple = '#9D2EC5'
+CB91_Violet = '#661D98'
+CB91_Amber = '#F5B14C'
+red = "#FC4445"
+newred = "#E4265C"
+flame = "#DD6031"
+
+color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
+                CB91_Purple,
+                # CB91_Violet,
+                'dodgerblue',
+                'slategrey', newred]
+plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 
 """
@@ -120,29 +179,27 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 
 """ do this once """ #-----------------------------------------------------------------------------------------------------
 # #import df with nans
-# dfO_withnan = pd.read_csv(dataLoc+dfname6, 
-#                   index_col=False
-#                   )
-# #collect nan locs
-# nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
-# #drop nan locs
-# dfO_nonans = dfO_withnan.drop(nanRows)
-# #convert to complex values
-# for headline in ["FT-J12", "FT-J23", "FT-J31", "HE-J12", "HE-J23", "HE-J31", "HE-O1", "HE-O2", "HE-O3"]:
-#     dfO_nonans[headline] = dfO_nonans[headline].apply(ConvertComplex)
-# #save to new df
-# dfO_nonans.to_csv(dataLoc+dfname_nonans6,
-#                   index=False, 
-#                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
-#                   )
+dfO_withnan = pd.read_csv(dataLoc+dfname4, 
+                  index_col=False
+                  )
+#collect nan locs
+nanRows = np.where(np.isnan(ConvertComplex(dfO_withnan["FT-J12"])))[0]
+#drop nan locs
+dfO_nonans = dfO_withnan.drop(nanRows)
+#convert to complex values
+for headline in ["FT-J12", "FT-J23", "FT-J31", "HE-J12", "HE-J23", "HE-J31", "HE-O1", "HE-O2", "HE-O3"]:
+    dfO_nonans[headline] = dfO_nonans[headline].apply(ConvertComplex)
+#save to new df
+dfO_nonans.to_csv(dataLoc+dfname_nonans5,
+                  index=False, 
+                  # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
+                  )
 #---------------------------------------------------------------------------------------------------------------------------
-
 
 # dfO.to_csv(dataLoc+"FullTriangleData.csv",
 #                   index=False, 
 #                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
 #                   )
-
 #%%
 # df19 = pd.read_csv(dataLoc+dfname_nonans19, 
 #                  index_col=False, 
@@ -214,10 +271,20 @@ Out[22]: (array([213867, 286575, 558668, 558704], dtype=int64),)
 #                                 }
 #                   )
 
-
-
-# dfO = pd.read_csv(dataLoc+"FullTriangleData.csv",
-
+df5 = pd.read_csv(dataLoc+dfname_nonans5, 
+                  index_col=False, 
+                    converters={"FT-J12": ConvertComplex,
+                              "FT-J23": ConvertComplex,
+                              "FT-J31": ConvertComplex,
+                              "HE-J12": ConvertComplex,
+                              "HE-J23": ConvertComplex,
+                              "HE-J31": ConvertComplex,
+                              "HE-O1": ConvertComplex,
+                              "HE-O2": ConvertComplex,
+                              "HE-O3": ConvertComplex
+                                }
+                  )
+#All down to A2 = 6
 dfFull =  pd.read_csv(dataLoc+dfnameFull, 
                   index_col=False, 
                     converters={"FT-J12": ConvertComplex,
@@ -232,10 +299,11 @@ dfFull =  pd.read_csv(dataLoc+dfnameFull,
                                 }
                   )
 
-#%%
-# dfO = pd.concat([df19, df17, df7, df77, df6])
+df5 = 
 
-dfO = dfFull
+
+#%%
+dfO = pd.concat([df19, df17, df7, df77, df6])
 
 #%%
 #get rid of data that is not full yet
@@ -1057,7 +1125,7 @@ def maxDeltas(ns):
 import random
 rad = 0.05
 
-df = pd.DataFrame(columns = ["CentreX", "CentreY", "Radius", "MaxDelta", "PhaseOpening", "PhaseClosing"])
+# df = pd.DataFrame(columns = ["CentreX", "CentreY", "Radius", "MaxDelta", "PhaseOpening", "PhaseClosing"])
 i = len(df)
 for sqCentreX in np.linspace(0,1,101)[:-1]:
     for sqCentreY in np.linspace(0.0, sqCentreX, round((sqCentreX)/0.01 + 1)):
@@ -1119,13 +1187,13 @@ dfP =df[(df.Radius == rad)
         &(df.CentreX !=1)
         &(df.CentreY != 0)
         ]
-size=22
+size=12
 params = {
-            'legend.fontsize': size*0.8,
+            'legend.fontsize': size*0.7,
           'axes.labelsize': size,
           'axes.titlesize': size,
-          'xtick.labelsize': size*0.8,
-          'ytick.labelsize': size*0.8,
+          'xtick.labelsize': size*0.7,
+          'ytick.labelsize': size*0.7,
           'font.size': size,
           'font.family': 'STIXGeneral',
 #          'axes.titlepad': 25,
@@ -1146,13 +1214,12 @@ fig, ax = plt.subplots(figsize=(1.6*sz,sz))
 sc = ax.scatter(dfP.CentreX, dfP.CentreY, c=dfP.MaxDelta, s=1, cmap="jet", marker=".")
 ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1])
 ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
-ax.set_xlabel(r"$\frac{\mathrm{J}_a}{\mathrm{J}_c}$", fontsize=27)
-ax.set_ylabel(r"$\frac{\mathrm{J}_b}{\mathrm{J}_c}$", rotation = 0, labelpad=20, fontsize=27)
+ax.set_xlabel(r"$\frac{\mathrm{J}_a}{\mathrm{J}_c}$",  fontsize=14)
+ax.set_ylabel(r"$\frac{\mathrm{J}_b}{\mathrm{J}_c}$", rotation = 0, labelpad=10, fontsize=14)
 cbar = plt.colorbar(sc)
-cbar.ax.set_ylabel(r"$\Phi_{\mathrm{max\ gap}}$", rotation=0, labelpad=40)
-# ax.set_title("Circle Radius = "+str(rad))
-# plt.savefig(figLoc + 'PhaseOpenings.png', dpi=300, format="png", bbox_inches='tight')
-plt.savefig(figLoc + 'PhaseOpenings.pdf', format="pdf", bbox_inches='tight')
+cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
+ax.set_title("Circle Radius = "+str(rad))
+plt.savefig(figLoc + 'PhaseOpenings.png', dpi=300, format="png", bbox_inches='tight')
 plt.show()  
         
 fig, ax = plt.subplots(figsize=(1.6*sz,sz))
@@ -1161,13 +1228,12 @@ ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
 ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
 ax.set_yticks([-pi, -pi/2, 0,pi/2, pi])
 ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-ax.set_xlabel(r"$\Phi_{\mathrm{gap;\>open}}$")
-ax.set_ylabel(r"$\Phi_{\mathrm{gap;\>close}}$", rotation = 0, labelpad=30)
+ax.set_xlabel(r"$\phi_{\mathrm{open}}$")
+ax.set_ylabel(r"$\phi_{\mathrm{close}}$", rotation = 0, labelpad=10)
 cbar = plt.colorbar(sc)
-cbar.ax.set_ylabel(r"$\Phi_{\mathrm{max\ gap}}$", rotation=0, labelpad=40)
-# ax.set_title("Circle Radius = "+str(rad))
-plt.savefig(figLoc + 'PhaseOpeningSizesOnRelTriangle.pdf', format="pdf", bbox_inches='tight')
-# plt.savefig(figLoc + 'PhaseOpeningSizesOnRelTriangle.png', dpi=300, format="png",bbox_inches='tight')
+cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
+ax.set_title("Circle Radius = "+str(rad))
+plt.savefig(figLoc + 'PhaseOpeningSizesOnRelTriangle.png', dpi=300, format="png",bbox_inches='tight')
 plt.show()
 
 

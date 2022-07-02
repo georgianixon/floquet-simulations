@@ -5,7 +5,7 @@ Created on Wed Jul  7 09:45:45 2021
 @author: Georgia Nixon
 """
 
-place = "Georgia Nixon"
+place = "Georgia"
 
 from numpy.linalg import eig
 from numpy import  pi, log, exp, sin
@@ -38,9 +38,9 @@ def filter_duplicates(x):
             return np.nan
         
 
-sh = "/Users/"+place+"/Code/MBQD/floquet-simulations/"
-dfname = "data/analysis-G.csv"
-
+dataLoc = "/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
+dfname = "analysis-G-N6.csv"
+dfnameSave = "analysis-G-N6-v2.csv"
 
 # df = pd.DataFrame(columns=["form", "rtol","N", 
 #                            "a1", "a2", 
@@ -94,7 +94,7 @@ df_dtype_dict = {'form':str, "rtol":np.float64, 'N':int,
                     "epsilon": np.complex128,
                     "delta": np.complex128}
 
-df = pd.read_csv(sh+dfname, 
+df = pd.read_csv(dataLoc+dfname, 
                  index_col=False, 
                  converters={"square": ConvertComplex,
                             "chi": ConvertComplex,
@@ -121,11 +121,10 @@ form='SS-p'
 rtol = 1e-11
 a = 500
 # phis = [ pi/7, pi/6, pi/5, pi/4, pi/3, pi/2, 0]
-phis = [ pi/5, pi/4,  pi/3, pi/2, 0]
+phis = [0]
 phiOffset = 0
 omegaMultiplier = 0
 onsite = 0
-
 
 
 #def RGaugeMatrix(N, centre, a, omega, phi):
@@ -156,6 +155,7 @@ for phi in phis:
                                 "rho",
                                 "epsilon",
                                 "delta"])
+    
     for i, omega1 in enumerate(np.linspace(3.1, 20, int((20-3.1)*10+1), endpoint=True)):
         
         start = time.time()

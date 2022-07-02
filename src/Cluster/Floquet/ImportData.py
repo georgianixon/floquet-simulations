@@ -12,7 +12,7 @@ import numpy as np
 from numpy import pi, exp, sin, cos
 
 import pandas as pd
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib as mpl
 import seaborn as sns
 import sys

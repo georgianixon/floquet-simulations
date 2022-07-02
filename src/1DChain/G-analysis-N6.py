@@ -6,7 +6,7 @@ Created on Thu Jun 17 19:34:11 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -47,11 +47,10 @@ def filter_duplicates(x):
             return np.nan
 
 
-def Plot():    
+def Plot(size):    
     
     sns.set(style="darkgrid")
     sns.set(rc={'axes.facecolor':'0.96'})
-    size=23
     params = {
                 'legend.fontsize': size*0.9,
               'axes.labelsize': size,
@@ -91,12 +90,12 @@ def Plot():
                     'slategrey', newred]
     plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
     
-Plot()
+Plot(10)
 
 
 # sh = "/Users/" + place + "/Code/MBQD/floquet-simulations/"
-dataLoc = "/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
-dfname = "analysis-G-N6.csv"
+dataLoc = "/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/1D/"
+dfname = "analysis-G-N6-v2.csv"
 # dfname = "data/analysis-G.csv"
 
 
@@ -154,12 +153,12 @@ omegaMax = 20
 omegaMin = 4
 ymax = 0.5
 ymin = None
-# form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
+form = "SS-p"; hamiltonianString="$H(t)=H_0 + a \> \hat{n}_b \cos (\omega t + \phi_1) $"#; paramsString = r"$a=$"+str(a)
 # form = "StepFunc"; hamiltonianString="StepFunc"#; paramsString = r"$a=$"+str(a)
 # form = "DS-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b \cos (\omega_1 t + \phi_1)  + a \> \hat{n}_{b+1} \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 # form = "SSDF-p"; hamiltonianString = "$H(t)=H_0 + a \> \hat{n}_b [\cos (\omega_1 t + \phi_1)  +  \cos (\omega_2 t + \phi_2)]$"; paramsString = r"$a=$"+str(a)+", "+r"$\omega_1=\omega, \omega_2 = 2 \omega, \phi_1 = \phi_1, \phi_2 = \phi_1 + \pi/2$ "
 
-form = "SS-p-RemoveGauge"
+# form = "SS-p-RemoveGauge"
 
 termsDict = [ 
     # ("O-3", "G_{n-3, n-3}"),
@@ -283,7 +282,7 @@ N = 51;
 centre = 25
 
 rtol=1e-11
-aas = [35]#[35, 30, 25, 20, 15, 10, 5]
+aas = [30]#[35, 30, 25, 20, 15, 10, 5]
 # aas = [30]
 phis =  [0]
 # phis =  [0]
@@ -476,17 +475,15 @@ for look, matrixEl in termsDict:
     plt.show()                                                           
 
 #%%
-# for DAMOP poster
-
-      
-#For paper
+# originally for DAMOP poster
+# Now for paper
 
 N = 51; 
 centre = 25
 
 rtol=1e-11
 aas = [35]
-phi = 0
+
 apply = [np.abs]
 omegaMax = 20
 omegaMin = 4
@@ -501,12 +498,12 @@ termsDict = [
             ("N1-1","G_{b-1, b}"),
             ]
 
-
 look = termsDict[0][0]
 matrixEl = termsDict[0][1]
 
+phi = 0
 
-sz =4
+sz =3.2
 # sz = 20
 fig, ax = plt.subplots(figsize=(sz,0.6*sz),constrained_layout=True, sharey=True)
 
@@ -515,15 +512,15 @@ fig, ax = plt.subplots(figsize=(sz,0.6*sz),constrained_layout=True, sharey=True)
         
 for a in aas:
 
-
     df_plot = df[(df['form']==form)&
              (df['N']==N)&
               (df['a']==a)&
               (df['phi']==phi)&
-              (df["centre"]==centre)]
+              (df["centre"]==centre)&
+              (df["omega"]>=4)]
         # df_plot.loc[:,"x-axis"] = df_plot.loc[:,"a"]/df_plot.loc[:,"omega"]
         
-        
+    
     if not df_plot.empty:
         df_plot["x-axis"] = df_plot.apply(
             lambda row: row["a"]/row["omega"], axis=1)
@@ -540,21 +537,23 @@ for a in aas:
         #             label=r"$J' = -" +matrixEl+"$")
         ax.plot(df_plot["x-axis"], -np.real((df_plot[look].values)), 
                     # label=r"$J' = -" +matrixEl+"$"
-                    label = r"$J_{b-1, b}^{\mathrm{eff}}$"
+                    label = r"$J_{b-1, b}^{\mathrm{eff}}/ J$"
                     )
         # ax.set_ylabel()
-        ax.set_xlabel(r'$\sfrac{A}{\omega}$')
-        # ax.set_xlabel(r'$\omega$')
-    ax.plot(df_plot["x-axis"], jv(0, df_plot["x-axis"]), '--', 
-                    label=r"$\mathcal{J}_0 (A / \omega)$")
-    ax.set_ylabel(r"J'", rotation = 0, labelpad = 23)
+        
+ax.plot(df_plot["x-axis"], jv(0, df_plot["x-axis"]), '--', 
+                label=r"$\mathcal{J}_0 (A / \omega)$")
+    
+ax.set_xlabel(r'$\sfrac{A}{\omega}$')
+    # ax.set_xlabel(r'$\omega$')
+# ax.set_ylabel(r"$J'$", rotation = 0, labelpad = 17)
 
     
 handles_legend, labels_legend = ax.get_legend_handles_labels()    
 fig.legend(handles_legend, labels_legend, loc='upper right')
 plt.grid(True)
 ax.set_ylim([ymin, ymax])
-paper = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Paper/Figures/"
-# fig.savefig(posterLoc+'ElementG-SS-Tunnelling.pdf', format='pdf', bbox_inches='tight')
+paperLoc = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Writing/Local Modulations/"
+fig.savefig(paperLoc+'ElementG-SS-Tunnelling.pdf', format='pdf', bbox_inches='tight')
 # fig.savefig(posterLoc+'ElementG-SS-Tunnelling.png', format='png', bbox_inches='tight', dpi=300)
 plt.show()

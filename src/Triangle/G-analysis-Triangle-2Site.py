@@ -6,7 +6,7 @@ Created on Fri Dec  3 15:26:34 2021
 """
 
 
-place = "Georgia Nixon"
+place = "Georgia"
 import matplotlib.colors as col
 norm = col.Normalize(vmin=-1, vmax=1) 
 from numpy import  pi, log
@@ -23,7 +23,7 @@ from numpy import sin, cos, exp, pi
 import sys
 sys.path.append("/Users/" + place + "/Code/MBQD/floquet-simulations/src")
 from hamiltonians import  hoppingHF, ConvertComplex, PhiString, ConvertFraction
-dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
+dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/Triangle/"
 from fractions import Fraction
 
 def filter_duplicates(x):

@@ -6,7 +6,7 @@ Created on Sat Aug 22 14:01:15 2020
 """
 
 import matplotlib as mpl
-place="Georgia Nixon"
+place="Georgia"
 from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,14 +30,14 @@ posterLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Posters/
 
 
 def Plot():
-    size=22
+    size=10
     params = {
-                'legend.fontsize': size*0.8,
+                'legend.fontsize': size,
     #          'figure.figsize': (20,8),
               'axes.labelsize': size,
               'axes.titlesize': size,
-              'xtick.labelsize': size*0.8,
-              'ytick.labelsize': size*0.8,
+              'xtick.labelsize': size*0.9,
+              'ytick.labelsize': size*0.9,
               'font.size': size,
               'xtick.bottom':True,
               'xtick.top':False,
@@ -48,10 +48,13 @@ def Plot():
               'axes.edgecolor' :'white',
               'xtick.minor.visible': False,
               'axes.grid':False,
-              'font.family' : "sans-serif",#"Arial"#'STIXGeneral',
-              "font.sans-serif":"Arial",
-               'mathtext.fontset':"Arial"#'stix'
+              'font.family' : 'STIXGeneral',#"sans-serif",#"Arial"#
+              "font.sans-serif":"stix",#"Arial",
+               'mathtext.fontset':"stix"#"Arial"#'stix'
               }
+    
+    mpl.rcParams.update(params)
+
     
 
 Plot()
@@ -270,6 +273,8 @@ norm = mpl.colors.Normalize(vmin=-1, vmax=1)
 # norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 # 
 
+paperLoc= "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Writing/Local Modulations/"
+
 '''abs real imag'''
 Plot()
 cmap = "RdBu"#"PuOr"
@@ -289,11 +294,12 @@ ax.set_ylabel('n', rotation=0, labelpad=10)
 ax.set_ylabel('n', rotation=0, labelpad=14)
     
 # cax = plt.axes([0.97, 0.145, 0.08, 0.78]) #size = 6
-# cax = plt.axes([0.99, 0.13, 0.04, 0.8])
-cax = plt.axes([0.9, 0.265, 0.08, 0.59]) 
+# cax = plt.axes([0.95, 0.145, 0.045, 0.76]) # size=3
+cax = plt.axes([0.92, 0.22, 0.06, 0.645])
+# cax = plt.axes([0.9, 0.265, 0.08, 0.59]) 
 # fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
 fig.colorbar(pcm, cax=cax)
-fig.savefig(posterLoc+'G-SSH-Real.pdf', format='pdf', bbox_inches='tight')
+fig.savefig(paperLoc+'G-SSH-Real.pdf', format='pdf', bbox_inches='tight')
 plt.show()
 
 #%%
