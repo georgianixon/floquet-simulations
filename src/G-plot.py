@@ -6,7 +6,7 @@ Created on Sat Aug 22 14:01:15 2020
 """
 
 import matplotlib as mpl
-place="Georgia"
+place="Georgia Nixon"
 from numpy import exp, sin, cos, pi, log
 import numpy as np
 import matplotlib.pyplot as plt
@@ -70,6 +70,15 @@ Set form = ... and other parameters
 Plot the Real, Imag and Abs parts of the floquet Hamiltonian
 """
 
+
+# to try and get black hole
+# _, HF = CreateHFGeneral(3,
+#                          [0,1,2],
+#                          [Cosine]*3,
+#                          [[,10,0,0] for i in range(10)],
+#                          2*pi/10,
+#                          0
+#                          )
 # def GetPhiOffsetReal(phi1Real, phiTOffset, omegaMultiplier):
 #     if omegaMultiplier == 1.5:
 #         piEquivA = 1/4
@@ -91,7 +100,7 @@ def GetPhiOffset(time1, timeOffset, omega1, omega2):
     return phi1, phi2, totalT 
         
 # common params
-N=8;   rtol=1e-11
+# N=8;   rtol=1e-11
 
 # form="SS-p"
 # phi1 = pi/4
@@ -104,26 +113,27 @@ N=8;   rtol=1e-11
 # omegas = [omega1, omega2]
 
 
-form = "SSHModel"
-centre = np.nan
-a = [35, 15]
-omega1 = 10; omega = [omega1, 2*omega1 ]
-phi = [0, 0]
-onsite = [0,0]
-UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
+# form = "SSHModel"
+# centre = np.nan
+# a = [35, 15]
+# omega1 = 10; omega = [omega1, 2*omega1 ]
+# phi = [0, 0]
+# onsite = [0,0]
+# UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
 #triangle
-# centres= [1,2]
-# funcs = [Cosine, Cosine]
-# a1 = 25; a2 = 53;
-# omega0 = 6
-# T = 2*pi/omega0
-# alpha = 1; beta = 2
-# omega1 = alpha*omega0; omega2 = beta*omega0
-# phi1 = 0; phi2 = pi/3
-# onsite = 0
-# paramss = [[a1, omega1, phi1, onsite], [a2, omega2, phi2, onsite]]
-# circleBoundary = 1
+N = 3
+centres= [1,2]
+funcs = [Cosine, Cosine]
+a1 = 15; a2 = 15;
+omega0 = 10
+T = 2*pi/omega0
+alpha = 1; beta = 2
+omega1 = alpha*omega0; omega2 = beta*omega0
+phi1 = 0; phi2 = 2*pi/3
+onsite = 0
+paramss = [[a1, omega1, phi1, onsite], [a2, omega2, phi2, onsite]]
+circleBoundary = 1
 
 
 # a = 35
@@ -145,11 +155,11 @@ UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 # _, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 
 
-# _, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
+_, HF = CreateHFGeneral(N, centres, funcs, paramss, T, circleBoundary)
+# 
 
-
-# for site in range(N):
-#     HF = RemoveWannierGauge(HF, site, N)
+for site in range(N):
+    HF = RemoveWannierGauge(HF, site, N)
 
 
 
@@ -173,11 +183,124 @@ UT, HF = CreateHF(form, rtol, N, centre, a, omega, phi, onsite)
 # ax.set_xlim([-0.3, 1.4])
 # plt.show()
 
+#%%
+
+a = 10
+omega0 = 10
+alpha = 1
+beta = 3
+phi2_frac = 0.8
+
+tshift_frac = 0.1
+phi3_frac = beta*(tshift_frac + phi2_frac/alpha)
+phi3rel_frac = phi3_frac - phi2_frac
+
+tshiftfrac1 = phi3rel_frac/beta + phi2_frac/beta  - phi2_frac/alpha
+print(tshift_frac, tshiftfrac1)
+
+t = np.linspace(0,2*pi/omega0,100)
+two = 10*cos(alpha*omega0*t + phi2_frac*pi)
+three = a*cos(beta*omega0*t + phi2_frac*pi + phi3rel_frac*pi)
+
+plt.plot(t, two, label="two")
+plt.plot(t, three, label="three")
+plt.legend()
+plt.show()
+
+
 
 #%%
 
+# def RampHalf(params, t): # ramp
+#     a = params[0]
+#     omega = params[1]
+#     phi = params[2]
+#     onsite = params[3]
+    
+#     nHalfCycle = np.floor(t*omega/pi + phi/pi)
+#     y = (a*omega*t/pi + a*phi/pi - nHalfCycle*a)*((nHalfCycle + 1 ) % 2) + onsite
+#     return y
+
+# def RampGen(params, t): # ramp
+#     a = params[0]
+#     omega = params[1]
+#     phi = params[2]
+#     theta = params[4] 
+#     onsite = params[3]
+    
+#     nCycles = np.floor(t*omega/2/pi)
+#     tCycle = t - nCycles*2*pi/omega
+#     multiplier = 1
+#     if tCycle < phi/omega:
+#         multiplier = 0
+#     elif tCycle > (phi + theta)/omega:
+#         multiplier = 0
+    
+
+#     subtract_height = 2*a*(pi)/theta*nCycles
+#     y = (a*omega*t/theta - a*phi/theta - subtract_height)*multiplier + onsite
+#     return y
+
+
+def RampGen(params, t): # ramp
+    a = params[0]
+    omega = params[1]
+    phi = params[2]
+    theta = params[4] 
+    onsite = params[3]
+
+    
+    nCycles = np.floor(t*omega/2/pi)
+    tCycle = t - nCycles*2*pi/omega
+    
+    multiplier_pre_phi = (np.sign(tCycle - phi/omega)%3)%2
+    multiplier_post_theta =  (np.sign(-tCycle + phi/omega + theta/omega)%3)%2
+
+    subtract_height = 2*a*(pi)/theta*nCycles
+    y = (a*omega*t/theta - a*phi/theta - subtract_height)*multiplier_pre_phi*multiplier_post_theta + onsite
+    return y
+
+a = 10; omega = 2*pi; phi = 0; onsite = 0; theta = pi
+
+t = np.linspace(0,2*pi/omega,1000)
+y = RampGen([a, omega, phi, onsite, theta],t) 
+
+plt.plot(t,y,'.')
+#%%
+
+# _, HF = CreateHFGeneral(10,
+#                          [0,1,2,3,4,5,6,7,8,9],
+#                          [Cosine]*10,
+#                          [[15,10,0,i/2] for i in range(10)],
+#                          2*pi/10,
+#                          0
+                         # )
+
+a = 0
+omega = 8
+onsite = 0
+N = 12
+
+# _, HF = CreateHFGeneral(N,
+#                          [int(i) for i in np.linspace(0,N -1, N)],
+#                          [Cosine]*N,
+#                          [[10,omega,0+i*pi/8,onsite] for i in range(1,N+1)],
+#                          2*pi/omega,
+#                          0
+#                          )
+
+# for i in range(N):
+#     HF[i][i] = 0
+    
+    
+absMax = np.max([np.abs(np.min(np.real(HF))),
+                np.abs(np.max(np.real(HF))),
+                np.abs(np.min(np.imag(HF))),
+                np.abs(np.max(np.imag(HF)))])
+
 latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
 norm = mpl.colors.Normalize(vmin=-1, vmax=1)
+norm = mpl.colors.Normalize(vmin=-absMax, vmax=absMax)
 # linthresh = 1e-1
 # norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
 # 
@@ -218,6 +341,7 @@ plt.show()
 
 
 
+print(np.angle(HF[2,0])/pi)
 
 #%%
 

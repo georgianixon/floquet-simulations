@@ -12,7 +12,7 @@ import numpy as np
 from numpy import pi, exp, sin, cos
 
 import pandas as pd
-place = "Georgia"
+place = "Georgia Nixon"
 import matplotlib as mpl
 import seaborn as sns
 import sys
@@ -20,116 +20,14 @@ sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 from hamiltonians import CreateHFGeneral
 from hamiltonians import Cosine, ConvertComplex
 from hamiltonians import ListRatiosInLowerTriangle
-
-# dataLoc = "/Users/"+place+"/Code/MBQD/floquet-simulations/src/Cluster/Floquet/Data/"
-dataLoc = "E:/Set7/"
+import time
+# dataLoc = "/Users/"+place+"/Code/MBQD/floquet-simulations/src/Cluster/Floquet/Data/hpc-work/"
+# dataLoc = "E:/Set10-alpha=1,beta=2,rel3phase/"
+dataLoc = "E:/Set4-alpha=1,beta=3,A3e{0,5}/"
+# dataLoc = "E:/Set4-alpha=1,beta=3,A3e{6,17}/"
 # dataLoc = "/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/Triangle/Cluster/"
 # sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
-
-def GetNewColumns(dfO):
-    dfO["FT-J12-ABS"] = np.abs(dfO["FT-J12"])
-    dfO["FT-J23-ABS"] = np.abs(dfO["FT-J23"])
-    dfO["FT-J31-ABS"] = np.abs(dfO["FT-J31"])
-    
-    #negative to account for the fact that matrix element is negative
-    # dfO["FT-J12-PHA"] = np.angle(-dfO["FT-J12"])
-    # dfO["FT-J23-PHA"] = np.angle(-dfO["FT-J23"])
-    dfO["FT-Plaq-PHA"] = np.angle(-dfO["FT-J31"])
-    
-    
-    dfO["HE-J12-ABS"] = np.abs(dfO["HE-J12"])
-    dfO["HE-J23-ABS"] = np.abs(dfO["HE-J23"])
-    dfO["HE-J31-ABS"] = np.abs(dfO["HE-J31"])
-    
-    #negative to account for the fact that matrix element is negative
-    # dfO["HE-J12-PHA"] = np.angle(-dfO["HE-J12"])
-    # dfO["HE-J23-PHA"] = np.angle(-dfO["HE-J23"])
-    dfO["HE-Plaq-PHA"] = np.angle(-dfO["HE-J31"])
-    
-    
-    dfO["FT-J12/J23-ABS"] = dfO["FT-J12-ABS"] / dfO["FT-J23-ABS"]
-    dfO["FT-J31/J23-ABS"] = dfO["FT-J31-ABS"] / dfO["FT-J23-ABS"]
-    dfO["FT-J31/J12-ABS"] = dfO["FT-J31-ABS"] / dfO["FT-J12-ABS"]
-    dfO["FT-J23/J12-ABS"] = dfO["FT-J23-ABS"] / dfO["FT-J12-ABS"]
-    dfO["FT-J23/J31-ABS"] = dfO["FT-J23-ABS"] / dfO["FT-J31-ABS"]
-    dfO["FT-J12/J31-ABS"] = dfO["FT-J12-ABS"] / dfO["FT-J31-ABS"]
-    
-    
-    dfO["HE-J12/J23-ABS"] = dfO["HE-J12-ABS"] / dfO["HE-J23-ABS"]
-    dfO["HE-J31/J23-ABS"] = dfO["HE-J31-ABS"] / dfO["HE-J23-ABS"]
-    dfO["HE-J31/J12-ABS"] = dfO["HE-J31-ABS"] / dfO["HE-J12-ABS"]
-    dfO["HE-J23/J12-ABS"] = dfO["HE-J23-ABS"] / dfO["HE-J12-ABS"]
-    dfO["HE-J23/J31-ABS"] = dfO["HE-J23-ABS"] / dfO["HE-J31-ABS"]
-    dfO["HE-J12/J31-ABS"] = dfO["HE-J12-ABS"] / dfO["HE-J31-ABS"]
-    
-    
-    # """
-    # get point on lower triangle
-    # """
-    
-    lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTriangle(dfO["FT-J12/J23-ABS"].to_numpy(),
-                                                                                           dfO["FT-J31/J23-ABS"].to_numpy(), 
-                                                                                           dfO["FT-J23/J12-ABS"].to_numpy(), 
-                                                                                           dfO["FT-J31/J12-ABS"].to_numpy(),
-                                                                                           dfO["FT-J23/J31-ABS"].to_numpy(),
-                                                                                           dfO["FT-J12/J31-ABS"].to_numpy())
-    dfO["FT-LowerT.X"] = lowerTriListA
-    dfO["FT-LowerT.Y"] = lowerTriListB
-    # dfO["FT-UpperT.X"] = upperTriListX
-    # dfO["FT-UpperT.Y"] = upperTriListY
-    
-    lowerTriListA, lowerTriListB, upperTriListX, upperTriListY = ListRatiosInLowerTriangle(dfO["HE-J12/J23-ABS"].to_numpy(),
-                                                                                           dfO["HE-J31/J23-ABS"].to_numpy(), 
-                                                                                           dfO["HE-J23/J12-ABS"].to_numpy(), 
-                                                                                           dfO["HE-J31/J12-ABS"].to_numpy(),
-                                                                                           dfO["HE-J23/J31-ABS"].to_numpy(),
-                                                                                           dfO["HE-J12/J31-ABS"].to_numpy())
-    dfO["HE-LowerT.X"] = lowerTriListA
-    dfO["HE-LowerT.Y"] = lowerTriListB
-    # dfO["HE-UpperT.X"] = upperTriListX
-    # dfO["HE-UpperT.Y"] = upperTriListY
-    
-    
-    dfO = dfO.drop(columns=["HE-J12/J23-ABS","HE-J31/J23-ABS","HE-J12/J31-ABS","HE-J23/J31-ABS",
-                            "HE-J23/J12-ABS","HE-J31/J12-ABS"])
-    dfO = dfO.drop(columns=["FT-J12/J23-ABS","FT-J31/J23-ABS","FT-J12/J31-ABS","FT-J23/J31-ABS",
-                            "FT-J23/J12-ABS","FT-J31/J12-ABS"])
-    # "FT-J12-ABS","FT-J23-ABS","FT-J31-ABS","HE-J12-ABS","HE-J23-ABS","HE-J31-ABS",
-    # dfO = dfO.drop(columns=["FT-J12-PHA","FT-J23-PHA",
-                            # "HE-J12-PHA","HE-J23-PHA"])
-    # dfO=dfO.drop(columns=["FT-UpperT.X", "FT-UpperT.Y", "HE-UpperT.X", "HE-UpperT.Y"])
-    return dfO
-
-
-bigData = pd.DataFrame({'A2': [], 
-                        'A3': [], 
-                        'omega0': [], 
-                        'alpha': [], 
-                        'beta': [],
-                        'phi3/pi': [],                
-                        "FT-J12": [],
-                        "FT-J23": [],
-                        "FT-J31": [],
-                        "HE-J12": [],
-                        "HE-J23": [],
-                        "HE-J31": [],
-                        "HE-O1": [],
-                        "HE-O2": [],
-                        "HE-O3":[],
-                        "FT-J12-ABS":[],
-                        "FT-J23-ABS":[],
-                        "FT-J31-ABS":[],
-                        "FT-Plaq-PHA":[],
-                        "HE-J12-ABS":[],
-                        "HE-J23-ABS":[],
-                        "HE-J31-ABS":[],
-                        "HE-Plaq-PHA":[],
-                        "FT-LowerT.X":[],
-                        "FT-LowerT.Y":[],
-                        "HE-LowerT.X":[],
-                        "HE-LowerT.Y":[]
-                        })
-
+#%%
 
 
 alpha = 1
@@ -140,27 +38,36 @@ dfs_no_raw = []
 
 # folders = [ "Set5"]
 # for f in folders:
-for A2 in np.linspace(0,30,31):
+for A2 in np.linspace(26,30,5):
     
     for A3 in np.linspace(0,30,31):
         # print(str(int(A2)), str(int(A3)))
+        
         fileName = "TriangleRatios,alpha="+str(int(alpha))+",beta="+str(int(beta))+",A2="+str(int(A2))+",A3="+str(int(A3))+".csv"
-        # print(fileName)
+        # fileName = "TriangleRatios,alpha=1,beta=2,A2=0,A3=0.csv"# print(fileName)
         try:
             dfi = pd.read_csv(dataLoc+fileName,
-                          index_col=False, 
-                            converters={"FT-J12": ConvertComplex,
-                                      "FT-J23": ConvertComplex,
-                                      "FT-J31": ConvertComplex,
-                                      "HE-J12": ConvertComplex,
-                                      "HE-J23": ConvertComplex,
-                                      "HE-J31": ConvertComplex,
-                                      "HE-O1": ConvertComplex,
-                                      "HE-O2": ConvertComplex,
-                                      "HE-O3": ConvertComplex
-                                        }
-                          )
-            dfi = GetNewColumns(dfi)
+                          index_col=False,
+                          dtype = {'A2': np.float64,
+                              'A3': np.float64,
+                              'omega0': np.float64,
+                              "alpha":np.uint32,
+                              "beta":np.uint32,
+                              "phi2/pi":np.float64,
+                              "phi3rel/pi":np.float64,
+			      "FT-J12-ABS":np.float64,
+			      "FT-J23-ABS":np.float64,
+			      "FT-J31-ABS":np.float64,
+			      "FT-Plaq-PHA":np.float64,
+			      "HE-J12-ABS":np.float64,
+			      "HE-J23-ABS":np.float64,
+			      "HE-J31-ABS":np.float64,
+			      "HE-Plaq-PHA":np.float64,
+			      "FT-LowerT.X":np.float64,
+			      "FT-LowerT.Y":np.float64,
+			      "HE-LowerT.X":np.float64,
+			      "HE-LowerT.Y":np.float64
+                              } )
             print(A2, A3)
             dfi_noraw = dfi.drop(columns=["FT-J12","FT-J23","FT-J31","HE-J12","HE-J23","HE-J31","HE-O1", "HE-O2","HE-O3"])
             dfi_noraw = dfi_noraw.astype({'A2': np.float64,
@@ -168,16 +75,8 @@ for A2 in np.linspace(0,30,31):
                               'omega0': np.float64,
                               "alpha":np.uint32,
                               "beta":np.uint32,
-                              "phi3/pi":np.float64,
-                              # "FT-J12":np.complex128,
-                              # "FT-J23":np.complex128,
-                              # "FT-J31":np.complex128,
-                              # "HE-J12":np.complex128,
-                              # "HE-J23":np.complex128,
-                              # "HE-J31":np.complex128,
-                              # "HE-O1":np.complex128,
-                              # "HE-O2":np.complex128,
-                              # "HE-O3":np.complex128,
+                              "phi2/pi":np.float64,
+                              "phi3rel/pi":np.float64,
 			      "FT-J12-ABS":np.float64,
 			      "FT-J23-ABS":np.float64,
 			      "FT-J31-ABS":np.float64,
@@ -198,34 +97,117 @@ for A2 in np.linspace(0,30,31):
             p = 0
             print("Oh no ", A2, A3)
             
+
+
 bigData = pd.concat(dfs_no_raw, ignore_index=True)
-   
-# bigData = pd.concat(dfs_no_raw[:100], ignore_index=True)   
-# bigData2 = pd.concat(dfs_no_raw[10:20], ignore_index=True)   
-# bigData3 = pd.concat(dfs_no_raw[20:30], ignore_index=True)  
-# bigData1 = bigData[bigData.A3<12]
-    
 
-# bigData.to_csv(dataLoc +  "Set7SummaryPartial.csv",
-#                   index=False, 
-#                    columns=['A2', 'A3', 'omega0', 'alpha', 'beta', 'phi3/pi', 
-#                             # 'FT-J12', 'FT-J23',
-#        # 'FT-J31', 'HE-J12', 'HE-J23', 'HE-J31',
-#        'HE-O1', 'HE-O2', 'HE-O3',
-#        'FT-J12-ABS', 'FT-J23-ABS', 'FT-J31-ABS', 'FT-J31-PHA', 'HE-J12-ABS',
-#        'HE-J23-ABS', 'HE-J31-ABS', 'HE-J31-PHA', 'FT-LowerT.X', 'FT-LowerT.Y',
-#        'HE-LowerT.X', 'HE-LowerT.Y']
-#                   )
+#FInd rows with nans
+nanRows = np.where(np.isnan(ConvertComplex(bigData["FT-J12-ABS"])))[0]
+#drop nan locs
+print("num of nans:", len(nanRows))
+bigData = bigData.drop(nanRows)
+
+st = time.time()    
+
+bigData.to_csv(dataLoc +  "bigData3.csv",
+                  index=False, 
+                  )
+et = time.time()
+print("   save took", np.round(et - st, 1), "s")
 
 
-# bigData.to_csv(dataLoc + "Set7Summary1.csv",
-#                   index=False, 
-#                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
-#                   )
+#%%
+#import
+st = time.time()    
+
+df1 = pd.read_csv(dataLoc+"Set4Phases.csv", index_col=False)
+# df1 = pd.read_csv(dataLoc+"Set4Summary.csv", index_col=False)
+# df2 = pd.read_csv(dataLoc+"bigData2.csv", index_col=False)
+# df3 = pd.read_csv(dataLoc+"bigData3.csv", index_col=False)
+
+et = time.time()
+
+print("   import took", np.round(et - st, 1), "s")
+
+#%%
+# omegas = 1601
+# A2s = 31
+# A3s = 6
+# phi3/pi = 41
+
+
+#%%
+bigData = pd.concat([df1,df2,df3], ignore_index=True)
+
+st = time.time()    
+
+df1.to_csv(dataLoc + "Test.csv", index=False)
+et = time.time()
+print("   save took", np.round(et - st, 1), "s")
+
 #%%
 
+df1 = df1.rename(columns={"FT-J31-PHA": "FT-Plaq-PHA", "HE-J31-PHA": "HE-Plaq-PHA"})
+
+df1 = df1.astype({'A2': np.float64,
+                              'A3': np.float64,
+                              'omega0': np.float64,
+                              "alpha":np.uint8,
+                              "beta":np.uint8,
+                              "phi3/pi":np.float64,
+                              # "phi3rel/pi":np.float64,
+			      "FT-J12-ABS":np.float64,
+			      "FT-J23-ABS":np.float64,
+			      "FT-J31-ABS":np.float64,
+			      "FT-Plaq-PHA":np.float64,
+			      "HE-J12-ABS":np.float64,
+			      "HE-J23-ABS":np.float64,
+			      "HE-J31-ABS":np.float64,
+			      "HE-Plaq-PHA":np.float64,
+			      "FT-LowerT.X":np.float64,
+			      "FT-LowerT.Y":np.float64,
+			      "HE-LowerT.X":np.float64,
+			      "HE-LowerT.Y":np.float64
+                              })
+
+#%%
+# save phases data only
+dfPha = df1.drop(columns=[ 'FT-J12-ABS',
+       'FT-J23-ABS', 'FT-J31-ABS', 'HE-J12-ABS', 'HE-J23-ABS',
+       'HE-J31-ABS',  'FT-LowerT.X', 'FT-LowerT.Y',
+       'HE-LowerT.X', 'HE-LowerT.Y'] )
+
+st = time.time()    
+dfPha.to_csv(dataLoc + "Phases.csv", index=False)
+et = time.time()
+print("   save took", np.round(et - st, 1), "s")
+
+#%%
+# save lower triangle data only
+dfLowerT = df1.drop(columns=['FT-J12-ABS',
+       'FT-J23-ABS', 'FT-J31-ABS', 'FT-Plaq-PHA', 'HE-J12-ABS', 'HE-J23-ABS',
+       'HE-J31-ABS', 'HE-Plaq-PHA' ] )
+st = time.time()    
+dfLowerT.to_csv(dataLoc + "LowerTriangle.csv", index=False)
+et = time.time()
+print("   save took", np.round(et - st, 1), "s")
 
 
+#%%
+# save HT data only
+dfHE = df1.drop(columns=['FT-J12-ABS',
+       'FT-J23-ABS', 'FT-J31-ABS', 'FT-Plaq-PHA', 'FT-LowerT.X', 'FT-LowerT.Y' ] )
+st = time.time()    
+dfHE.to_csv(dataLoc + "Set4HE.csv", index=False)
+et = time.time()
+print("   save took", np.round(et - st, 1), "s")
 
-import platform
-platform.architecture()
+
+#%%
+# save HT data only
+dfFT = df1.drop(columns=['HE-J12-ABS',
+       'HE-J23-ABS', 'HE-J31-ABS', 'HE-Plaq-PHA', 'HE-LowerT.X', 'HE-LowerT.Y' ] )
+st = time.time()    
+dfFT.to_csv(dataLoc + "Set4FT.csv", index=False)
+et = time.time()
+print("   save took", np.round(et - st, 1), "s")
