@@ -26,7 +26,6 @@ from hamiltonians import Cosine, ConvertComplex
 # latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/Analytics/"
 
 
-dataLoc =  "E://"
 
 def Plot():
         
@@ -75,8 +74,8 @@ def Plot():
     plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
 Plot()
-bigData = pd.read_csv(dataLoc+"bigData2.csv",
-                          index_col=False)
+# bigData = pd.read_csv(dataLoc+"bigData2.csv",
+#                           index_col=False)
 #%%
 #order by time shift
 
@@ -1005,9 +1004,10 @@ plt.show()
 # dfN = dfO[(dfO["alpha"]==1)&(dfO["beta"]==2)&(dfO["omega"])]
 
 
-saveFig = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs/"
+saveFig = ("C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs"+
+           "/ShakingTriangle/Relative Hopping Triangle/V2/alpha=1,beta=2,omega0=10,NonAccum/")
 # for A2 in np.linspace(0,30,31):
-alpha = 1; beta = 2; omega0=5; phi3=0
+alpha = 1; beta = 2; omega0=10; phi3=0
 for A3 in np.linspace(0,30,31):
     A3 = np.round(A3, 1)
     
@@ -1034,14 +1034,18 @@ for A3 in np.linspace(0,30,31):
     ax.set_xlim([0,1])
     ax.set_ylim([0,1])
     cbar = plt.colorbar(sc)
-    title = (r"$\alpha="+str(alpha)+r", \beta="+str(beta)+
-              r", \omega_0="+str(omega0)+
+    title = (r"First Term, $\alpha="+str(alpha)+r", \beta="+str(beta)+
+              r", \omega_0="+str(omega0)
+               + r", \phi_3 \in \{0, 2 \pi\} "
+               +
               # r", \phi_3="+str(phi3)+r"\pi"
              r", A_3="+str(A3)
+             
+            
              +r"$")
     plt.suptitle(title)
     cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
-    # plt.savefig(saveFig+"alpha=1,beta=2,omega0=10,More,Accumulate/"+"Frame"+str(A2)+".png", format='png', bbox_inches='tight')
+    plt.savefig(saveFig+"Frame"+str(A3)+".png", format='png', bbox_inches='tight')
     plt.show()
 
 
@@ -1052,10 +1056,11 @@ for A3 in np.linspace(0,30,31):
 Plot showing values in lower triangle accumulative - First Term
 """
 
-saveFig = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs2/"
+saveFig = ("C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs"+
+           "/ShakingTriangle/Relative Hopping Triangle/V2/alpha=1,beta=2,omega0=10,Accum/")
 
 
-alpha = 1; beta = 2; omega0=5; phi=0
+alpha = 1; beta = 2; omega0=10; phi=0
 # omegaMax= 20; omegaMin = 0;
 
 # A2 = 19
@@ -1094,14 +1099,15 @@ for i, A3max in enumerate(np.linspace(0,30,31)):#np.linspace(0,30,301)):
     ax.set_xlim([0,1])
     ax.set_ylim([0,1])
     cbar = plt.colorbar(sc)
-    title = (r"$\alpha="+str(alpha)+r", \beta="+str(beta)+
+    title = (r"First Term, $\alpha="+str(alpha)+r", \beta="+str(beta)+
               r", \omega_0="+str(omega0)+
               # r", \phi_3="+str(phi3)+r"\pi"
              r", A_3="+str(A3max)
+             + r", \phi_3 \in {0, 2 \pi} "
              +r"$")
     plt.suptitle(title)
     cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
-    # plt.savefig(saveFig+"alpha=1,beta=2,omega0=10,More,AccumulateR/"+"Frame"+str(A2max)+".png", format='png', bbox_inches='tight')
+    plt.savefig(saveFig+"Frame"+str(A3max)+".png", format='png', bbox_inches='tight')
     plt.show()
 
 #%%
@@ -1122,6 +1128,7 @@ See what sort of phases we can get in that square
 #     delta = max(pairs)
 #     return delta
 
+dataSave = "E:/Set8-alpha=1,beta=2/"
 
 def maxDeltas(ns):
     '''Each of the maximally differing successive pairs
@@ -1135,71 +1142,10 @@ def maxDeltas(ns):
  
     return delta
 
+calc_type = "FT"
 import random
 rad = 0.05
 
-# df = pd.DataFrame(columns = ["CentreX", "CentreY", "Radius", "MaxDelta", "PhaseOpening", "PhaseClosing"])
-i = len(df)
-for sqCentreX in np.linspace(0,1,101)[:-1]:
-    for sqCentreY in np.linspace(0.0, sqCentreX, round((sqCentreX)/0.01 + 1)):
-
-        
-        sqCentreX = np.round(sqCentreX, 3)
-        sqCentreY = np.round(sqCentreY, 3)
-        
-        # sqCentreX = 0.94
-        # sqCentreY = 0.94
-        # rad = 0.01
-        print(sqCentreX, sqCentreY)
-        
-        dfP = dfO[((dfO["HE-LowerT.X"] - sqCentreX)**2 + (dfO["HE-LowerT.Y"] - sqCentreY)**2 <= rad**2)]
-        
-        # dfP = dfO[(dfO["HE-LowerT.X"] < sqCentreX+rad)&
-        #           (dfO["HE-LowerT.X"] > sqCentreX-rad)&
-        #           (dfO["HE-LowerT.Y"] < sqCentreY+rad)&
-        #           (dfO["HE-LowerT.Y"] > sqCentreY-rad)
-        #           ]
-        
-        phases = dfP["HE-J31-PHA"].to_numpy()
-        
-        # colour = dfP.A2.to_numpy()
-        # yaxis = dfP["phi3/pi"].to_numpy()
-        # title = (r"$\alpha=1$, $\beta=2$, centre$=("+"{0:.4g}".format(sqCentreX)+r","+"{0:4g}".format(sqCentreY)+r")$, rad$="+"{0:.4g}".format(rad)+r"$")
-        # fig, ax = plt.subplots(figsize=(5,3))
-        # sc = ax.scatter( phases,yaxis, s=1, c=colour, cmap="jet", marker=".")
-        # ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
-        # ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-        # ax.set_xlabel(r"effective $\phi$")
-        # cbar = plt.colorbar(sc)
-        # cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
-        # ax.set_title(title)
-        # ax.set_ylabel(r"$\frac{\theta_3}{\pi} $", rotation=0, labelpad = 12)
-        # plt.show()
-        
-        
-        # fig, ax = plt.subplots(figsize=(5,3))
-        # sc = ax.scatter( phases,[0]*len(phases), s=1, c=colour, cmap="jet", marker=".")
-        # ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
-        # ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-        # ax.set_xlabel(r"effective $\phi$")
-        # ax.set_yticks([0])
-        # cbar = plt.colorbar(sc)
-        # cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
-        # ax.set_title(title)
-        # plt.show()
-
-        phases = np.sort(phases)
-        maxDelta = maxDeltas(phases)
-        df.loc[i] = [sqCentreX, sqCentreY, rad, maxDelta[0], maxDelta[1][0], maxDelta[1][1]]
-        i +=1
-        
-
-#%%
-rad = 0.05
-dfP =df[(df.Radius == rad)
-        &(df.CentreX !=1)
-        &(df.CentreY != 0)
-        ]
 size=12
 params = {
             'legend.fontsize': size*0.7,
@@ -1219,55 +1165,113 @@ params = {
           # 'grid.color': "0.9"
           "text.usetex": True
           }
+# mpl.rcParams.update(params)
+
+    
+for begin in [7,8,9,10]:
+
+    dfO = dfO[dfO.omega0 >=begin]
+    
+
+    
+    df = pd.DataFrame(columns = ["CentreX", "CentreY", "Radius", "MaxDelta", "PhaseOpening", "PhaseClosing"])
+    i = len(df)
+    for sqCentreX in np.linspace(0,1,101)[:-1]:
+        for sqCentreY in np.linspace(0.0, sqCentreX, round((sqCentreX)/0.01 + 1)):
+    
+            
+            sqCentreX = np.round(sqCentreX, 3)
+            sqCentreY = np.round(sqCentreY, 3)
+            
+            # sqCentreX = 0.94
+            # sqCentreY = 0.94
+            # rad = 0.01
+            print(sqCentreX, sqCentreY)
+            
+            dfP = dfO[((dfO[calc_type+"-LowerT.X"] - sqCentreX)**2 + (dfO[calc_type+"-LowerT.Y"] - sqCentreY)**2 <= rad**2)]
+            
+            # dfP = dfO[(dfO["HE-LowerT.X"] < sqCentreX+rad)&
+            #           (dfO["HE-LowerT.X"] > sqCentreX-rad)&
+            #           (dfO["HE-LowerT.Y"] < sqCentreY+rad)&
+            #           (dfO["HE-LowerT.Y"] > sqCentreY-rad)
+            #           ]
+            
+            phases = dfP[calc_type+"-Plaq-PHA"].to_numpy()
+            
+            # colour = dfP.A2.to_numpy()
+            # yaxis = dfP["phi3/pi"].to_numpy()
+            # title = (r"$\alpha=1$, $\beta=2$, centre$=("+"{0:.4g}".format(sqCentreX)+r","+"{0:4g}".format(sqCentreY)+r")$, rad$="+"{0:.4g}".format(rad)+r"$")
+            # fig, ax = plt.subplots(figsize=(5,3))
+            # sc = ax.scatter( phases,yaxis, s=1, c=colour, cmap="jet", marker=".")
+            # ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
+            # ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+            # ax.set_xlabel(r"effective $\phi$")
+            # cbar = plt.colorbar(sc)
+            # cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+            # ax.set_title(title)
+            # ax.set_ylabel(r"$\frac{\theta_3}{\pi} $", rotation=0, labelpad = 12)
+            # plt.show()
+            
+            
+            # fig, ax = plt.subplots(figsize=(5,3))
+            # sc = ax.scatter( phases,[0]*len(phases), s=1, c=colour, cmap="jet", marker=".")
+            # ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
+            # ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+            # ax.set_xlabel(r"effective $\phi$")
+            # ax.set_yticks([0])
+            # cbar = plt.colorbar(sc)
+            # cbar.ax.set_ylabel(r"$A_2$", rotation=0, labelpad=10)
+            # ax.set_title(title)
+            # plt.show()
+    
+            phases = np.sort(phases)
+            maxDelta = maxDeltas(phases)
+            df.loc[i] = [sqCentreX, sqCentreY, rad, maxDelta[0], maxDelta[1][0], maxDelta[1][1]]
+            i +=1
+    
+    st = time.time()    
+    df.to_csv(dataLoc + "PhasesPlot,omega0g"+str(begin)+".csv", index=False)
+    et = time.time()
+    print("   save took", np.round(et - st, 1), "s")
+
+        
+    
+    rad = 0.05
+    dfP =df[(df.Radius == rad)
+            &(df.CentreX !=1)
+            &(df.CentreY != 0)
+            ]
+
+    
+    sz = 3
+    fig, ax = plt.subplots(figsize=(1.6*sz,sz))
+    sc = ax.scatter(dfP.CentreX, dfP.CentreY, c=dfP.MaxDelta, s=1, cmap="jet", marker=".")
+    ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
+    ax.set_xlabel(r"$\frac{\mathrm{J}_a}{\mathrm{J}_c}$",  fontsize=14)
+    ax.set_ylabel(r"$\frac{\mathrm{J}_b}{\mathrm{J}_c}$", rotation = 0, labelpad=10, fontsize=14)
+    cbar = plt.colorbar(sc)
+    cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
+    ax.set_title(r"Circle Radius = "+str(rad)+r", $\omega_0 \geq"+str(begin)+r"$")
+    plt.savefig(dataLoc + 'PhaseOpenings,omega0g'+str(begin)+'.png', dpi=300, format="png", bbox_inches='tight')
+    plt.show()  
+            
+    fig, ax = plt.subplots(figsize=(1.6*sz,sz))
+    sc = ax.scatter(dfP.PhaseOpening, dfP.PhaseClosing, c=dfP.MaxDelta, s=1, cmap="jet", marker=".")
+    ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
+    ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+    ax.set_yticks([-pi, -pi/2, 0,pi/2, pi])
+    ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
+    ax.set_xlabel(r"$\phi_{\mathrm{open}}$")
+    ax.set_ylabel(r"$\phi_{\mathrm{close}}$", rotation = 0, labelpad=10)
+    cbar = plt.colorbar(sc)
+    cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
+    ax.set_title(r"Circle Radius = "+str(rad)+r", $\omega_0 \geq"+str(begin)+r"$")
+    plt.savefig(dataLoc + 'PhaseOpeningSizesOnRelTriangle,omega0g'+str(begin)+'.png', dpi=300, format="png",bbox_inches='tight')
+    plt.show()
 
 
-mpl.rcParams.update(params)
-sz = 3
-fig, ax = plt.subplots(figsize=(1.6*sz,sz))
-sc = ax.scatter(dfP.CentreX, dfP.CentreY, c=dfP.MaxDelta, s=1, cmap="jet", marker=".")
-ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1])
-ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
-ax.set_xlabel(r"$\frac{\mathrm{J}_a}{\mathrm{J}_c}$",  fontsize=14)
-ax.set_ylabel(r"$\frac{\mathrm{J}_b}{\mathrm{J}_c}$", rotation = 0, labelpad=10, fontsize=14)
-cbar = plt.colorbar(sc)
-cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
-ax.set_title("Circle Radius = "+str(rad))
-plt.savefig(figLoc + 'PhaseOpenings.png', dpi=300, format="png", bbox_inches='tight')
-plt.show()  
-        
-fig, ax = plt.subplots(figsize=(1.6*sz,sz))
-sc = ax.scatter(dfP.PhaseOpening, dfP.PhaseClosing, c=dfP.MaxDelta, s=1, cmap="jet", marker=".")
-ax.set_xticks([-pi, -pi/2, 0,pi/2, pi])
-ax.set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-ax.set_yticks([-pi, -pi/2, 0,pi/2, pi])
-ax.set_yticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", '0',r"$\frac{\pi}{2}$", r"$\pi$"])
-ax.set_xlabel(r"$\phi_{\mathrm{open}}$")
-ax.set_ylabel(r"$\phi_{\mathrm{close}}$", rotation = 0, labelpad=10)
-cbar = plt.colorbar(sc)
-cbar.ax.set_ylabel(r"$\Delta(\phi)_{\mathrm{max}}$", rotation=0, labelpad=25)
-ax.set_title("Circle Radius = "+str(rad))
-plt.savefig(figLoc + 'PhaseOpeningSizesOnRelTriangle.png', dpi=300, format="png",bbox_inches='tight')
-plt.show()
 
-
-# sqCentreX = 0.5
-# sqCentreY = 0.2
-# rad = 0.01
-
-# x = dfP["HE-LowerT.X"]
-# y = dfP["HE-LowerT.Y"]
-                                    
-# fig, ax = plt.subplots(figsize=(5,3))
-# sc = ax.scatter( x,y, s=1, cmap="jet", marker=".")
-# plt.show()        
-     
-        
-        
-        
-        
-        
-        
-        
         
         
         

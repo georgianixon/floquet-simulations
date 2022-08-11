@@ -39,6 +39,18 @@ def ListRatioLowerTriangle(a1, b1, a2, b2, a3, b3):
 
     return lowerTriListX, lowerTriListY
 
+def RefineA1DP(A):
+    if isinstance(A, int) or isinstance(A, np.integer):
+        A = np.int64(A)
+        return A, str(A)
+    else:
+        A = np.round(A, 1)
+        return A, str(A).replace(".", "p")
+    
+    
+def FormatNumToSave(num, dp):
+    return  
+
 if __name__ == "__main__":
     
    
@@ -95,6 +107,9 @@ if __name__ == "__main__":
     A2 = BASHA2
     A3 = BASHA3
     
+    A2, A2_str = RefineA1DP(A2)
+    A3, A3_str = RefineA1DP(A3)
+    
     alpha=1
     beta = 2
     # omega0 = np.float64(sys.argv[1])
@@ -105,11 +120,11 @@ if __name__ == "__main__":
     
     
     dirname = "/rds/user/gmon2/hpc-work/"
-    dfname = "TriangleRatios,alpha="+str(alpha)+",beta="+str(beta)+",A2="+str(A2)+",A3="+str(A3)+".csv"
+    dfname = "TriangleRatios,alpha="+str(alpha)+",beta="+str(beta)+",A2="+A2_str+",A3="+A3_str+".csv"
     
     
-    #phi3s = np.linspace(0, 2, 41)
-    phi3s = np.linspace(0, 2, 3)
+    phi3s = np.linspace(0, 2, 41)
+    # phi3s = np.linspace(0, 2, 3)
     # phi3s = [round(i,2) for i in phi3s]
     
     
