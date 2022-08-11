@@ -103,7 +103,7 @@ def ListRatiosInLowerTriangle(lst1a,lst1b, lst2a,lst2b, lst3a,lst3b):
 alpha = 1
 beta = 3
 
-dfs_full = []
+
 dfs_no_raw = []
 
 # folders = [ "Set5"]
@@ -220,7 +220,7 @@ for A2 in np.linspace(0,30,31):
             #FInd rows with nans
             nanRows = np.where(np.isnan(ConvertComplex(dfO["FT-J12-ABS"])))[0]
             #drop nan locs
-            print("num of nans:", len(nanRows))
+            print("  # nans:", len(nanRows))
             dfO = dfO.drop(nanRows)
     
             dfs_no_raw.append(dfO)
