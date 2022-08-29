@@ -25,10 +25,10 @@ for A2 in np.linspace(0,30,31):
             dfi_noraw = dfi_noraw.astype({'A2': np.float64,
                               'A3': np.float64,
                               'omega0': np.float64,
-                              "alpha":np.uint32,
-                              "beta":np.uint32,
-                              "phi2/pi":np.float64,
-                              "phi3rel/pi":np.float64,
+                              "alpha":np.uint8,
+                              "beta":np.uint8,
+                              "phi3/pi":np.float64,
+                              #"phi3rel/pi":np.float64,
 			      "FT-J12-ABS":np.float64,
 			      "FT-J23-ABS":np.float64,
 			      "FT-J31-ABS":np.float64,
@@ -57,6 +57,59 @@ nanRows = np.where(np.isnan(bigData["FT-J12-ABS"]))[0]
 print("num of nans:", len(nanRows))
 bigData = bigData.drop(nanRows)
 
-bigData.to_csv(dataLoc +  "bigData.csv",
+bigData.to_csv(dataLoc +  "Summary.csv",
                   index=False, 
                   )
+
+# save phases data only
+dfPha = bigData.drop(columns=[ 'FT-J12-ABS',
+   'FT-J23-ABS', 'FT-J31-ABS', 'HE-J12-ABS', 'HE-J23-ABS',
+   'HE-J31-ABS',  'FT-LowerT.X', 'FT-LowerT.Y',
+   'HE-LowerT.X', 'HE-LowerT.Y'] )
+
+# st = time.time()    
+dfPha.to_csv(dataLoc + "Phases.csv", index=False)
+# et = time.time()
+# print("   save took", np.round(et - st, 1), "s")
+
+
+# save lower triangle data only
+dfLowerT = bigData.drop(columns=['FT-J12-ABS',
+   'FT-J23-ABS', 'FT-J31-ABS', 'FT-Plaq-PHA', 'HE-J12-ABS', 'HE-J23-ABS',
+   'HE-J31-ABS', 'HE-Plaq-PHA' ] )
+# st = time.time()    
+dfLowerT.to_csv(dataLoc + "LowerTriangle.csv", index=False)
+# et = time.time()
+# print("   save took", np.round(et - st, 1), "s")
+
+
+# save HT data only
+dfHE = bigData.drop(columns=['FT-J12-ABS',
+   'FT-J23-ABS', 'FT-J31-ABS', 'FT-Plaq-PHA', 'FT-LowerT.X', 'FT-LowerT.Y' ] )
+# st = time.time()    
+dfHE.to_csv(dataLoc + "HE.csv", index=False)
+# et = time.time()
+# print("   save took", np.round(et - st, 1), "s")
+
+HEMins = dfHE.drop(columns = ['HE-J12-ABS',
+       'HE-J23-ABS', 'HE-J31-ABS'])
+# st = time.time()    
+HEMins.to_csv(dataLoc + "HE-Min.csv", index=False)
+# et = time.time()
+# print("   save took", np.round(et - st, 1), "s")
+
+
+
+
+# save FT data only
+dfFT = bigData.drop(columns=['HE-J12-ABS',
+   'HE-J23-ABS', 'HE-J31-ABS', 'HE-Plaq-PHA', 'HE-LowerT.X', 'HE-LowerT.Y' ] )
+# st = time.time()    
+dfFT.to_csv(dataLoc + "FT.csv", index=False)
+# et = time.time()
+# print("   save took", np.round(et - st, 1), "s")
+FTMins = dfHE.drop(columns = ['FT-J12-ABS',
+       'FT-J23-ABS', 'FT-J31-ABS'])
+FTMins.to_csv(dataLoc + "FT-Min.csv", index=False)
+# et = time.time()
+# print("   save took", np.round(et - st, 1), "s")
