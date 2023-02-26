@@ -12,15 +12,15 @@ from numpy import pi, exp, sin, cos
 import pandas as pd
 place = "Georgia"
 import matplotlib as mpl
-import seaborn as sns
+# import seaborn as sns
 import sys
 import time
 sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 # sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
 
 def Plot():
-    sns.set(style="darkgrid")
-    sns.set(rc={'axes.facecolor':'0.96'})
+    # sns.set(style="darkgrid")
+    # sns.set(rc={'axes.facecolor':'0.96'})
     size=18
     params = {
                 'legend.fontsize': size*0.7,
@@ -103,7 +103,7 @@ segmented_cmap = make_segmented_cmap()
 dataLoc = "D:Data/Merges/alpha=1,beta=2,omega=8,0-40/FT/"
 
 #%%
-dfO = pd.read_csv(dataLoc+"FT-Min.csv",
+dfO = pd.read_csv(dataLoc+"FT-Min,phi3=0.csv",
                           index_col=False)
 # dataLoc = "D:/Data/Merges/alpha=1,beta=2,omega=8/HE/"
 # dfO = pd.read_csv(dataLoc+"HE-Min.csv",

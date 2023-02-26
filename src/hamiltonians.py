@@ -176,7 +176,7 @@ def HT_SSHModel(N, aas, omegas,  phis, onsites,  t):
 No energy offset
 """
 def H0(N):
-    return np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)      
+    return np.diag(-np.ones(N-1),-1)+np.diag(-np.ones(N-1),1)
 
 
 def HT_General(N, centres, funcs, paramss, circleBoundary, t):
@@ -190,6 +190,9 @@ def HT_General(N, centres, funcs, paramss, circleBoundary, t):
         func = funcs[i]
         H[centres[i],centres[i]] = func(paramss[i], t)
     return H
+
+
+
 
 """Moving phases"""
 
@@ -802,6 +805,19 @@ def Cosine(params, t):
     y = a*cos(omega*t + phi)+ onsite
     return y 
 
+def Zero(params, t):
+    return 0
+
+def OnsiteOnly(onsite, t):
+    return onsite
+
+def DoubleCosine(params, t):
+    a1 = params[0][0]; a2 = params[0][1]
+    omega1 = params[1][0]; omega2 = params[1][1]
+    phi1 = params[2][0]; phi2 = params[2][1]
+    onsite = params[3];
+    y = a1*cos(omega1*t + phi1) + a2*cos(omega2*t + phi2) + onsite
+    return y
 
 def RemoveWannierGauge(matrix, c, N):
     phase = np.angle(matrix[c-1,c])

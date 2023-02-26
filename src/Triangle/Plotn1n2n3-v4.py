@@ -14,16 +14,16 @@ from math import gcd
 import pandas as pd
 place = "Georgia"
 import matplotlib as mpl
-import seaborn as sns
-import sys
-sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
+# import seaborn as sns
+# import sys
+# sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
 # sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
-from hamiltonians import CreateHFGeneral
-from hamiltonians import Cosine, ConvertComplex
+# from hamiltonians import CreateHFGeneral
+# from hamiltonians import Cosine, ConvertComplex
 
 def Plot():
-    sns.set(style="darkgrid")
-    sns.set(rc={'axes.facecolor':'0.96'})
+    # sns.set(style="darkgrid")
+    # sns.set(rc={'axes.facecolor':'0.96'})
     size=18
     params = {
                 'legend.fontsize': size*0.7,
@@ -66,6 +66,7 @@ Plot()
 def unique(a):
     unique, counts = np.unique(a, return_counts=True)
     return np.asarray((unique, counts)).T
+
 def round2(i):
     return np.round(i,2)
 
@@ -122,8 +123,11 @@ def MaxDelta(ns):
     return delta
     
 dataLoc = "D:/Data/Set13-alpha=1,beta=2,omega=9/"
-dfO = pd.read_csv(dataLoc+"Summaries/FT-Min.csv",
-                          index_col=False)
+# dfO = pd.read_csv(dataLoc+"Summaries/FT-Min.csv",
+                          # index_col=False)
+
+dfO = pd.read_csv("D:/Data/Merges/alpha=1,beta=2,omega=8,0-40/FT/FT-Min,phi3=0.csv", 
+                  index_col=False)
 
 
 
@@ -137,13 +141,97 @@ saveFig = ("C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs"+
            "/ShakingTriangle/Relative Hopping Triangle/V3/"+
            "alpha=1,beta=2,omega0=9,NonAccum,FT/")
 
+saveFig = ("D:/Data/Merges/alpha=1,beta=2,omega=8,0-40/FT/reltriangleplots"+
+           "/phi3=0,mincovering2/")
 
-alpha = 1; beta = 2; omega0=9; phi3=0
+color_var = "A3"
+time_var = "A2"
+
+if time_var=="A3":
+    time_var_list = np.linspace(37, 38.5, 31 )
+    #color var = A2 so
+    color_var_min = 0
+    color_var_max = 18.5
+elif time_var == "A2":
+    time_var_list = np.linspace(0, 18.5, 18*20+10+1)
+    color_var_min = 37
+    color_var_max = 38.5
+
+
+alpha = 1; beta = 2; omega0=8; phi3=0
 type_calc = "FT"
 title_type = "First Term"
 
-for i, A3 in enumerate(np.linspace(0, 30.95, 620)):
-    A3 = np.round(A3, 2)
+# for i, A3 in enumerate(np.linspace(0, 30.95, 620)):
+for i, time_var_i in enumerate(time_var_list):
+    time_var_i = np.round(time_var_i, 3)
+  
+    
+    dfP = dfO[
+        # (dfO.beta == beta)
+             # &(dfO.alpha == alpha)
+               # &(dfO.omega0 == omega0)
+             (dfO[time_var] == time_var_i)
+             &(dfO[color_var] <=color_var_max)
+             &(dfO[color_var] >= color_var_min)
+                # &(dfO["phi3/pi"]==phi3)
+                      ]
+    
+    dfP = dfP.sort_values(by=[color_var])
+    
+    
+    xLT = dfP[type_calc+"-LowerT.X"]
+    yLT = dfP[type_calc+"-LowerT.Y"] 
+    
+    
+    fig, ax = plt.subplots(figsize=(6,5))
+    sc = ax.scatter(xLT, yLT, s=3, c=dfP[color_var].to_numpy(), 
+                    cmap="jet", marker=".")
+    ax.set_xlim([0,1])
+    ax.set_ylim([0,1])
+    ax.set_xlabel(r"$\frac{J_{\mathrm{med}}}{J_{\mathrm{max}}}$", 
+                  fontsize = 24)
+    ax.set_ylabel(r"$\frac{J_{\mathrm{min}}}{J_{\mathrm{max}}}$", 
+                  rotation = 0, fontsize = 24,  labelpad = 20)
+    cbar = plt.colorbar(sc)
+    title = (title_type + r", $\alpha=" + str(alpha) + r", \beta="+str(beta)
+             + r", \omega_0=" + str(omega0) 
+             + r", \phi_3 "
+              + r"= 0 "
+             # + r" \in \{0, 2 \pi \}"             
+             r",A_2="+f'{time_var_i:.2f}'
+             # str(round(A3,2)) 
+             + r"$")
+    plt.suptitle(title)
+    cbar.ax.set_ylabel(r"$A_3$", rotation=0, labelpad=10)
+    plt.savefig(saveFig+"Frame"+str(i)+".png", format='png', bbox_inches='tight')
+    plt.show()
+
+#%%
+
+
+"""
+2) Plot showing values in lower triangle, non accumulative
+"""
+
+saveFig = ("C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Figs"+
+           "/ShakingTriangle/Relative Hopping Triangle/V3/"+
+           "alpha=1,beta=2,omega0=9,NonAccum,FT/")
+
+saveFig = ("D:/Data/Merges/alpha=1,beta=2,omega=8,0-40/FT/reltriangleplots"+
+           "/phi3=0,mincovering2/")
+
+color_var = "A2"
+time_var = "A3"
+
+
+alpha = 1; beta = 2; omega0=8; phi3=0
+type_calc = "FT"
+title_type = "First Term"
+
+# for i, A3 in enumerate(np.linspace(0, 30.95, 620)):
+for i, A3 in enumerate(np.linspace(37, 38.5, 31)):
+    A3 = np.round(A3, 3)
   
     
     dfP = dfO[
@@ -151,6 +239,7 @@ for i, A3 in enumerate(np.linspace(0, 30.95, 620)):
              # &(dfO.alpha == alpha)
                # &(dfO.omega0 == omega0)
              (dfO.A3 == A3)
+             &(dfO.A2 <=18.50)
                 # &(dfO["phi3/pi"]==phi3)
                       ]
     
@@ -171,8 +260,8 @@ for i, A3 in enumerate(np.linspace(0, 30.95, 620)):
     title = (title_type + r", $\alpha=" + str(alpha) + r", \beta="+str(beta)
              + r", \omega_0=" + str(omega0) 
              + r", \phi_3 "
-             # + r"= 0 "
-             + r" \in \{0, 2 \pi \}"             
+              + r"= 0 "
+             # + r" \in \{0, 2 \pi \}"             
              r",A_3="+f'{A3:.2f}'
              # str(round(A3,2)) 
              + r"$")
