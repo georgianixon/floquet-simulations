@@ -22,6 +22,9 @@ from fractions import Fraction
 # from hamiltonians import Cosine, PhiString
 from scipy.optimize import minimize_scalar
 from scipy.linalg import eigh
+import matplotlib.cm as cm
+import matplotlib as mpl
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 posterLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Posters/202205 DAMOP/Final/"
@@ -34,7 +37,7 @@ posterLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Posters/
 
 
 def Plot():
-    size=12
+    size=41
     params = {
                 'legend.fontsize': size,
     #          'figure.figsize': (20,8),
@@ -247,7 +250,7 @@ def Plot3G(HF):
     fig.colorbar(pcm, cax=cax)
     plt.show()
     
-def PlotRG(HF):
+def PlotRG(HF, figsize=(3,3)):
     absMax = np.max([np.abs(np.min(np.real(HF))),
                     np.abs(np.max(np.real(HF))),
                     np.abs(np.min(np.imag(HF))),
@@ -261,22 +264,26 @@ def PlotRG(HF):
 
     '''abs real imag'''
 
-
-    sz = 3
+    # cmap = plt.cm.rainbow
+    
     fig, ax = plt.subplots(constrained_layout=True, 
-                           figsize=(sz,sz))
+                           figsize=figsize)
     pcm = ax.matshow(np.real(HF), interpolation='none', cmap='PuOr',  norm=norm)
-    ax.set_title( r'$\mathrm{Re}\{H_{n,m}\}$')
+    ax.set_title( r'$\mathrm{Real}\{H_{n,m}^{\mathrm{eff}}\}$')
     ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
       labeltop=False)  
     ax.set_xlabel('m')
 
     ax.set_ylabel('n', rotation=0, labelpad=10)
+    
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('right', size='5%', pad=0.4)
+    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap="PuOr"), cax=cax)# label="unweighted graph distance")
 
     # cax = plt.axes([1.03, 0.1, 0.03, 0.8])
-    cax = plt.axes([0.95, 0.16, 0.06, 0.74])
+    # cax = plt.axes([0.95, 0.16, 0.06, 0.74])
     # fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
-    fig.colorbar(pcm, cax=cax)
+    # fig.colorbar(pcm, cax=cax)
     plt.show()
 
 #%%
@@ -444,13 +451,13 @@ plt.plot(t,y,'.')
 We use this for generating the linear gradient and the black hole stuff or also SSH using addition_type +2,-2"""
 
 # get the A vals to get the right gradient
-Ndiffs = 8
+Ndiffs = 36
 ymin = jv(0, 3.8316)
-omega = 25
+omega = 30
 xzero = 2.4048
-# gradients = np.linspace(-ymin, ymin, Ndiffs) # for linear
+gradients = np.linspace(-ymin, ymin, Ndiffs) # for linear
 # gradients = np.array([ymin, -ymin]*(int(Ndiffs/2)))  # for SSH
-gradients = np.array([0.4, -0.1, 0.1]*4)
+# gradients = np.array([0.4, -0.1, 0.1]*4) #for SSH3
 # gradients = np.array([0.9, 0.4]*int(Ndiffs/2)) # for SSH not negative, makes A's lower
 xvals = ComputeAValsFromRequiredGradients(gradients)
 A_vals = GetAValsFromBesselXVals(xvals, omega, addition_type="alternating", constant_shift="zero centre") # get actual shaking values
@@ -459,10 +466,11 @@ A_vals = GetAValsFromBesselXVals(xvals, omega, addition_type="alternating", cons
 # A_vals = np.array([i%2 for i in range(Ndiffs +1)])*10
 
 N= len(A_vals)
-fig, ax = plt.subplots(figsize=(3,2))
-ax.plot(range(N), A_vals, '.')
+markersize = 15
+fig, ax = plt.subplots(figsize=(8,6))
+ax.plot(range(N), A_vals, '.', markersize=markersize)
 ax.set_ylabel(r"$A$", rotation = 0)
-ax.set_xlabel(r"$i$")
+ax.set_xlabel(r"$site i$")
 ax.set_xticks(np.arange(0,N,10))
 plt.show()
 
@@ -485,14 +493,14 @@ _, HF = CreateHFGeneral(N,
 Plot3G(HF)
 
 
-PlotRG(HF)
+PlotRG(HF, figsize=(10, 10))
   
-  
+
 ymax = 0.43
 # plot gradient
-fig, ax = plt.subplots(figsize=(3,2))
+fig, ax = plt.subplots(figsize=(8,6))
 JNN = [np.real(HF[i,i+1]) for i in range(N-1)]
-ax.plot(range(N-1), JNN, '.', label = r"$J_i$")
+ax.plot(range(N-1), JNN, '.', markersize=markersize, label = r"$J_i$")
 # plt.plot(range(N-1), -gradients, label=r"linear gradient")
 ax.set_xlabel("i")
 ax.set_ylabel(r"$J_{i, i+1}$")
@@ -504,22 +512,22 @@ plt.show()
 
 # plot gradient 2
 JNNN = [np.real(HF[i,i+2]) for i in range(N-2)]
-fig, ax = plt.subplots(figsize=(3,2))
-ax.plot(range(N-2), JNNN, '.')
+fig, ax = plt.subplots(figsize=(8,6))
+ax.plot(range(N-2), JNNN, '.', markersize=markersize)
 
 ax.set_ylabel(r"$J_{i, i+2}$")
 ax.set_ylim([-ymax, ymax])
-ax.set_xlabel("i")
+ax.set_xlabel("site i")
 ax.set_xticks(np.arange(0,N-1,10))
 plt.show()
 
 
 onsite = [np.real(HF[i,i]) for i in range(N)]
-fig, ax = plt.subplots(figsize=(3,2))
-ax.plot(range(N), onsite, '.')
+fig, ax = plt.subplots(figsize=(8,6))
+ax.plot(range(N), onsite, '.', markersize=markersize)
 ax.set_ylabel(r"$H_{i, i}$")
 ax.set_ylim([-ymax, ymax])
-ax.set_xlabel("i")
+ax.set_xlabel("site i")
 ax.set_xticks(np.arange(0,N,10))
 plt.show()
 
@@ -622,7 +630,8 @@ HFdf.to_csv("/Users/GeorgiaNixon/OneDrive - Riverlane/PhD/LinearMetric/Hamiltoni
 #                           )
 
 a = 0
-
+Ndiffs = 12
+omega = 8
 onsite = 0
 N = Ndiffs + 1
 
@@ -630,7 +639,7 @@ N = 12
 _, HF = CreateHFGeneral(N,
                           [int(i) for i in np.linspace(0,N -1, N)],
                           [Cosine]*N,
-                          [[10,omega,i*pi/4,onsite] for i in range(1,N+1)],
+                          [[10,omega,i*pi/12,onsite] for i in range(1,N+1)],
                           2*pi/omega,
                           0
                           )

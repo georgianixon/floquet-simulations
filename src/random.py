@@ -219,10 +219,3 @@ df2 = dfO[(dfO.beta == beta)
                   &(dfO.A2 <= A3Max)
                   &(dfO.A3 >= A2Min)
                   &(dfO.A3 <= A2Max)]
-
-
-
-
-
-
-
