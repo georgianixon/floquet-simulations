@@ -1,0 +1,14 @@
+Metadata-Version: 2.0
+Name: ipynb
+Version: 0.5.1
+Summary: Package / Module importer for importing code from Jupyter Notebook files (.ipynb)
+Home-page: http://github.com/yuvipanda/ipynb
+Author: Yuvi Panda
+Author-email: yuvipanda@gmail.com
+License: BSD
+Platform: UNKNOWN
+Requires-Python: >=3.4
+
+UNKNOWN
+
+
