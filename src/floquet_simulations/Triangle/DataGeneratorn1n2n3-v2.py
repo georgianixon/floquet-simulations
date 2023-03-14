@@ -11,19 +11,17 @@ import scipy.integrate as integrate
 from numpy import pi, exp, sin, cos
 from math import gcd
 import pandas as pd
-place = "Georgia"
 import matplotlib as mpl
 import seaborn as sns
-import sys
-sys.path.append("/Users/"+place+"/Code/MBQD/floquet-simulations/src")
+
 # sys.path.append("/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations-1/src/")
-from hamiltonians import CreateHFGeneral, CreateHFGeneralLoopA
-from hamiltonians import Cosine,  RemoveWannierGauge
-from hamiltonians import Cosine, ConvertComplex
+from floquet_simulations.hamiltonians import CreateHFGeneral, CreateHFGeneralLoopA
+from floquet_simulations.hamiltonians import Cosine,  RemoveWannierGauge
+from floquet_simulations.hamiltonians import Cosine, ConvertComplex
 import time
 
-dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
-latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
+# dataLoc = "C:/Users/" + place + "/OneDrive - University of Cambridge/MBQD/Data/floquet-simulations/"
+# latexLoc = "C:/Users/"+place+"/OneDrive - University of Cambridge/MBQD/Notes/Local Modulation Paper/OldStuff/"
 
 
 dfnamePast = "TriangleRatios-phasedata-v14.csv"
@@ -31,24 +29,24 @@ dfname = "TriangleRatios-phasedata-v14-v2.csv"
 
 
 
-dfN = pd.read_csv(dataLoc+dfnamePast, 
-                  index_col=False, 
-                    converters={"FT-J12": ConvertComplex,
-                              "FT-J23": ConvertComplex,
-                              "FT-J31": ConvertComplex,
-                              "HE-J12": ConvertComplex,
-                              "HE-J23": ConvertComplex,
-                              "HE-J31": ConvertComplex,
-                              "HE-O1": ConvertComplex,
-                              "HE-O2": ConvertComplex,
-                              "HE-O3": ConvertComplex
-                                }
-                   )
+# dfN = pd.read_csv(dataLoc+dfnamePast, 
+#                   index_col=False, 
+#                     converters={"FT-J12": ConvertComplex,
+#                               "FT-J23": ConvertComplex,
+#                               "FT-J31": ConvertComplex,
+#                               "HE-J12": ConvertComplex,
+#                               "HE-J23": ConvertComplex,
+#                               "HE-J31": ConvertComplex,
+#                               "HE-O1": ConvertComplex,
+#                               "HE-O2": ConvertComplex,
+#                               "HE-O3": ConvertComplex
+#                                 }
+#                    )
 
-# dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
-#                             "FT-J12", "FT-J23", "FT-J31", 
-#                             "HE-J12", "HE-J23", "HE-J31",
-#                             "HE-O1", "HE-O2", "HE-O3"  ])
+dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
+                            "FT-J12", "FT-J23", "FT-J31", 
+                            "HE-J12", "HE-J23", "HE-J31",
+                            "HE-O1", "HE-O2", "HE-O3"  ])
 
 dfN = dfN.astype({'A2': np.float64,
                           'A3': np.float64,
@@ -73,16 +71,16 @@ dfN = dfN.astype({'A2': np.float64,
 
 # A2s = np.linspace(0,4,5)
 A2s = [4]
-A3s = np.linspace(0,21,22)
+A3s = [4]#np.linspace(0,21,22)
 # A3s = np.linspace(0,4,5)
 
 alpha = 1
 beta = 2
 # omega0s = [10]
-omega0s = np.linspace(4,20,16*10+1)
+omega0s = [8]#np.linspace(4,20,16*10+1)
 phi2 = 0 
 phi3s = np.linspace(0,2, 41)
-phi3s = [round(i,2) for i in phi3s]
+phi3s = [0]#[round(i,2) for i in phi3s]
 
 
 centres = [1,2]
@@ -203,10 +201,10 @@ for A2 in reversed(A2s):
                          "HE-O3":np.complex128
                          })
         
-        dfN.to_csv(dataLoc+dfname,
-                  index=False, 
-                  # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
-                  )
+        # dfN.to_csv(dataLoc+dfname,
+        #           index=False, 
+        #           # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
+        #           )
         
         A3end = time.time()
         print("   ", np.round(A3end - A3start, 1), "s")
@@ -238,10 +236,10 @@ dfN = dfN.astype({'A2': np.float64,
                          })
 
 
-dfN.to_csv(dataLoc+dfname,
-                  index=False, 
-                  # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
-                  )
+# dfN.to_csv(dataLoc+dfname,
+#                   index=False, 
+#                   # columns=["A2", "A3", "omega0", "alpha", "beta", "J12", "J23", "J31"]
+#                   )
 
 
 
