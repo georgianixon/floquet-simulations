@@ -348,8 +348,8 @@ def F_0(t, psi, N):
 def F_HF(t, psi, HF):
     return -1j*np.dot(HF, psi)
 
-def F_General(t, psi, N, centre, func, params, circleBoundary):
-    H = HT_General(N, centre, func, params, circleBoundary, t)
+def F_General(t, psi, N, centre, func, params, circle_boundary):
+    H = HT_General(N, centre, func, params, circle_boundary, t)
     return -1j*np.dot(H, psi)
 
 def F_0_T(t, psi, N, centre):
@@ -386,13 +386,13 @@ def RoundComplex(num, dp):
 #     digits -= math.ceil(math.log10(np.real(x)))
 #     return np.round(x, digits)
 
-def SolveSchrodingerGeneral(N,centre,func,params, tspan, nTimesteps, psi0, circleBoundary = 0):
+def SolveSchrodingerGeneral(N,centre,func,params, tspan, nTimesteps, psi0, circle_boundary = 0):
     
     rtol=1e-11
     # points to calculate the matter wave at
     t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
     sol = solve_ivp(lambda t,psi: F_General(t, psi, 
-                                          N, centre, func, params, circleBoundary), 
+                                          N, centre, func, params, circle_boundary), 
             t_span=tspan, y0=psi0, rtol=rtol, 
             atol=rtol, t_eval=t_eval,
             method='RK45')
@@ -571,91 +571,38 @@ def CreateHF(form, rtol, N, centre, a, omega, phi, onsite):
     return UT, HF
 
 
-def CreateHFGeneral(N, centre, func, params, T, circleBoundary): 
 
-    tspan = (0,T)
-    UT = np.zeros([N,N], dtype=np.complex_)
-    nTimesteps = 100
     
-    for A_site_start in range(N):
-    #    print(A_site_start)
-        psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = SolveSchrodingerGeneral(N, centre, func, params, tspan, nTimesteps, psi0, circleBoundary=circleBoundary)
-        UT[:,A_site_start]=sol[:,-1] 
+def CreateHFGeneral(num_sites, centre, func, params, T, circle_boundary=0, t0=0, hermitian_accuracy_dp=7): 
+    """
+    t0 is fraction of T
+    """
+    tspan = (t0*T,T+t0*T)
+    UT = np.zeros([num_sites, num_sites], dtype=np.complex_)
+    n_timesteps = 100
     
-    # print(time.time()-start, 'seconds.')
-    
-    # evals_U, evecs = eig(UT)
-    evals_U, evecs = GetEvalsAndEvecsGen(UT) #evals can be imaginary
-    evals_H = 1j / T *log(evals_U)
-    
-    HF = np.zeros([N,N], dtype=np.complex_)
-    for i in range(N):
-        term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
-        HF = HF+term
-        
-    # print('   ',time.time()-start, 's')
-    HFr = RoundComplex(HF, 7)
-    assert(np.all(0 == (HFr - np.conj(HFr.T))))
-
-    return UT, HF
-
-def CreateHFGeneralLoopA(N, centre, func, params, T, circleBoundary): 
-
-    tspan = (0,T)
-    UT = np.zeros([N,N], dtype=np.complex_)
-    nTimesteps = 100
-    
-    for A_site_start in range(N):
-        psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = SolveSchrodingerGeneral(N, centre, func, params, tspan, nTimesteps, psi0, circleBoundary=circleBoundary)
+    for A_site_start in range(num_sites):
+        psi0 = np.zeros(num_sites, dtype=np.complex_); psi0[A_site_start] = 1
+        sol = SolveSchrodingerGeneral(num_sites, centre, func, params, tspan, n_timesteps, psi0, circle_boundary=circle_boundary)
         UT[:,A_site_start]=sol[:,-1] 
     
     # evals_U, evecs = eig(UT)
     evals_U, evecs = GetEvalsAndEvecsGen(UT) #evals can be imaginary
     evals_H = 1j / T *log(evals_U)
     
-    HF = np.zeros([N,N], dtype=np.complex_)
-    for i in range(N):
+    HF = np.zeros([num_sites,num_sites], dtype=np.complex_)
+    for i in range(num_sites):
         term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
         HF = HF+term
 
-    HFr = RoundComplex(HF, 7)
-    if np.all(0 == (HFr - np.conj(HFr.T))):
+    HF = RoundComplex(HF, hermitian_accuracy_dp)
+    # assert(np.all(0 == (HFr - np.conj(HFr.T))))
+    if np.all(0 == (HF - np.conj(HF.T))):
         return UT, HF
     else:
         return np.nan, np.nan
- 
     
-def CreateHFGeneralv3(N, centre, func, params, T, circleBoundary, t0=0): 
 
-    tspan = (t0,T+t0)
-    UT = np.zeros([N,N], dtype=np.complex_)
-    nTimesteps = 100
-    
-    for A_site_start in range(N):
-    #    print(A_site_start)
-        psi0 = np.zeros(N, dtype=np.complex_); psi0[A_site_start] = 1;
-        sol = SolveSchrodingerGeneral(N, centre, func, params, tspan, nTimesteps, psi0, circleBoundary=circleBoundary)
-        UT[:,A_site_start]=sol[:,-1] 
-    
-    # print(time.time()-start, 'seconds.')
-    
-    # evals_U, evecs = eig(UT)
-    evals_U, evecs = GetEvalsAndEvecsGen(UT) #evals can be imaginary
-    evals_H = 1j / T *log(evals_U)
-    
-    HF = np.zeros([N,N], dtype=np.complex_)
-    for i in range(N):
-        term = evals_H[i]*np.outer(evecs[:,i], np.conj(evecs[:,i]))
-        HF = HF+term
-        
-    # print('   ',time.time()-start, 's')
-    HFr = RoundComplex(HF, 4)
-    if np.all(0 == (HFr - np.conj(HFr.T))):
-        return UT, HF
-    else:
-        return np.nan, np.nan
 
 def hoppingHF(N, centre, a, omega, phi):
     HF =  np.zeros([N,N], dtype=np.complex_)
