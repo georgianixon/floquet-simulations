@@ -597,10 +597,11 @@ def CreateHFGeneral(num_sites, centre, func, params, T, circle_boundary=0, t0=0,
 
     HF = RoundComplex(HF, hermitian_accuracy_dp)
     # assert(np.all(0 == (HFr - np.conj(HFr.T))))
-    if np.all(0 == (HF - np.conj(HF.T))):
-        return UT, HF
-    else:
-        return np.nan, np.nan
+    return UT, HF
+    # if np.all(0 == (HF - np.conj(HF.T))):
+    #     return UT, HF
+    # else:
+    #     return np.nan, np.nan
     
 
 
