@@ -62,8 +62,7 @@ def GetEvalsAndEvecsGen(HF, fix_gauge=1):
     #     return evals, evecs
 
 
-    
-    
+
     
 def getevalsandevecs(HF):
     """
