@@ -23,19 +23,27 @@ def PlotParams(fontsize=12, font="stix"):
               'ytick.left': True,
               'ytick.right':False,
 
-              'axes.edgecolor' :'white',#"0.15",
+  
               'xtick.minor.visible': False,
               'axes.grid':False,
               'font.family' : 'STIXGeneral',#"sans-serif",#"Arial"#
               "font.sans-serif":"stix",#"Arial",
-               'mathtext.fontset':"stix"#"Arial"#'stix'
-              #  "text.usetex": True
+               'mathtext.fontset':"stix",#"Arial"#'stix'
+               "text.usetex": True,
+
               #  'grid.alpha': 1,
               # 'grid.color': "0.9"
+              # border around plot
+
+               'axes.edgecolor' : "0.35",#'white',#"0.15",
+                "axes.spines.left":   True,
+                "axes.spines.bottom": True,
+                "axes.spines.top":    True,
+                "axes.spines.right":  True,
 
 
             #    "axes.facecolor": '0.97', #"white"
-            #     "axes.spines.left":   False,
+                # "axes.spines.left":   False,
             # "axes.spines.bottom": False,
             # "axes.spines.top":    False,
             # "axes.spines.right":  False,
@@ -62,6 +70,11 @@ def PlotParams(fontsize=12, font="stix"):
     #                 'slategrey', newred]
     # plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 
+def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    new_cmap = mpl.colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    return new_cmap
 
 def PlotAbsRealImagHamiltonian(HF,  figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False):
     absMax = np.max([np.abs(np.min(np.real(HF))),
@@ -73,7 +86,6 @@ def PlotAbsRealImagHamiltonian(HF,  figsize=(3,3), colourbar_pad=0.4, colourbar_
     norm = mpl.colors.Normalize(vmin=-absMax, vmax=absMax)
     # linthresh = 1e-1
     # norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
-    # 
 
     '''abs real imag'''
 
@@ -109,34 +121,26 @@ def PlotAbsRealImagHamiltonian(HF,  figsize=(3,3), colourbar_pad=0.4, colourbar_
         elif save_location.as_posix().find("png"):
             fig.savefig(save_location, format="png", bbox_inches="tight")
 
-    # # cax = plt.axes([1.03, 0.1, 0.03, 0.8])
-    # cax = plt.axes([1.03, 0.2, 0.03, 0.6])
-    # # fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
-    # fig.colorbsar(pcm, cax=cax)
     plt.show()
     
 
-def PlotRealHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False):
-    absMax = np.max([np.abs(np.min(np.real(HF))),
-                    np.abs(np.max(np.real(HF))),
-                    np.abs(np.min(np.imag(HF))),
-                    np.abs(np.max(np.imag(HF)))])
+def PlotRealHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False, colourbar_cmap_lims=(-1,1),  colourbar_ticks = np.arange(-1,1.2,0.2)):
+    """
+    cmap_lims is tuple giving range between -1 and 1, ie proportion of full colour map that is used. 
+    """ 
 
     norm = mpl.colors.Normalize(vmin=-1, vmax=1)
-    norm = mpl.colors.Normalize(vmin=-absMax, vmax=absMax)
     # linthresh = 1e-1
     # norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
-    # 
 
-    # cmap = plt.cm.rainbow
-    # cmap= "PuOr"
     cmap = LinearSegmentedColormap.from_list('custom hamiltonians', ['#006F63', "#FFFFFF", '#F78320'], N=256)
-
+    
     cm_unit = 1/2.54
+    
     fig, ax = plt.subplots(constrained_layout=True, 
                            figsize=(figsize[0]*cm_unit, figsize[1]*cm_unit))
     pcm = ax.matshow(np.real(HF), interpolation='none', cmap=cmap,  norm=norm)
-    ax.set_title( r'$\mathrm{Real}\{H_{n,m}^{\mathrm{eff}}\}$')
+    ax.set_title( r'$\mathrm{Real}\left\{ {H_{S}^{t_0}}_{n,m} \right\}$')
     ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
       labeltop=False)  
     ax.set_xlabel('m')
@@ -150,39 +154,37 @@ def PlotRealHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_per
     
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size=f"{colourbar_size_percentage}%", pad=colourbar_pad)
-    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax)# label="unweighted graph distance")
+
+    if colourbar_cmap_lims:
+        new_norm = mpl.colors.Normalize(vmin=colourbar_cmap_lims[0], vmax=colourbar_cmap_lims[1])
+        new_cmap = truncate_colormap(cmap, (colourbar_cmap_lims[0]+1)/2, (colourbar_cmap_lims[1]+1)/2)
+        fig.colorbar(mpl.cm.ScalarMappable(norm=new_norm, cmap=new_cmap), cax=cax, ticks = colourbar_ticks)
+    else:
+        fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax, ticks = colourbar_ticks)
+       
     if save_location:
       if save_location.as_posix().find("pdf"):
         fig.savefig(save_location, format="pdf", bbox_inches="tight")
       elif save_location.as_posix().find("png"):
         fig.savefig(save_location, format="png", bbox_inches="tight")
-    # cax = plt.axes([1.03, 0.1, 0.03, 0.8])
-    # cax = plt.axes([0.95, 0.16, 0.06, 0.74])
-    # fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
-    # fig.colorbar(pcm, cax=cax)
+
     plt.show()
 
-def PlotImagHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False):
-    absMax = np.max([np.abs(np.min(np.real(HF))),
-                    np.abs(np.max(np.real(HF))),
-                    np.abs(np.min(np.imag(HF))),
-                    np.abs(np.max(np.imag(HF)))])
+def PlotImagHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False,  colourbar_cmap_lims=(-1,1),  colourbar_ticks = [0]):
+
 
     norm = mpl.colors.Normalize(vmin=-1, vmax=1)
-    norm = mpl.colors.Normalize(vmin=-absMax, vmax=absMax)
     # linthresh = 1e-1
     # norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
     # 
 
-    # cmap = plt.cm.rainbow
-    # cmap= "PuOr"
     cmap = LinearSegmentedColormap.from_list('custom hamiltonians', ['#006F63', "#FFFFFF", '#F78320'], N=256)
 
     cm_unit = 1/2.54
     fig, ax = plt.subplots(constrained_layout=True, 
                            figsize=(figsize[0]*cm_unit, figsize[1]*cm_unit))
     pcm = ax.matshow(np.imag(HF), interpolation='none', cmap=cmap,  norm=norm)
-    ax.set_title( r'$\mathrm{Imag}\{H_{n,m}^{\mathrm{eff}}\}$')
+    ax.set_title( r'$\mathrm{Imag}\left\{ {H_{S}^{t_0}}_{n,m} \right\}$')
     ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
       labeltop=False)  
     ax.set_xlabel('m')
@@ -197,17 +199,24 @@ def PlotImagHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_per
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size=f"{colourbar_size_percentage}%", pad=colourbar_pad)
-    fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax)# label="unweighted graph distance")
+
+    if colourbar_cmap_lims:
+        new_norm = mpl.colors.Normalize(vmin=colourbar_cmap_lims[0], vmax=colourbar_cmap_lims[1])
+        new_cmap = truncate_colormap(cmap, (colourbar_cmap_lims[0]+1)/2, (colourbar_cmap_lims[1]+1)/2)
+        fig.colorbar(mpl.cm.ScalarMappable(norm=new_norm, cmap=new_cmap), cax=cax, ticks = colourbar_ticks)
+    else:
+        fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax, ticks = colourbar_ticks)
+
+
     if save_location:
       if save_location.as_posix().find("pdf"):
         fig.savefig(save_location, format="pdf", bbox_inches="tight")
       elif save_location.as_posix().find("png"):
         fig.savefig(save_location, format="png", bbox_inches="tight")
-    # cax = plt.axes([1.03, 0.1, 0.03, 0.8])
-    # cax = plt.axes([0.95, 0.16, 0.06, 0.74])
-    # fig.colorbar(plt.cm.ScalarMappable(cmap='PuOr', norm=norm), cax=cax)
-    # fig.colorbar(pcm, cax=cax)
+
     plt.show()
+
+
 
 def PlotAngleHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False):
 
@@ -224,7 +233,7 @@ def PlotAngleHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_pe
     fig, ax = plt.subplots(constrained_layout=True, 
                            figsize=(figsize[0]*cm_unit, figsize[1]*cm_unit))
     pcm = ax.matshow(PhaseShiftBetweenPlusMinusPi(np.angle(HF)), interpolation='none', cmap=cmap,  norm=norm)
-    ax.set_title( r'$\mathrm{Angle}\{H_{n,m}^{\mathrm{eff}}\}$')
+    ax.set_title( r'$\mathrm{Angle}\{H_{n,m}^{\mathrm{t_0}}\}$')
     ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
       labeltop=False)  
     ax.set_xlabel('m')
