@@ -58,3 +58,21 @@ def DoubleCosine(params, t):
     onsite = params[3]
     y = a1*cos(omega1*t + phi1) + a2*cos(omega2*t + phi2) + onsite
     return y
+
+def RampGen(params, t): # ramp
+    a = params[0]
+    omega = params[1]
+    phi = params[2]
+    theta = params[4] 
+    onsite = params[3]
+
+    
+    nCycles = np.floor(t*omega/2/pi)
+    tCycle = t - nCycles*2*pi/omega
+    
+    multiplier_pre_phi = (np.sign(tCycle - phi/omega)%3)%2
+    multiplier_post_theta =  (np.sign(-tCycle + phi/omega + theta/omega)%3)%2
+
+    subtract_height = 2*a*(pi)/theta*nCycles
+    y = (a*omega*t/theta - a*phi/theta - subtract_height)*multiplier_pre_phi*multiplier_post_theta + onsite
+    return y
