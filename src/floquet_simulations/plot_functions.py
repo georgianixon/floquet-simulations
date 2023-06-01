@@ -51,6 +51,7 @@ def PlotParams(fontsize=12, font="stix"):
               }
     
     mpl.rcParams.update(params)
+    plt.rc('text.latex', preamble=r'\usepackage{amsmath,nicefrac,xfrac}')
 
     # mpl.rcParams["text.latex.preamble"] = mpl.rcParams["text.latex.preamble"] + r'\usepackage{xfrac}'
     # CB91_Blue = 'darkblue'#'#2CBDFE'
@@ -69,6 +70,7 @@ def PlotParams(fontsize=12, font="stix"):
     #                 'dodgerblue',
     #                 'slategrey', newred]
     # plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
+
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = mpl.colors.LinearSegmentedColormap.from_list(
@@ -122,58 +124,12 @@ def PlotAbsRealImagHamiltonian(HF,  figsize=(3,3), colourbar_pad=0.4, colourbar_
             fig.savefig(save_location, format="png", bbox_inches="tight")
 
     plt.show()
-    
 
-def PlotRealHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False, colourbar_cmap_lims=(-1,1),  colourbar_ticks = np.arange(-1,1.2,0.2)):
-    """
-    cmap_lims is tuple giving range between -1 and 1, ie proportion of full colour map that is used. 
-    """ 
-
-    norm = mpl.colors.Normalize(vmin=-1, vmax=1)
-    # linthresh = 1e-1
-    # norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
-
-    cmap = LinearSegmentedColormap.from_list('custom hamiltonians', ['#006F63', "#FFFFFF", '#F78320'], N=256)
-    
-    cm_unit = 1/2.54
-    
-    fig, ax = plt.subplots(constrained_layout=True, 
-                           figsize=(figsize[0]*cm_unit, figsize[1]*cm_unit))
-    pcm = ax.matshow(np.real(HF), interpolation='none', cmap=cmap,  norm=norm)
-    ax.set_title( r'$\mathrm{Real}\left\{ {H_{S}^{t_0}}_{n,m} \right\}$')
-    ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
-      labeltop=False)  
-    ax.set_xlabel('m')
-    ax.set_ylabel('n', rotation=0, labelpad=10)
-    if axes_tick_pos:
-        ax.set_xticks(axes_tick_pos)
-        ax.set_yticks(axes_tick_pos)
-    if axes_tick_labels:
-        ax.set_xticklabels(axes_tick_labels)
-        ax.set_yticklabels(axes_tick_labels)
-    
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes('right', size=f"{colourbar_size_percentage}%", pad=colourbar_pad)
-
-    if colourbar_cmap_lims:
-        new_norm = mpl.colors.Normalize(vmin=colourbar_cmap_lims[0], vmax=colourbar_cmap_lims[1])
-        new_cmap = truncate_colormap(cmap, (colourbar_cmap_lims[0]+1)/2, (colourbar_cmap_lims[1]+1)/2)
-        fig.colorbar(mpl.cm.ScalarMappable(norm=new_norm, cmap=new_cmap), cax=cax, ticks = colourbar_ticks)
-    else:
-        fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax, ticks = colourbar_ticks)
-       
-    if save_location:
-      if save_location.as_posix().find("pdf"):
-        fig.savefig(save_location, format="pdf", bbox_inches="tight")
-      elif save_location.as_posix().find("png"):
-        fig.savefig(save_location, format="png", bbox_inches="tight")
-
-    plt.show()
-
-def PlotImagHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False,  colourbar_cmap_lims=(-1,1),  colourbar_ticks = [0]):
+def PlotAbsHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False, 
+                         data_cmap_lims = (-1,1), colourbar_cmap_lims=(-1,1),  colourbar_ticks = [0]):
 
 
-    norm = mpl.colors.Normalize(vmin=-1, vmax=1)
+    norm = mpl.colors.Normalize(vmin=data_cmap_lims[0], vmax=data_cmap_lims[1])
     # linthresh = 1e-1
     # norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
     # 
@@ -190,28 +146,181 @@ def PlotImagHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_per
     ax.set_xlabel('m')
 
     ax.set_ylabel('n', rotation=0, labelpad=10)
-    if axes_tick_pos:
+    if bool(axes_tick_pos):
         ax.set_xticks(axes_tick_pos)
         ax.set_yticks(axes_tick_pos)
-    if axes_tick_labels:
+    if bool(axes_tick_labels):
         ax.set_xticklabels(axes_tick_labels)
         ax.set_yticklabels(axes_tick_labels)
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size=f"{colourbar_size_percentage}%", pad=colourbar_pad)
 
-    if colourbar_cmap_lims:
+    if bool(colourbar_cmap_lims):
         new_norm = mpl.colors.Normalize(vmin=colourbar_cmap_lims[0], vmax=colourbar_cmap_lims[1])
-        new_cmap = truncate_colormap(cmap, (colourbar_cmap_lims[0]+1)/2, (colourbar_cmap_lims[1]+1)/2)
+        new_cmap = truncate_colormap(cmap, (colourbar_cmap_lims[0]-data_cmap_lims[0])/(data_cmap_lims[1] - data_cmap_lims[0]), (colourbar_cmap_lims[1]-data_cmap_lims[0])/(data_cmap_lims[1] - data_cmap_lims[0]))
         fig.colorbar(mpl.cm.ScalarMappable(norm=new_norm, cmap=new_cmap), cax=cax, ticks = colourbar_ticks)
     else:
         fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax, ticks = colourbar_ticks)
 
 
-    if save_location:
+    if bool(save_location):
       if save_location.as_posix().find("pdf"):
         fig.savefig(save_location, format="pdf", bbox_inches="tight")
       elif save_location.as_posix().find("png"):
+        print("A")
+        fig.savefig(save_location, format="png", bbox_inches="tight")
+
+    plt.show()
+
+
+
+def PlotRealHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, 
+                        axes_tick_pos=False, axes_tick_labels=False, data_cmap_lims = (-1,1), 
+                        colourbar_cmap_lims=(-1,1),  colourbar_ticks = np.arange(-1,1.2,0.2),
+                        normaliser_type="linear",
+                        title_labelpad=10, 
+                        dpi=506):
+    """
+    cmap_lims is tuple giving range between -1 and 1, ie proportion of full colour map that is used. 
+    """ 
+    if normaliser_type =="linear":
+        norm = mpl.colors.Normalize(vmin=data_cmap_lims[0], vmax=data_cmap_lims[1])
+    elif normaliser_type == "log":
+        linthresh = 1e-1
+        norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+
+    # 
+    # 
+    cmap = LinearSegmentedColormap.from_list('custom hamiltonians', ['#006F63', "#FFFFFF", '#F78320'], N=256)
+    
+    cm_unit = 1/2.54
+    
+    fig, ax = plt.subplots(constrained_layout=True, 
+                           figsize=(figsize[0]*cm_unit, figsize[1]*cm_unit))
+    ax.matshow(np.real(HF), interpolation='none', cmap=cmap,  norm=norm)
+    ax.set_title( r'$ \left[H_{S}^{t_0}\right]_{i,j} /J$', pad=title_labelpad)
+    ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+      labeltop=False)  
+    ax.set_xlabel('$i$')
+    ax.set_ylabel('$j$', rotation=0, labelpad=10)
+    if bool(axes_tick_pos):
+        ax.set_xticks(axes_tick_pos)
+        ax.set_yticks(axes_tick_pos)
+    if bool(axes_tick_labels):
+        ax.set_xticklabels(axes_tick_labels)
+        ax.set_yticklabels(axes_tick_labels)
+    
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('right', size=f"{colourbar_size_percentage}%", pad=colourbar_pad)
+
+    if bool(colourbar_cmap_lims):
+        new_norm = mpl.colors.Normalize(vmin=colourbar_cmap_lims[0], vmax=colourbar_cmap_lims[1])
+        new_cmap = truncate_colormap(cmap, (colourbar_cmap_lims[0]-data_cmap_lims[0])/(data_cmap_lims[1] - data_cmap_lims[0]), (colourbar_cmap_lims[1]-data_cmap_lims[0])/(data_cmap_lims[1] - data_cmap_lims[0]))
+        fig.colorbar(mpl.cm.ScalarMappable(norm=new_norm, cmap=new_cmap), cax=cax, ticks = colourbar_ticks)
+    else:
+        fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax, ticks = colourbar_ticks)
+       
+    if bool(save_location):
+      if save_location.as_posix().find("pdf") >=0:
+        fig.savefig(save_location, format="pdf", bbox_inches="tight")
+      elif save_location.as_posix().find("png")>=0:
+        fig.savefig(save_location, format="png", bbox_inches="tight", dpi=dpi)
+
+    plt.show()
+
+# def PlotRealHamiltonianLog(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, 
+#                         axes_tick_pos=False, axes_tick_labels=False, data_cmap_lims = (-1,1), 
+#                         colourbar_cmap_lims=(-1,1),  colourbar_ticks = np.arange(-1,1.2,0.2)):
+#     """
+#     cmap_lims is tuple giving range between -1 and 1, ie proportion of full colour map that is used. 
+#     """ 
+
+#     linthresh = 1e-1
+#     norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+
+#     # 
+#     # 
+#     cmap = LinearSegmentedColormap.from_list('custom hamiltonians', ['#006F63', "#FFFFFF", '#F78320'], N=256)
+    
+#     cm_unit = 1/2.54
+    
+#     fig, ax = plt.subplots(constrained_layout=True, 
+#                            figsize=(figsize[0]*cm_unit, figsize[1]*cm_unit))
+#     ax.matshow(np.real(HF), interpolation='none', cmap=cmap,  norm=norm)
+#     ax.set_title( r'$\mathrm{Real}\left\{ {H_{S}^{t_0}}_{n,m} \right\}$')
+#     ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+#       labeltop=False)  
+#     ax.set_xlabel('m')
+#     ax.set_ylabel('n', rotation=0, labelpad=10)
+#     # if axes_tick_pos:
+#     #     ax.set_xticks(axes_tick_pos)
+#     #     ax.set_yticks(axes_tick_pos)
+#     # if axes_tick_labels:
+#     #     ax.set_xticklabels(axes_tick_labels)
+#     #     ax.set_yticklabels(axes_tick_labels)
+    
+#     divider = make_axes_locatable(ax)
+#     cax = divider.append_axes('right', size=f"{colourbar_size_percentage}%", pad=colourbar_pad)
+
+#     # if colourbar_cmap_lims:
+#     #     new_norm = mpl.colors.Normalize(vmin=colourbar_cmap_lims[0], vmax=colourbar_cmap_lims[1])
+#     #     new_cmap = truncate_colormap(cmap, (colourbar_cmap_lims[0]-data_cmap_lims[0])/(data_cmap_lims[1] - data_cmap_lims[0]), (colourbar_cmap_lims[1]-data_cmap_lims[0])/(data_cmap_lims[1] - data_cmap_lims[0]))
+#     #     fig.colorbar(mpl.cm.ScalarMappable(norm=new_norm, cmap=new_cmap), cax=cax, ticks = colourbar_ticks)
+#     # else:
+#     #     fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax, ticks = colourbar_ticks)
+       
+#     if save_location:
+#       if save_location.as_posix().find("pdf") >=0:
+#         fig.savefig(save_location, format="pdf", bbox_inches="tight")
+#       elif save_location.as_posix().find("png")>=0:
+#         fig.savefig(save_location, format="png", bbox_inches="tight")
+
+#     plt.show()
+
+def PlotImagHamiltonian(HF, figsize=(3,3), colourbar_pad=0.4, colourbar_size_percentage=5, save_location = False, axes_tick_pos=False, axes_tick_labels=False, 
+                         data_cmap_lims = (-1,1), colourbar_cmap_lims=(-1,1),  colourbar_ticks = [0]):
+
+
+    norm = mpl.colors.Normalize(vmin=data_cmap_lims[0], vmax=data_cmap_lims[1])
+    # linthresh = 1e-1
+    # norm=mpl.colors.SymLogNorm(linthresh=linthresh, linscale=1, vmin=-1.0, vmax=1.0, base=10)
+    # 
+
+    cmap = LinearSegmentedColormap.from_list('custom hamiltonians', ['#006F63', "#FFFFFF", '#F78320'], N=256)
+
+    cm_unit = 1/2.54
+    fig, ax = plt.subplots(constrained_layout=True, 
+                           figsize=(figsize[0]*cm_unit, figsize[1]*cm_unit))
+    pcm = ax.matshow(np.imag(HF), interpolation='none', cmap=cmap,  norm=norm)
+    ax.set_title( r'$\mathrm{Imag}\left\{ {H_{S}^{t_0}}_{n,m} \right\}$')
+    ax.tick_params(axis="x", bottom=True, top=False, labelbottom=True, 
+      labeltop=False)  
+    ax.set_xlabel('m')
+
+    ax.set_ylabel('n', rotation=0, labelpad=10)
+    if bool(axes_tick_pos):
+        ax.set_xticks(axes_tick_pos)
+        ax.set_yticks(axes_tick_pos)
+    if bool(axes_tick_labels):
+        ax.set_xticklabels(axes_tick_labels)
+        ax.set_yticklabels(axes_tick_labels)
+
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('right', size=f"{colourbar_size_percentage}%", pad=colourbar_pad)
+
+    if bool(colourbar_cmap_lims):
+        new_norm = mpl.colors.Normalize(vmin=colourbar_cmap_lims[0], vmax=colourbar_cmap_lims[1])
+        new_cmap = truncate_colormap(cmap, (colourbar_cmap_lims[0]-data_cmap_lims[0])/(data_cmap_lims[1] - data_cmap_lims[0]), (colourbar_cmap_lims[1]-data_cmap_lims[0])/(data_cmap_lims[1] - data_cmap_lims[0]))
+        fig.colorbar(mpl.cm.ScalarMappable(norm=new_norm, cmap=new_cmap), cax=cax, ticks = colourbar_ticks)
+    else:
+        fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax, ticks = colourbar_ticks)
+
+
+    if bool(save_location):
+      if save_location.as_posix().find("pdf") >=0:
+        fig.savefig(save_location, format="pdf", bbox_inches="tight")
+      elif save_location.as_posix().find("png")>=0:
         fig.savefig(save_location, format="png", bbox_inches="tight")
 
     plt.show()
