@@ -7,7 +7,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import LinearSegmentedColormap
 from floquet_simulations.utilities import PhaseShiftBetweenPlusMinusPi
 
-def PlotParams(fontsize=12, font="stix"):
+def PlotParams(fontsize=10, font="stix"):
     # sns.set(style="darkgrid")
     # sns.set(rc={'axes.facecolor':'0.96'})
 

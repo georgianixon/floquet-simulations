@@ -1,3 +1,4 @@
+import numpy as np
 
 def MaxDeltas2(ns, num_gaps = 4):
     '''Each of the maximally differing successive pairs

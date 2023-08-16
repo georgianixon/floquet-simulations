@@ -720,26 +720,17 @@ def ListRatioLowerTriangle(a1, b1, a2, b2, a3, b3):
     
     if a1 <=1 and b1 <=1:
         if b1<=a1:  # b is smaller than a so b is y and a is x
-            lowerTriListX = a1
-            lowerTriListY = b1
+            return a1, b1
         else:       # a is smaller than b so a is y and b is x
-            lowerTriListX = b1
-            lowerTriListY = a1
-
+            return b1, a1
     elif a2 <= 1 and b2 <=1:
         if b2 <=a2:
-            lowerTriListX = a2 
-            lowerTriListY = b2
+            return a2, b2
         else:
-            lowerTriListX = b2
-            lowerTriListY = a2
+            return b2, a2
     
     elif a3 <=1 and b3 <=1:
         if b3 <=a3:
-            lowerTriListX = a3
-            lowerTriListY = b3
+            return a3,b3
         else:
-            lowerTriListX = b3
-            lowerTriListY = a3
-
-    return lowerTriListX, lowerTriListY
+            return b3,a3
