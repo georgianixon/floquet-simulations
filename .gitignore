@@ -4,3 +4,7 @@ src/__pycache__/
 *.pyc
 *.pdf
 *.csv
+*.gif
+*.png
+*.pdf
+*.Identifier
