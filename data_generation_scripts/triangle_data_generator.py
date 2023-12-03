@@ -16,12 +16,12 @@ from floquet_simulations.hamiltonians import CreateHFGeneral, ConvertComplex, Li
 from floquet_simulations.periodic_functions import Cosine
 import time
 
-alpha = 2
-beta = 3
+alpha = 1
+beta = 2
 omega0 = 8
 
-# a = np.linspace(0,2,21)
-
+def Mid(v1, v2, v3):
+   return v1+v2+v3 - np.max([v1, v2, v3])-np.min([v1, v2, v3])
 
 phi3_fracs = np.array([round(i, 2) for i in np.linspace(0,2,101)])
 
@@ -29,14 +29,13 @@ phi3_fracs = np.array([round(i, 2) for i in np.linspace(0,2,101)])
 
 
 
-df_dir = Path(__file__).absolute().parent.parent/"paper_data"/f"Heff_omega={omega0},alpha={alpha},beta={beta},A3=21,41<A2<42.csv"
-df_dir_save = Path(__file__).absolute().parent.parent/"paper_data"/f"Heff_omega={omega0},alpha={alpha},beta={beta},A3=21,41<A2<42.csv"
+df_dir = Path(__file__).absolute().parent.parent/"paper_data"/f"Heff_omega={omega0},alpha={alpha},beta={beta}.csv"
+df_dir_save = Path(__file__).absolute().parent.parent/"paper_data"/f"Heff_omega={omega0},alpha={alpha},beta={beta}.csv"
+
 print(df_dir)
 if not os.path.isfile(df_dir):
     dfN = pd.DataFrame(columns=["A2", "A3", "omega0", "alpha", "beta",  "phi3/pi",
                             "FT-J12", "FT-J23", "FT-J31", 
-                            # "HE-J12", "HE-J23", "HE-J31",
-                            # "HE-O1", "HE-O2", "HE-O3" 
                             "FT-LowerT.X",
 				                    "FT-LowerT.Y",
                                     "xi"
@@ -47,12 +46,6 @@ else:
                         converters={"FT-J12": ConvertComplex,
                                   "FT-J23": ConvertComplex,
                                   "FT-J31": ConvertComplex,
-                                  # "HE-J12": ConvertComplex,
-                                  # "HE-J23": ConvertComplex,
-                                  # "HE-J31": ConvertComplex,
-                                  # "HE-O1": ConvertComplex,
-                                  # "HE-O2": ConvertComplex,
-                                  # "HE-O3": ConvertComplex
                                     }
                        )
 
@@ -68,13 +61,6 @@ dfN = dfN.astype({'A2': np.float64,
                           "FT-J23":np.complex128,
                           "FT-J31":np.complex128,
 
-                        #   "HE-J12":np.complex128,
-                        #   "HE-J23":np.complex128,
-                        #   "HE-J31":np.complex128,
-                        #   "HE-O1":np.complex128,
-                        #   "HE-O2":np.complex128,
-                        #   "HE-O3":np.complex128
-
                         "FT-LowerT.X":np.float64,
 				                "FT-LowerT.Y":np.float64,
                                 "xi":np.float64
@@ -88,15 +74,19 @@ dfN = dfN.astype({'A2': np.float64,
 # A2s = np.append(np.linspace(0,18.5,1850+1), [round(jn_zeros(0,1)[0]*omega0, 6)])
 # A3s = np.linspace(37,38.5,150+1)
 
-lst1 = np.linspace(0,45,91)
+# lst1 = np.linspace(0,45,91)
 # lst2 = np.linspace(0,45,46)
 # lst2 = np.linspace(0.3, 44.3, 89)
 # A2s = np.array([round(i,2) for i in lst1 if i not in lst2])
 # A3s = lst1
-lst3 = np.linspace(45,70,51)
-lst2 = np.linspace(0,70,141)
+# lst3 = np.linspace(45,70,51)
+# lst2 = np.linspace(0,70,141)
 
-A2s = np.array([round(i,2) for i in lst2])
+lst1 = np.linspace(70.5, 100, 60)
+lst1 = lst1[lst1 <95.5]
+lst2 = np.linspace(0,100,201)
+
+A2s = np.array([round(i,2) for i in lst1])
 A3s = np.array([round(i,2) for i in lst2])
 
 # A2s = np.linspace(41.55, 41.7, 16)
@@ -140,41 +130,31 @@ for A2 in reversed(A2s):
         
             J12 = jv(0,A2/omega2)
             
-            # HF_FT = np.array([[0,np.conj(J12), J31], [J12, 0, np.conj(J23)], [np.conj(J31), J23, 0]])
-            HF_FT = np.array([[0,np.conj(J12), J31], [J12, 0, np.conj(J23)], [np.conj(J31), J23, 0]])
+            xi = np.angle(J12*J23*J31)
 
-            xi = np.angle(J12 + J23+ J31)
+            J_min = np.min([np.abs(J12), np.abs(J23), np.abs(J31)])
+            J_mid = Mid(np.abs(J12), np.abs(J23), np.abs(J31))
+            J_max = np.max([np.abs(J12), np.abs(J23), np.abs(J31)])
 
-            #full Hamiltonian evolution
-            # paramss = [[A2, omega2, 0, 0], [A3, omega3, phi3, 0]]
-            # _, HF = CreateHFGeneralLoopA(3, centres, funcs, paramss, T, 1)
-                
-                
-            J12_FT = HF_FT[1,0] 
-            J23_FT = HF_FT[2,1] 
-            J31_FT = HF_FT[0,2]
+            # J12_FT_abs = np.abs(J12)
+            # J23_FT_abs = np.abs(J23)
+            # J31_FT_abs = np.abs(J31)
 
-            J12_FT_abs = np.abs(J12_FT)
-            J23_FT_abs = np.abs(J23_FT)
-            J31_FT_abs = np.abs(J31_FT)
-
-            R1223_FT = J12_FT_abs/J23_FT_abs
-            R3123_FT = J31_FT_abs/J23_FT_abs
-            R3112_FT = J31_FT_abs/J12_FT_abs
-            R2312_FT = J23_FT_abs/J12_FT_abs
-            R1231_FT = J12_FT_abs/J31_FT_abs
-            R2331_FT = J23_FT_abs/J31_FT_abs   
+            # R1223_FT = J12_FT_abs/J23_FT_abs
+            # R3123_FT = J31_FT_abs/J23_FT_abs
+            # R3112_FT = J31_FT_abs/J12_FT_abs
+            # R2312_FT = J23_FT_abs/J12_FT_abs
+            # R1231_FT = J12_FT_abs/J31_FT_abs
+            # R2331_FT = J23_FT_abs/J31_FT_abs   
                     
-            lowerTriangle_X_FT, lowerTriangle_Y_FT = ListRatioLowerTriangle(R1223_FT, 
-                    R3123_FT, R2312_FT, R3112_FT, R1231_FT, R2331_FT)
+            # lowerTriangle_X_FT lowerTriangle_Y_FT = ListRatioLowerTriangle(R1223_FT, 
+            #         R3123_FT, R2312_FT, R3112_FT, R1231_FT, R2331_FT)
                 
 
             dfN.loc[i] = [f"{A2:.6f}", f"{A3:.6f}", np.float64(omega0), np.uint32(alpha), np.uint32(beta)
                           , np.float64(phi3_frac), 
-                          np.complex128(J12), np.complex128(J23), np.complex128(J31), 
-                        #   np.complex128(J12_Ham), np.complex128(J23_Ham), np.complex128(J31_Ham),
-                        #   np.complex128(O1), np.complex128(O2), np.complex128(O3),
-                        np.float64(lowerTriangle_X_FT), np.float64(lowerTriangle_Y_FT),
+                          np.complex128(J12), np.complex128(J23), np.complex128(J31),
+                        np.float64(J_mid/J_max), np.float64(J_min/J_max),
                         xi
                           ]
                 
@@ -199,12 +179,6 @@ for A2 in reversed(A2s):
                       "FT-J12":np.complex128,
                       "FT-J23":np.complex128,
                       "FT-J31":np.complex128,
-                    #  "HE-J12":np.complex128,
-                    #  "HE-J23":np.complex128,
-                    #  "HE-J31":np.complex128,
-                    #  "HE-O1":np.complex128,
-                    #  "HE-O2":np.complex128,
-                    #  "HE-O3":np.complex128
                     "FT-LowerT.X":np.float64,
                     "FT-LowerT.Y":np.float64,
                     "xi":np.float64
@@ -236,12 +210,6 @@ dfN = dfN.astype({
                       "FT-J12":np.complex128,
                       "FT-J23":np.complex128,
                       "FT-J31":np.complex128,
-                    #  "HE-J12":np.complex128,
-                    #  "HE-J23":np.complex128,
-                    #  "HE-J31":np.complex128,
-                    #  "HE-O1":np.complex128,
-                    #  "HE-O2":np.complex128,
-                    #  "HE-O3":np.complex128
                     "FT-LowerT.X":np.float64,
                     "FT-LowerT.Y":np.float64,
                     "xi":np.float64

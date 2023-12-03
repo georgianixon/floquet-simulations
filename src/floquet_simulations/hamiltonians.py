@@ -27,7 +27,7 @@ def GetEvalsAndEvecsGen(HF, fix_gauge=1):
     """
     
     # check if hermitian
-    if np.all(np.round(np.conj(HF.T),15)==np.round(HF,15)):
+    if np.all(np.round(np.conj(HF.T),12)==np.round(HF,12)):
         evals, evecs = eigh(HF) # evals are automatically real
     
     else:
@@ -38,17 +38,17 @@ def GetEvalsAndEvecsGen(HF, fix_gauge=1):
         evals = evals[idx]
         evecs = evecs[:,idx]
     
-    # all evecs have a gauge 
-    # make first element of evecs real and positive
-    if fix_gauge:
-        for vec in range(np.size(HF[0])):
-            
-            # Find first element of the first eigenvector that is not zero
-            firstNonZero = (evecs[:,vec]!=0).argmax()
-            #find the conjugate phase of this element
-            conjugatePhase = np.conj(evecs[firstNonZero,vec])/np.abs(evecs[firstNonZero,vec])
-            #multiply all elements by the conjugate phase
-            evecs[:,vec] = conjugatePhase*evecs[:,vec]
+        # all evecs have a gauge 
+        # make first element of evecs real and positive
+        if fix_gauge:
+            for vec in range(np.size(HF[0])):
+                
+                # Find first element of the first eigenvector that is not zero
+                firstNonZero = (evecs[:,vec]!=0).argmax()
+                #find the conjugate phase of this element
+                conjugatePhase = np.conj(evecs[firstNonZero,vec])/np.abs(evecs[firstNonZero,vec])
+                #multiply all elements by the conjugate phase
+                evecs[:,vec] = conjugatePhase*evecs[:,vec]
 
     # check that the evals are real
     
