@@ -89,16 +89,19 @@ real first_column_label_x = 3;
 real second_column_label_x = 16.9;
 real second_column_fig_x = 23.5;
 
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/epsilon_l(t).pdf"),(9,second_row_image_heightb));
-label("(b)", (first_column_label_x,second_row_label_height));
+pair b_image_loc = (9,-11.2);
+pair c_image_loc = (23,-10.4);
+pair d_image_loc = (9, - 24.7);
 
+//label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/epsilon_l(t).pdf"),(9,second_row_image_heightb));
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating.pdf"),b_image_loc);
+label("(b)", (first_column_label_x,second_row_label_height));
 
 
 
 // ################ third pic
 
-
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating.pdf"),(second_column_fig_x,second_row_image_heightc));
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/stroboscopic_ham.pdf"),c_image_loc);
 label("(c)", (second_column_label_x,second_row_label_height));
 
 
@@ -107,13 +110,67 @@ label("(c)", (second_column_label_x,second_row_label_height));
 real third_row_label_height = second_row_label_height - 13.5;
 real third_row_image_heightd = third_row_label_height - 6.4;
 real third_row_image_heighte = third_row_label_height - 7.1;
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/stroboscopic_ham.pdf"),(9,third_row_image_heightd));
+
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/tunnellings_alternating.pdf"),d_image_loc);
 label("(d)", (first_column_label_x,third_row_label_height));
 
 
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/tunnellings_alternating.pdf"),(second_column_fig_x,third_row_image_heighte));
+
 label("(e)", (second_column_label_x,third_row_label_height));
 
+
+real num_lines = 8;
+real line_x0 = 18.2;  // top left x0
+real line_y0 = -18.2;  // top left y0
+real line_space = 1.4;
+real line_y1 = line_y0 - num_lines*line_space;
+real line_x1 = line_x0 + num_lines*line_space;
+
+
+for (int i_d=0; i_d<=num_lines; ++i_d)
+{
+    draw((line_x0, line_y0-i_d*line_space) -- (line_x1, line_y0-i_d*line_space), p=linewidth(0.3pt));
+    draw((line_x0+i_d*line_space, line_y0) -- (line_x0+ i_d*line_space, line_y1),  p=linewidth(0.3pt));
+}
+
+
+pair centre = (line_x0 + 4*line_space,line_y0 - 4*line_space);
+dot(centre);
+for  (int i_d=-1; i_d<=1; i_d=i_d+2)
+{
+    //first dot
+    dot(centre + (0,i_d*line_space), p=rgb(colour1));
+    dot(centre + (i_d*line_space, 0), p=rgb(colour1));
+
+    // second dots
+    dot(centre+(-i_d*line_space,i_d*line_space), p=rgb(colour2));
+    dot(centre+(i_d*line_space,-i_d*line_space), p=rgb(colour2));
+    dot(centre+(-i_d*line_space,-i_d*line_space), p=rgb(colour2));
+    dot(centre+(i_d*line_space,i_d*line_space), p=rgb(colour2));
+    dot(centre+(i_d*2*line_space,0), p=rgb(colour2));
+    dot(centre+(-i_d*2*line_space,0), p=rgb(colour2));
+    dot(centre+(0,i_d*2*line_space), p=rgb(colour2));
+    dot(centre+(0,-i_d*2*line_space), p=rgb(colour2));
+
+    //third dots
+    dot(centre+(-i_d*2*line_space,i_d*line_space), p=rgb(colour3));
+    dot(centre+(-i_d*line_space,i_d*2*line_space), p=rgb(colour3));
+    dot(centre+(i_d*2*line_space,-i_d*line_space), p=rgb(colour3));
+    dot(centre+(i_d*line_space,-i_d*2*line_space), p=rgb(colour3));
+    dot(centre+(-i_d*2*line_space,-i_d*line_space), p=rgb(colour3));
+    dot(centre+(-i_d*line_space,-i_d*2*line_space), p=rgb(colour3));
+    dot(centre+(i_d*line_space,i_d*2*line_space), p=rgb(colour3));
+    dot(centre+(i_d*2*line_space,i_d*line_space), p=rgb(colour3));
+    dot(centre+(i_d*3*line_space,0), p=rgb(colour3));
+    dot(centre+(-i_d*3*line_space,0), p=rgb(colour3));
+    dot(centre+(0,i_d*3*line_space), p=rgb(colour3));
+    dot(centre+(0,-i_d*3*line_space), p=rgb(colour3));
+}
+
+pair label_shift = (0.6,0.4);
+label("$A_1$", centre+label_shift+(line_space,0),  p=rgb(colour1)+fontsize(5pt));
+label("$A_2$", centre+label_shift+(line_space, line_space),  p=rgb(colour2)+fontsize(5pt));
+label("$A_3$", centre+label_shift+(line_space, 2*line_space),  p=rgb(colour3)+fontsize(5pt));
 
 
 

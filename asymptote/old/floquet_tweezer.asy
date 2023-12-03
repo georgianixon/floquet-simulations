@@ -80,23 +80,22 @@ draw("$T$", origin +(2*pi, -1.3));
 //function
 real f(real t) { return (wave_amplitude)*sin(t-origin_x) + origin_y; }
 path g = graph(f, 0+origin_x, 2.4*pi+origin_x, n=200);
-draw(g, arrow=Arrow(TeXHead), p=rgb("1565C0")+linewidth(1pt));
+draw(g, arrow=Arrow(TeXHead), p=rgb("1565C0"));
 
-real second_row_label_height = -4.5;
-real image_height = -10.1;
-real third_row_label_height = second_row_label_height - 11;
+real second_row_label_height = -5.2;
+real image_height = -11.2;
 
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating_medium.pdf"),(9.8,image_height));
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating.pdf"),(7.2,image_height));
 label("(c)", (4,second_row_label_height));
 
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/stroboscopic_ham_medium.pdf"),(23.7,image_height+0.8));
-label("(d)", (17,second_row_label_height));
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/stroboscopic_ham.pdf"),(16.7,image_height+0.7));
+label("(d)", (12,second_row_label_height));
 
 
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/tunnellings_alternating_long.pdf"),(18,third_row_label_height-3.9));
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/tunnellings_alternating.pdf"),(26.6,image_height+1.8));
 
 
-label("(e)", (4,third_row_label_height));
+label("(e)", (22,second_row_label_height));
 
 
 

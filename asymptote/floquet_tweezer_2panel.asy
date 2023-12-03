@@ -19,7 +19,7 @@ string colour5 = "8E24AA";
 
 // ################## FIRST ONE
 real dot_separation_x = 3.2;
-real centre_dot_x = 17;
+real centre_dot_x = 16;
 
 // grey tweezer goes first to be behind
 real optical_tweez_height = 3.2;
@@ -89,38 +89,23 @@ real first_column_label_x = 3;
 real second_column_label_x = 16.9;
 real second_column_fig_x = 23.5;
 
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/epsilon_l(t).pdf"),(9,second_row_image_heightb));
-label("(b)", (first_column_label_x,second_row_label_height));
 
+pair b_label_loc = (3,-4.6);
+pair b_image_loc = (9.2,-11.7);
+pair c_image_loc = (23.2,-10.9);
+pair c_inset_image_loc = (20.9, -13.9);
+pair c_label_loc = (16.9,-4.6);
+
+//label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/epsilon_l(t).pdf"),(9,second_row_image_heightb));
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating.pdf"),b_image_loc);
+label("(b)", b_label_loc);
 
 
 
 // ################ third pic
 
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/stroboscopic_ham.pdf"),c_image_loc);
+label("(c)", c_label_loc);
+label(scale(0.6)*graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/tunnellings_alternating_inset.pdf"),c_inset_image_loc);
 
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating.pdf"),(second_column_fig_x,second_row_image_heightc));
-label("(c)", (second_column_label_x,second_row_label_height));
-
-
-
-// ################ last row
-real third_row_label_height = second_row_label_height - 13.5;
-real third_row_image_heightd = third_row_label_height - 6.4;
-real third_row_image_heighte = third_row_label_height - 7.1;
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/stroboscopic_ham.pdf"),(9,third_row_image_heightd));
-label("(d)", (first_column_label_x,third_row_label_height));
-
-
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/tunnellings_alternating.pdf"),(second_column_fig_x,third_row_image_heighte));
-label("(e)", (second_column_label_x,third_row_label_height));
-
-
-
-
-// real figb_lineheight = -7;
-// real figb_first_arrow_x = 6;
-// real figb_second_arrow_x = 11;
-// real figb_arrow_height = 8;
-// draw((figb_first_arrow_x,figb_lineheight) -- (figb_first_arrow_x, figb_lineheight+figb_arrow_height), p=rgb(colour1)+linewidth(0.7pt), arrow=ArcArrow(SimpleHead, size=3.5));
-// draw((figb_second_arrow_x,figb_lineheight) -- (figb_second_arrow_x,figb_lineheight-figb_arrow_height), p=rgb(colour1)+linewidth(0.7pt), arrow=ArcArrow(SimpleHead, size=3.5));
 
