@@ -1,5 +1,8 @@
-settings.outformat = "pdf";
+settings.outformat = "png";
+settings.render=10;
 defaultpen(fontsize(9pt));
+//defaultpen(arrowsize(9));
+//defaultpen(arrowsize(5bp));
 unitsize(3mm);
 settings.tex="pdflatex" ;
 
@@ -8,94 +11,116 @@ import graph;
 //size(7cm);
 
 //-0.37242316  0.85520254 -0.51623059  1.        
-
-string colour1 = "C30934";
-string colour2 = "1565C0";
+string colour1 = "1565C0";
+string colour2 = "C30934";
 string colour3 = "006F63";
+string colour4 = "F57F17";
+string colour5 = "8E24AA";
 
+// ################## FIRST ONE
+real dot_separation_x = 3.2;
+real centre_dot_x = 17;
 
 // grey tweezer goes first to be behind
 real optical_tweez_height = 3.2;
 real optical_tweez_width_min = 0.5;
 real optical_tweez_width_max = 1.7;
-fill((12 - optical_tweez_width_min,0){up} .. (12 - optical_tweez_width_max,optical_tweez_height) -- (12 + optical_tweez_width_max,optical_tweez_height) .. (12+optical_tweez_width_min,0){down} .. (12+optical_tweez_width_max,-optical_tweez_height) -- (12 - optical_tweez_width_max, -optical_tweez_height) .. cycle, mediumgray);
+fill((centre_dot_x - optical_tweez_width_min,0){up} .. (centre_dot_x - optical_tweez_width_max,optical_tweez_height) -- (centre_dot_x + optical_tweez_width_max,optical_tweez_height) .. (centre_dot_x+optical_tweez_width_min,0){down} .. (centre_dot_x+optical_tweez_width_max,-optical_tweez_height) -- (centre_dot_x - optical_tweez_width_max, -optical_tweez_height) .. cycle, p=rgb("BBDDFA"));
 
-// ################## FIRST ONE
-label("(a)", (4,4.2));
+
+label("(a)", (3,3.4));
 //shakes
-real large_shake_height = 1.6;
-// draw((0,large_shake_height) -- (0,-large_shake_height), p=rgb("C30934")+linewidth(1pt), arrow=ArcArrows());
-draw((6,large_shake_height) -- (6,-large_shake_height ), p=rgb(colour1)+linewidth(1pt), arrow=ArcArrows());
-draw((12,large_shake_height) -- (12,-large_shake_height), p=rgb(colour2)+linewidth(1pt), arrow=ArcArrows());
-draw((18,large_shake_height) -- (18,-large_shake_height), p=rgb(colour3)+linewidth(1pt), arrow=ArcArrows());
-
+real first_shake_height = 1.1;
+real shake_height_increase = 1.2;
+real arrow_head_size_decrease = 1;
 //dots
 // dot((0,0));
-dot((6,0));
-dot((12,-1));
-dot((18,0));
+//dot((centre_dot_x - 7*dot_separation_x,0));
+int num_dots_onside = 3;
+dot((centre_dot_x,0));
 
-// e_i bit
-label("$\epsilon_l(t)$", (14.7,-0.8));
-draw((13,0) -- (13,-1), bar=Bars);
+for (int i_d=1; i_d<=num_dots_onside; ++i_d)
+{
+ dot((centre_dot_x - i_d*dot_separation_x,0));
+ dot((centre_dot_x + i_d*dot_separation_x,0));
+}
+draw((centre_dot_x-(num_dots_onside+1)*dot_separation_x, 0)--(centre_dot_x+(num_dots_onside+1)*dot_separation_x,0));
 
-//tunnelling black curves
+// arrow shakes
+real first_dot_x = centre_dot_x + num_dots_onside*dot_separation_x;
+for (int i_d=0; i_d<=num_dots_onside*2; ++i_d)
+{
+    if(i_d %2== 1) {
+        draw((first_dot_x - i_d*dot_separation_x,0) -- (first_dot_x - i_d*dot_separation_x,-first_shake_height*shake_height_increase^i_d), p=rgb(colour1)+linewidth(0.7pt)+linetype("2 2"), arrow=ArcArrow(SimpleHead, size=3.5*arrow_head_size_decrease^i_d));
+        draw((first_dot_x - i_d*dot_separation_x,0) -- (first_dot_x - i_d*dot_separation_x,+first_shake_height*shake_height_increase^i_d), p=rgb(colour1)+linewidth(0.7pt), arrow=ArcArrow(SimpleHead, size=3.5*arrow_head_size_decrease^i_d));
 
-real tunnelling_line_height = 0.2;
-real tunnelling_curve_height = 1;
-real tunnelling_curve_space_to_dot = 0.4;
-// draw((tunnelling_curve_space_to_dot,tunnelling_line_height) .. (3,tunnelling_line_height+tunnelling_curve_height) .. (6 - tunnelling_curve_space_to_dot,tunnelling_line_height));
-draw((6 + tunnelling_curve_space_to_dot,tunnelling_line_height) .. (9,tunnelling_line_height+tunnelling_curve_height) .. (12 - tunnelling_curve_space_to_dot,tunnelling_line_height));
-draw((12 + tunnelling_curve_space_to_dot,tunnelling_line_height) .. (15,tunnelling_line_height+tunnelling_curve_height) .. (18 - tunnelling_curve_space_to_dot,tunnelling_line_height));
+    } else {
+        draw((first_dot_x - i_d*dot_separation_x,0) -- (first_dot_x - i_d*dot_separation_x,-first_shake_height*shake_height_increase^i_d), p=rgb(colour1)+linewidth(0.7pt), arrow=ArcArrow(SimpleHead, size=3.5*arrow_head_size_decrease^i_d));
+        draw((first_dot_x - i_d*dot_separation_x,0) -- (first_dot_x - i_d*dot_separation_x,+first_shake_height*shake_height_increase^i_d), p=rgb(colour1)+linewidth(0.7pt)+linetype("2 2"), arrow=ArcArrow(SimpleHead, size=3.5*arrow_head_size_decrease^i_d));
+    }
+}
 
-real label_height = 1.9;
-// label("$J_0$", (2.9,label_height) );
-label("$J_0$", (8.9,label_height));
-label("$J_0$", (14.9,label_height));
-
-real A_vals_height = 2.4;
-// label("$A_1$", (-1, A_vals_height), p=rgb("C30934"));
-label("$A_{l-1}$", (5, A_vals_height), p=rgb(colour1));
-label("$A_l$", (11, A_vals_height), p=rgb(colour2));
-label("$A_{l+1}$", (17, A_vals_height), p=rgb(colour3));
-
-
-// ################## second time-depenent pic
-label("(b)", (20,4.2));
-real origin_x = 23;
-real origin_y = -1;
-pair origin = (origin_x,origin_y);
-real wave_amplitude = 2;
-
-// axes
-draw(origin -- origin + (0,3.7), arrow=Arrow(TeXHead));
-draw(origin -- origin + (2.4*pi,0), arrow=Arrow(TeXHead));
-label("$t$", origin + (2.4*pi+0.3,-0.4));
-label("$\epsilon_l(t)$", origin +(-1.5, 3.7));
-draw(origin + (0,wave_amplitude) -- origin +(-0.3, wave_amplitude));
-label("$A_l$", origin + (-1.3, wave_amplitude), p=rgb(colour2));
-draw(origin + (2*pi, 0) -- origin + (2*pi, -0.3));
-draw("$T$", origin +(2*pi, -1.3));
-
-//function
-real f(real t) { return (wave_amplitude)*sin(t-origin_x) + origin_y; }
-path g = graph(f, 0+origin_x, 2.4*pi+origin_x, n=200);
-draw(g, arrow=Arrow(TeXHead), p=rgb("1565C0"));
-
-real second_row_label_height = -5.2;
-real image_height = -11.2;
-
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating.pdf"),(7.2,image_height));
-label("(c)", (4,second_row_label_height));
-
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/stroboscopic_ham.pdf"),(16.7,image_height+0.7));
-label("(d)", (12,second_row_label_height));
+// Al labels being alternating
+// epsilon bar
 
 
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/tunnellings_alternating.pdf"),(26.6,image_height+1.8));
+// e_i 
+draw((centre_dot_x+0.45,0) -- (centre_dot_x+0.45,-first_shake_height*shake_height_increase^3),p=linewidth(0.8pt),bar=Bars(size=3));
+label("$\epsilon_l(t)$", (centre_dot_x+1.75,-1.55));
+
+//J_0 label
+label("$J_0$", (centre_dot_x - dot_separation_x*2.5, 0.6));
+
+real A_vals_height = first_shake_height*shake_height_increase^4+1;
+
+label("$A_{l-3}$", (centre_dot_x - 3*dot_separation_x-1.5, -first_shake_height*shake_height_increase^4-0.5));
+label("$A_{l-2}$", (centre_dot_x - 2*dot_separation_x, first_shake_height*shake_height_increase^5+0.5));
+label("$A_{l-1}$", (centre_dot_x - dot_separation_x, -first_shake_height*shake_height_increase^4-0.5));
+label("$A_{l}$", (centre_dot_x, first_shake_height*shake_height_increase^3+0.5));
+label("$A_{l+1}$", (centre_dot_x+ dot_separation_x+1.2, -first_shake_height*shake_height_increase^2-0.5));
+label("$A_{l+2}$", (centre_dot_x+2*dot_separation_x+0.3, first_shake_height*shake_height_increase+0.6));
+label("$A_{l+3}$", (centre_dot_x+3*dot_separation_x+1, -first_shake_height-0.5));
+
+// ################## second time-dependent pic
+real second_row_label_height = -4.1;
+real second_row_image_heightb = second_row_label_height-6.2;
+real second_row_image_heightc = second_row_label_height-6.65;
+real first_column_label_x = 3;
+real second_column_label_x = 16.9;
+real second_column_fig_x = 23.5;
+
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/epsilon_l(t).pdf"),(9,second_row_image_heightb));
+label("(b)", (first_column_label_x,second_row_label_height));
 
 
-label("(e)", (22,second_row_label_height));
 
 
+// ################ third pic
+
+
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating.pdf"),(second_column_fig_x,second_row_image_heightc));
+label("(c)", (second_column_label_x,second_row_label_height));
+
+
+
+// ################ last row
+real third_row_label_height = second_row_label_height - 13.5;
+real third_row_image_heightd = third_row_label_height - 6.4;
+real third_row_image_heighte = third_row_label_height - 7.1;
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/stroboscopic_ham.pdf"),(9,third_row_image_heightd));
+label("(d)", (first_column_label_x,third_row_label_height));
+
+
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/tunnellings_alternating.pdf"),(second_column_fig_x,third_row_image_heighte));
+label("(e)", (second_column_label_x,third_row_label_height));
+
+
+
+
+// real figb_lineheight = -7;
+// real figb_first_arrow_x = 6;
+// real figb_second_arrow_x = 11;
+// real figb_arrow_height = 8;
+// draw((figb_first_arrow_x,figb_lineheight) -- (figb_first_arrow_x, figb_lineheight+figb_arrow_height), p=rgb(colour1)+linewidth(0.7pt), arrow=ArcArrow(SimpleHead, size=3.5));
+// draw((figb_second_arrow_x,figb_lineheight) -- (figb_second_arrow_x,figb_lineheight-figb_arrow_height), p=rgb(colour1)+linewidth(0.7pt), arrow=ArcArrow(SimpleHead, size=3.5));
 

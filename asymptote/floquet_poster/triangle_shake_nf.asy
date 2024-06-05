@@ -1,4 +1,5 @@
-settings.outformat = "pdf";
+settings.outformat = "png";
+settings.render = 20;
 defaultpen(fontsize(10pt));
 unitsize(3mm);
 
@@ -10,20 +11,17 @@ string colour5 = "0F1980"; //purple
 
 // ###################### First Triangle
 //shaking arrows
-real arrow_height2 = 1.9;
-real arrow_height3 = 1.6;
+real arrow_height2 = 1.4;
+real arrow_height3 = 1.9;
 
 draw((0,0) -- (0,arrow_height2), p=rgb(colour5)+linewidth(1pt), arrow=ArcArrow(SimpleHead, size=5));
 draw((0,0) -- (0,-arrow_height2), p=rgb(colour5)+linewidth(1pt)+linetype("2 2"), arrow=ArcArrow(SimpleHead, size=5));
 
 
-// draw((5,1.4) -- (5,-1.4), p=rgb(colour1)+linewidth(1pt), arrow=ArcArrows());
-// draw((5,0.5) -- (5,-0.5), p=rgb(colour1)+linewidth(4pt));
 
-draw((5,0) -- (5,arrow_height3), p=rgb(colour1)+linewidth(1.6pt)+linetype("1 2"), arrow=ArcArrow(SimpleHead, size=4));
-draw((5,0) -- (5,-arrow_height3), p=rgb(colour1)+linewidth(1.6pt), arrow=ArcArrow(SimpleHead, size=4));
+draw((5,0) -- (5,arrow_height3), p=rgb(colour1)+linewidth(2.5pt)+linetype("1 2"), arrow=ArcArrow(SimpleHead, size=4));
+draw((5,0) -- (5,-arrow_height3), p=rgb(colour1)+linewidth(2.5pt), arrow=ArcArrow(SimpleHead, size=4));
 
-// draw((i_d*5,0) -- (i_d*5,-arrow_height), p=rgb(colour5)+linewidth(0.9pt)+linetype("2 2"), arrow=ArcArrow(SimpleHead, size=4));
 
 // red hopping
 real line_gap = 0.6;
@@ -46,8 +44,6 @@ label("$J$", (2.5,0)-label_gap*(0,1));
 
 //a label
 pair label_loc = (-1.5, 5.4);
-label("(a)", label_loc);
-
 //site labels
 label("$1$", 5*(0.5, Sin(60))+(0,1));
 label("$3$", 5*(1, 0)+(1,0));
@@ -78,8 +74,7 @@ label("$J_{31}$", 2.5*(Cos(60),Sin(60))+label_gap*(Cos(150),Sin(150))+ triangle_
 label("$J_{12}$", (5,0)+2.5*(Cos(120),Sin(120))+label_gap*(Cos(30), Sin(30))+ triangle_shift, p=rgb(colour4));
 label("$J_{23}$", (2.5,0)-label_gap*(0,1)+ triangle_shift+(0,0.7), p=rgb(colour2));
 
-//b label
-label("(b)", label_loc+triangle_shift);
+
 
 // flux label
 pair tri_centre = (2.5, 1.75);

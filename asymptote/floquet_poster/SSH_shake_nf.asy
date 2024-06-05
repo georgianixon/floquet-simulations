@@ -1,4 +1,5 @@
-settings.outformat = "pdf";
+settings.outformat = "png";
+settings.render = 20;
 defaultpen(fontsize(10pt));
 unitsize(3mm);
 //size(7cm);
@@ -11,7 +12,7 @@ string colour5 = "0F1980"; //purple
 
 // ################## FIRST ONE
 pair label_loc = (-2,2.4);
-label("(a)", label_loc);
+
 //shakes
 real large_shake_height = 2;
 real small_shake_height = 1.4;
@@ -21,6 +22,8 @@ real arrow_height = 1.9;
 draw((10,0) -- (10,arrow_height), p=rgb(colour3)+linewidth(0.9pt)+linetype("2 2"), arrow=ArcArrow(SimpleHead, size=4));
 draw((10,0) -- (10,-arrow_height), p=rgb(colour3)+linewidth(0.9pt), arrow=ArcArrow(SimpleHead, size=4));
 
+
+// draw shakes
 for (int i_d=0; i_d<=4; ++i_d)
 {
     if(i_d %4== 0) {
@@ -71,7 +74,7 @@ label("$J$", (17.5, y_j_label), black);
 
 real y_fig_shift = -6;
 pair fig_shift = (0,y_fig_shift);
-label("(b)", label_loc+fig_shift);
+
 
 // dots
 //dots

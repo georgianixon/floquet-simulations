@@ -361,14 +361,14 @@ draw(legend2_loc + legend2_loc_second_row_shift - 3*legend_gaps -- legend2_loc +
 
 
 pair legend2_Jloc = legend2_loc + (1.8,0);
-label("$J_1$", legend2_Jloc);
-label("$J_2$", legend2_Jloc - legend_gaps);
-label("$J_3$", legend2_Jloc - 2*legend_gaps);
-label("$J_4$", legend2_Jloc - 3*legend_gaps);
-label("$J_5$", legend2_Jloc + legend2_loc_second_row_shift - 0*legend_gaps);
-label("$J_6$", legend2_Jloc + legend2_loc_second_row_shift - 1*legend_gaps);
-label("$J_7$", legend2_Jloc + legend2_loc_second_row_shift - 2*legend_gaps);
-label("$J_8$", legend2_Jloc + legend2_loc_second_row_shift - 3*legend_gaps);
+label("$\kappa_1$", legend2_Jloc);
+label("$\kappa_2$", legend2_Jloc - legend_gaps);
+label("$\kappa_3$", legend2_Jloc - 2*legend_gaps);
+label("$\kappa_4$", legend2_Jloc - 3*legend_gaps);
+label("$\kappa_5$", legend2_Jloc + legend2_loc_second_row_shift - 0*legend_gaps);
+label("$\kappa_6$", legend2_Jloc + legend2_loc_second_row_shift - 1*legend_gaps);
+label("$\kappa_7$", legend2_Jloc + legend2_loc_second_row_shift - 2*legend_gaps);
+label("$\kappa_8$", legend2_Jloc + legend2_loc_second_row_shift - 3*legend_gaps);
 
 
 pair brace_loc = legend2_Jloc + (0.8,0);

@@ -7,29 +7,57 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import LinearSegmentedColormap
 from floquet_simulations.utilities import PhaseShiftBetweenPlusMinusPi
 
-def PlotParams(fontsize=10, font="stix"):
+def PlotParams(fontsize=10, serif_font="charter", mathtext_font="stix"): 
     # sns.set(style="darkgrid")
     # sns.set(rc={'axes.facecolor':'0.96'})
 
+  # settings are for thesis
     params = {
-              'legend.fontsize': fontsize,
+
+              'legend.fontsize': fontsize*0.7,
               'axes.labelsize': fontsize,
               'axes.titlesize': fontsize,
               'xtick.labelsize': fontsize*0.9,
               'ytick.labelsize': fontsize*0.9,
               'font.size': fontsize,
+
               'xtick.bottom':True,
-              'xtick.top':False,
+              'xtick.top':True,
               'ytick.left': True,
-              'ytick.right':False,
+              'ytick.right':True,
+              "xtick.direction": "in",
+              "ytick.direction":"out", # because you dont want legend out
+              "xtick.labeltop":False,
+              "xtick.labelbottom":True,
+              "ytick.labelleft":True,
+              "ytick.labelright":False,
+              "xtick.major.pad":2,
+              "xtick.minor.pad":2,
+              "ytick.major.pad":2,
+              "ytick.minor.pad":2,
+              "xtick.major.size":3,
+              "ytick.major.size":3,
+
+              "xtick.major.top":False,   # draw x axis top major ticks
+              "xtick.major.bottom":  True,    # draw x axis bottom major ticks
+              "ytick.major.left":True,   # draw x axis top major ticks
+               "ytick.major.right":  False,    # draw x axis bottom major ticks
+                #xtick.minor.top:     True    # draw x axis top minor ticks
+                #xtick.minor.bottom:  True    # draw x axis bottom minor ticks
 
   
               'xtick.minor.visible': False,
               'axes.grid':False,
-              'font.family' : 'STIXGeneral',#"sans-serif",#"Arial"#
-              "font.sans-serif":"stix",#"Arial",
-               'mathtext.fontset':"stix",#"Arial"#'stix'
+
                "text.usetex": True,
+              'font.family' : "serif",#'STIXGeneral',#"sans-serif",#"Arial"#    # this is for non math fonts
+            "font.serif": serif_font,
+            "mathtext.fontset": mathtext_font,# "dejavusans",  # Should be 'dejavusans' (default),
+                               # 'dejavuserif', 'cm' (Computer Modern), 'stix',
+                               # 'stixsans' or 'custom'
+            "axes.formatter.use_mathtext": True,
+
+            #   "font.sans-serif": "Computer Modern Roman",#"stix",#"Arial",
 
               #  'grid.alpha': 1,
               # 'grid.color': "0.9"
@@ -50,6 +78,9 @@ def PlotParams(fontsize=10, font="stix"):
             #             "axes.linewidth":1.25,
               }
     
+
+
+
     mpl.rcParams.update(params)
     plt.rc('text.latex', preamble=r'\usepackage{amsmath,nicefrac,xfrac}')
 
