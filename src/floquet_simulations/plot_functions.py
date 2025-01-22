@@ -7,14 +7,21 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import LinearSegmentedColormap
 from floquet_simulations.utilities import PhaseShiftBetweenPlusMinusPi
 
-def PlotParams(fontsize=10, serif_font="charter", mathtext_font="stix"): 
+def PlotParams(fontsize=10, serif_font="charter", mathtext_font="cm"): 
     # sns.set(style="darkgrid")
     # sns.set(rc={'axes.facecolor':'0.96'})
-
-  # settings are for thesis
+    """
+    Mathtext fonts: (see https://matplotlib.org/stable/users/explain/text/mathtext.html)
+    dejavusans: DejaVu Sans
+    dejavuserif: DejaVu Serif
+    cm: Computer Modern (TeX)
+    stix: STIX (designed to blend well with Times)
+    stixsans: STIX sans
+    """
+    # settings are for thesis
     params = {
 
-              'legend.fontsize': fontsize*0.7,
+              'legend.fontsize': fontsize*0.9,
               'axes.labelsize': fontsize,
               'axes.titlesize': fontsize,
               'xtick.labelsize': fontsize*0.9,

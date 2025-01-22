@@ -1,7 +1,7 @@
 // settings.outformat = "pdf";
 
-settings.outformat = "png";
-settings.render=10;
+settings.outformat = "pdf";
+// settings.render=10;
 
 defaultpen(fontsize(9pt));
 
@@ -46,6 +46,24 @@ string colour14 = "#FEA764";
 string colour15 = "#FFCB30";
 string colour16 = "#FCF519";
 string colour17 = "#9EFF66";
+
+string colour1 = "#00202e";
+string colour2 = "#2c4875";
+string colour3 = "#58508d";
+string colour4 = "#8a508f";
+string colour5 = "#bc5090";
+string colour6 = "#de5a79";
+string colour7 = "#ff6361";
+string colour8 = "#ff8531";
+string colour9 = "#ffa600";
+string colour10 = "#80d353";
+string colour11 = "#609f3f";
+string colour12 = "#406a2a";
+string colour13 = '#2E788F';
+string colour14 = "#374899";
+string colour15 = "#9933FF";
+string colour16 = "#FF40F9";
+string colour17 = "#FF458C";
 
 // // DOTS
 real dot_spacing = 3;
@@ -194,19 +212,19 @@ draw(circle(dot_spacing*(4,8),dot_spacing*circle_size), p=rgb(circle_colour));
 draw(circle(dot_spacing*(8,4),dot_spacing*circle_size), p=rgb(circle_colour));
 
 
-real b_c_label_x_coord = 11;
-real b_c_fig_x_coord = 14.3;
-real a_b_label_y_coord = 10.4;
+real b_c_label_x_coord = 10.6;
+real b_c_fig_x_coord = 10.75;
+real a_b_label_y_coord = 10.6;
 
 pair b_label_loc = dot_spacing*(b_c_label_x_coord,a_b_label_y_coord);
-pair b_fig_loc = dot_spacing*(b_c_fig_x_coord+0.1,7.6);
-pair a_label_loc = dot_spacing*(-1.3,a_b_label_y_coord);
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating_2D.pdf"),b_fig_loc);
-label("(b)", b_label_loc);
-label("(a)", a_label_loc);
+pair b_fig_loc = dot_spacing*(b_c_fig_x_coord,10.4);
+pair a_label_loc = dot_spacing*(-1.5,a_b_label_y_coord);
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/a_vals_alternating_2D.pdf"),b_fig_loc, SE);
+label("(b)", b_label_loc, SE);
+label("(a)", a_label_loc, SE);
 
 
-pair c_label_loc = dot_spacing*(b_c_label_x_coord,4.5);
-pair c_fig_loc = dot_spacing*(b_c_fig_x_coord, 1.9);
-label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/linear_tunnelling_2D.pdf"),c_fig_loc);
-label("(c)", c_label_loc);
+pair c_label_loc = dot_spacing*(b_c_label_x_coord,4.9);
+pair c_fig_loc = dot_spacing*(b_c_fig_x_coord, 4.65);
+label(graphic("/home/gnixon/floquet-simulations/figures/black_hole_paper/linear_tunnelling_2D.pdf"),c_fig_loc, SE);
+label("(c)", c_label_loc, SE);

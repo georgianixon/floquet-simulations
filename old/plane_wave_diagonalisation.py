@@ -189,28 +189,3 @@ plt.show()
 #    Red}, {Thickness[0.01], Gray}, {Thickness[0.01], Dashed, 
 #    Lighter[Gray]}}]
   
-#%%
-import matplotlib
-import seaborn as sns
-matplotlib.rcParams['mathtext.fontset'] = 'cm' #latex style, cm?
-matplotlib.rcParams['mathtext.fontset'] = 'stix'
-sns.set(style="darkgrid")
-#matplotlib.rcParams["font.size"]=10
-sns.set(rc={'axes.facecolor':'0.96'})
-font = {'family' : 'STIXGeneral', 
-        'size'   : 10}
-size=10
-params = {
-            'legend.fontsize': 'small',
-#          'figure.figsize': (20,8),
-          'axes.labelsize': size,
-          'axes.titlesize': size,
-          'xtick.labelsize': size*0.75,
-          'ytick.labelsize': size*0.75,
-          'font.size': size,
-          'font.family': 'STIXGeneral'
-#          'axes.titlepad': 25
-          }
-matplotlib.rcParams.update(params)
-#matplotlib.rc('font', **font)
-

@@ -527,7 +527,7 @@ def SolveSchrodinger(form, rtol, N, centre, a, omega, phi, tspan, nTimesteps, ps
 def SolveSchrodingerTimeIndependent(hamiltonian, tspan, nTimesteps, psi0):
     t_eval = np.linspace(tspan[0], tspan[1], nTimesteps+1, endpoint=True)
     #diagonalise hamiltonian
-    evals, evecs = GetEvalsAndEvecsGen(hamiltonian)
+    evals, evecs = eigh(hamiltonian)
     coeffs =  np.dot(np.conj(evecs.T), psi0)
     sol = [np.dot(evecs, coeffs*exp(-1j*evals*t)) for t in t_eval]
     sol = np.vstack(sol).T
